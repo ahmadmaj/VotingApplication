@@ -1,0 +1,12 @@
+﻿humanPlayers: 2
+totalPlayers: 3
+candidates: 4
+votesPlayer: 5
+turns: 15
+playersType: human human computer
+agents: 1
+C:\Users\Lena\Documents\Visual Studio 2013\Projects\VotingApplication\Server\agent.txt
+candidatesNames: name1 name2 name3 name4
+points: 100 75 50 25
+priorities: 
+C:\Users\Lena\Documents\Visual Studio 2013\Projects\VotingApplication\Server\priority.txt

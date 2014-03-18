@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+    <script src="Scripts/jquery-2.1.0.min.js"></script>
+    <script src="Scripts/jquery-ui-1.10.4.min.js"></script>
+
+    <button id="b">change</button>
+    <img id="1" src="images/user1.png" />
+
+    <script>
+        function count() {
+            var sec = 5;
+            while (sec > 0)
+                sec--;
+            $('#b').trigger("click")
+        };
+    </script>
+    <script>
+        
+        $('#b').click(function () {
+            $('#1').attr('src', "images/user1_default.png");
+        });
+        count();
+    </script>
+</body>
+</html>
