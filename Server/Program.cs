@@ -22,7 +22,7 @@ namespace Server
         public static string first = "";
         static void Main(string[] args)
         {
-            string url = "http://localhost:8080";
+            string url = "http://132.72.23.212:9090";
             using (WebApp.Start(url))
             {
                 Console.WriteLine("Server running on {0}", url);
@@ -44,7 +44,12 @@ namespace Server
                 //        }
                 //    }
                 //}
-                gameDetails = readConfigFile("C://Users//lena//Documents//Visual Studio 2013//Projects//VotingApplication//Server//configFile2_check.txt");
+                string curpath = Directory.GetCurrentDirectory();
+                if (args.Length > 2)
+                    gameDetails = readConfigFile(curpath + args[1]);
+                else
+                    gameDetails = readConfigFile(curpath + "\\configFile2_check.txt");
+                //gameDetails = readConfigFile("C://Users//lena//Documents//Visual Studio 2013//Projects//VotingApplication//Server//configFile2_check.txt");
                 init = 1;
 
                 file = new WriteData();
@@ -54,18 +59,15 @@ namespace Server
         }
 
         //// **** file format ****
-        //  participants: <participants in experiment>
-        //  humanPlayers: <human palyers in a game>
-        //  totalPlayers: <total palyers in a game>
-        //  candidates: <candidates in a game>
-        //  votesPlayer: <votes per player>
-        //  turns: <turns>
-        //  playersType: <player type> <player type> ..
+        //  number_of_players: <number>
+        //  number_of_candidates: <number>
+        //  players_order: <human/computer>
+        //  number_of_rounds: <number>
         //  agents: <number of agent files>
-        //  <path>
+        //  <agent type> <path>
         //  ...
-        //  <path>
-        //  candidatesNames: <candidate1 name> <candidate2 name> ....
+        //  <agent type> <path>
+        //  candidates_names: <candidate1 name> <candidate2 name> ....
         //  points: <1st priority points> <2st priority points> ..
         //  priorities: 
         //  <path>
@@ -76,94 +78,72 @@ namespace Server
             try
             {
                 StreamReader sr = new StreamReader(file);
-                //int participants = -1;
-                int numofhumanplayers = -1;
-                int numoftotalplayers = -1;
-                int candidates = -1;
-                int votes = -1;
-                int turns = -1;
-                Boolean rounds = false;
-                
-
-                //string nextLine = sr.ReadLine();
-                //string[] line = nextLine.Split(' ');
-                //if (line[0] == "participants:")
-                //    participants = Convert.ToInt32(line[1]);
-                //else
-                //{
-                //    Console.WriteLine("error while reading the file - participants");
-                //    return null;
-                //}
-
+              
+                //number_of_players
+                int numOfPlayers = -1;
                 string nextLine = sr.ReadLine();
                 string[] line = nextLine.Split(' ');
-                if (line[0] == "humanPlayers:")
-                    numofhumanplayers = Convert.ToInt32(line[1]);
+                if (line[0] == "number_of_players:")
+                    numOfPlayers = Convert.ToInt32(line[1]);
                 else
                 {
-                    Console.WriteLine("error while reading the file - humanPlayers");
+                    Console.WriteLine("error while reading the file - number_of_players");
                     return null;
                 }
 
+                //number_of_candidates
+                int numberOfCandidates = -1;
                 nextLine = sr.ReadLine();
                 line = nextLine.Split(' ');
-                if (line[0] == "totalPlayers:")
-                    numoftotalplayers = Convert.ToInt32(line[1]);
+                if (line[0] == "number_of_candidates:")
+                    numberOfCandidates = Convert.ToInt32(line[1]);
                 else
                 {
-                    Console.WriteLine("error while reading the file - totalPlayers");
+                    Console.WriteLine("error while reading the file - number_of_candidates");
                     return null;
                 }
 
+                //players_order
+                List<string> playersOrder = new List<string>();
                 nextLine = sr.ReadLine();
                 line = nextLine.Split(' ');
-                if (line[0] == "candidates:")
-                    candidates = Convert.ToInt32(line[1]);
+                if (line[0] == "players_order:")
+                {
+                    for (int i = 1; i < numOfPlayers + 1; i++)
+                    {
+                        playersOrder.Add(line[i]);
+                    }
+                }
                 else
                 {
-                    Console.WriteLine("error while reading the file - candidates");
+                    Console.WriteLine("error while reading the file - players_order");
                     return null;
                 }
 
+                //number_of_rounds
+                int numOfRounds = -1;
                 nextLine = sr.ReadLine();
                 line = nextLine.Split(' ');
-                if (line[0] == "votesPlayer:")
-                    votes = Convert.ToInt32(line[1]);
+                if (line[0] == "number_of_rounds:")
+                    numOfRounds = Convert.ToInt32(line[1]);
                 else
                 {
                     Console.WriteLine("error while reading the file - votesPlayer");
                     return null;
                 }
 
-                nextLine = sr.ReadLine();
-                line = nextLine.Split(' ');
-                if (line[0] == "turns:")
-                    turns = Convert.ToInt32(line[1]);
-                else 
+                int numOfHumanPlayers = 0;
+                for (int i = 0; i < numOfPlayers; i++)
                 {
-                    Console.WriteLine("error while reading the file - turns");
-                    return null;
+                    if (playersOrder[i] == "human")
+                        numOfHumanPlayers++;
                 }
 
-                nextLine = sr.ReadLine();
-                line = nextLine.Split(' ');
-                List<string> players = new List<string>();
-                if (line[0] == "playersType:")
-                {
-                    for (int i = 1; i < numoftotalplayers + 1; i++)
-                    {
-                        players.Add(line[i]);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("error while reading the file - playersType");
-                    return null;
-                }
+                //agents
                 List<Agent> agents = new List<Agent>();
-                if (numofhumanplayers < numoftotalplayers)
+                Boolean isRounds = false;
+                if (numOfHumanPlayers < numOfPlayers)
                 {
-                    int numPaths = numoftotalplayers - numofhumanplayers;
                     nextLine = sr.ReadLine();
                     line = nextLine.Split(' ');
                     if (line[0] == "agents:")
@@ -172,12 +152,12 @@ namespace Server
                         Agent a;
                         for (int i = 0; i < numOfAgents; i++)
                         {
-                            nextLine = sr.ReadLine(); //agent file path
-                            a = readAgentFile(nextLine, votes, candidates);
+                            nextLine = sr.ReadLine();
+                            a = readAgent(nextLine, numOfRounds, numberOfCandidates);
                             if (a != null)
                             {
                                 agents.Add(a);
-                                rounds = a.isRounds();
+                                isRounds = a.isRounds();
                             }
                             else
                             {
@@ -196,17 +176,15 @@ namespace Server
                 {
                     nextLine = sr.ReadLine(); // skip ont the "agents:" line
                 }
-                
-                //nextLine = sr.ReadLine(); // skip ont the "agents:" line
 
-
+                //candidates_names
                 nextLine = sr.ReadLine();
                 line = nextLine.Split(' ');
                 List<string> candnames = new List<string>();
-                if (line[0] == "candidatesNames:")
+                if (line[0] == "candidates_names:")
                 {
-                    string names = nextLine.Substring(16);
-                    for (int i = 0; i < candidates; i++)
+                    string names = nextLine.Substring(17);
+                    for (int i = 0; i < numberOfCandidates; i++)
                     {
                         int startIndex = names.IndexOf('"');
                         names = names.Substring(startIndex + 1);
@@ -222,13 +200,14 @@ namespace Server
                     return null;
                 }
 
+                //points
                 nextLine = sr.ReadLine();
                 line = nextLine.Split(' ');
                  List<int> points = new List<int>();
 
                 if (line[0] == "points:")
                 {
-                    for (int i = 1; i < candidates + 1; i++)
+                    for (int i = 1; i < numberOfCandidates + 1; i++)
                     {
                         points.Add(Convert.ToInt32(line[i]));
                     }
@@ -246,7 +225,7 @@ namespace Server
                 if (line[0] == "priorities:")
                 {
                     string path = sr.ReadLine();
-                    priorities = readPriorityFile(path, numoftotalplayers, candidates);
+                    priorities = readPriorityFile(path, numOfPlayers, numberOfCandidates);
                     if (priorities == null)
                     {
                         Console.WriteLine("error while reading the file - priorities");
@@ -261,7 +240,7 @@ namespace Server
 
 
 
-                return new GameDetails(0, numofhumanplayers, numoftotalplayers, candidates, votes, turns, candnames, players, points, priorities, agents, rounds);
+                return new GameDetails(numOfHumanPlayers, numOfPlayers, numberOfCandidates, numOfRounds, candnames, playersOrder, points, priorities, agents, isRounds);
 
             }
             catch (Exception e)
@@ -270,30 +249,57 @@ namespace Server
                 Debug.WriteLine(e.Message);
                 return null;
             }
-
         }
 
 
-        public static Agent readAgentFile(string file, int votes, int numOfCandidates)
+        public static Agent readAgent(string agentLine, int roundsNum, int numOfCandidates)
         {
             try
             {
-                StreamReader sr = new StreamReader(file);
-                string nextLine = sr.ReadLine();
-                string[] line = nextLine.Split(' ');
-                if (line[0] == "rounds")
+                string[] line = agentLine.Split(' ');
+                if (line[0] == "random")
+                    return new Agent("RANDOM");
+
+                else if(line[0] == "first")
+                    return new Agent("FIRST");
+                else if(line[0] == "last")
+                    return new Agent("LAST");
+                else if (line[0] == "priority")
                 {
-                    List<List<int>> rounds = new List<List<int>>();
-                    for (int i = 0; i < votes; i++) // the number rounds = number of vote per player
+                    StreamReader sr = new StreamReader(Directory.GetCurrentDirectory() + "\\" + line[1]);
+                    string nextLine = sr.ReadLine();
+                    line = nextLine.Split(' ');
+                    return new Agent("PRIORITY", Convert.ToInt32(line[1]));
+                }
+                else if (line[0] == "turns")
+                {
+                    StreamReader sr = new StreamReader(Directory.GetCurrentDirectory() + "\\" + line[1]);
+                    string nextLine;
+
+                    List<string> votesPerTurn = new List<string>();
+                    for (int i = 0; i < roundsNum; i++)
+                    {
+                        nextLine = sr.ReadLine();
+                        if (nextLine != "")
+                            votesPerTurn.Add(nextLine.Substring(2));
+                    }
+                    return new Agent("TURNS", votesPerTurn);
+                }
+                else if (line[0] == "rounds")
+                {
+                    StreamReader sr = new StreamReader(Directory.GetCurrentDirectory() + "\\" + line[1]);
+                    string nextLine;
+                    List<List<int>> rounds = new List<List<int>>(); // for each round a list with number of votes per candidate
+                    for (int i = 0; i < roundsNum; i++)
                     {
                         nextLine = sr.ReadLine();
                         line = nextLine.Split(' ');
                         List<int> votesForCand = new List<int>();
-                        string[] numOfVotes = line[1].Split(',');
-                        if (numOfVotes.Length == numOfCandidates)
+                        string[] votesInRound = line[1].Split(',');
+                        if (votesInRound.Length == numOfCandidates)
                         {
-                            for (int j = 0; j < numOfVotes.Length; j++)
-                                votesForCand.Add(Convert.ToInt32(numOfVotes[j]));
+                            for (int j = 0; j < votesInRound.Length; j++)
+                                votesForCand.Add(Convert.ToInt32(votesInRound[j]));
                             rounds.Add(votesForCand);
                         }
                         else
@@ -304,30 +310,6 @@ namespace Server
 
                     }
                     return new Agent("ROUNDS", rounds);
-                }
-                else if (line[0] == "all")
-                {
-                    if (line[1] == "random")
-                        return new Agent("RANDOM");
-                    else if (line[1] == "first")
-                        return new Agent("FIRST");
-                    else if (line[1] == "last")
-                        return new Agent("LAST");
-                    else if (line[1] == "priority")
-                        return new Agent("PRIORITY", Convert.ToInt32(line[2]));
-                    else
-                        return null;
-                }
-                else if (line[0] == "turns")
-                {
-                    List<string> votesPerTurn = new List<string>();
-                    for (int i = 0; i < votes; i++)
-                    {
-                        nextLine = sr.ReadLine();
-                        if(nextLine != "")
-                            votesPerTurn.Add(nextLine.Substring(2));
-                    }
-                    return new Agent("TURNS", votesPerTurn);
                 }
                 else
                     return null;
@@ -349,7 +331,7 @@ namespace Server
 
             try
             {
-                StreamReader sr = new StreamReader(file);
+                StreamReader sr = new StreamReader(Directory.GetCurrentDirectory() + "\\" + file);
                 string nextLine;
                 for (int i = 0; i < numLines; i++) //go over the priority lines
                 {
@@ -390,7 +372,7 @@ namespace Server
         public static string createCandIndexString(int game, string playerID)
         {
             string ans = "";
-            int player = Program.games[game].findPlayer(playerID);
+            int player = Program.games[game].getPlayerIndex(playerID);
             List<string> candNames = gameDetails.getCandidatesNames();
             List<string> priority = gameDetails.getPriorities().ElementAt(player);
 
@@ -441,7 +423,7 @@ namespace Server
             //for (int i = 0; i < names.Count; i++)
             //    ans = ans + " " + names[i];
 
-            int player = Program.games[game].findPlayer(playerID);
+            int player = Program.games[game].getPlayerIndex(playerID);
             //List<string> candNames = gameDetails.getCandidatesNames();
             List<string> priority = gameDetails.getPriorities().ElementAt(player);
 
@@ -474,7 +456,7 @@ namespace Server
         public static string createNumOfVotesString(int game, string playerID)
         {
             string ans = "";
-            int player = Program.games[game].findPlayer(playerID);
+            int player = Program.games[game].getPlayerIndex(playerID);
             List<string> priority = gameDetails.getPriorities().ElementAt(player);
             List<string> candNames = gameDetails.getCandidatesNames();
             List<int> numOfVotes = games[game].getNumOfVotes();

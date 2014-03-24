@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,8 +19,9 @@ namespace Server
             {
                 filename = generateName();
             }
-
-            path = @"C:\Users\Lena\Documents\Visual Studio 2013\Projects\VotingApplication\Server\" + filename;
+            Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\logs\\");
+            path = string.Format(Directory.GetCurrentDirectory() + "{0}" + filename, "\\logs\\");
+            //path = @"C:\Users\Lena\Documents\Visual Studio 2013\Projects\VotingApplication\Server\" + filename;
             file = new System.IO.StreamWriter(path, true);
         }
 

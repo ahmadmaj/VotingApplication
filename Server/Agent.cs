@@ -101,7 +101,7 @@ namespace Server
                     string[] p = v.Split(' ');
                     if (p[0] == "priority")
                     {
-                        return Convert.ToInt32(p[1]);
+                        return Convert.ToInt32(p[1])-1;
                     }
                     else
                         return -2;

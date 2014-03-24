@@ -17,7 +17,8 @@ namespace Server
             Program.awaitingPlayersID.Add(id);
             if (Program.awaitingPlayersID.Count == Program.gameDetails.getNumOfHumanPlayers())
             {
-                Program.games.Add(new Game(Program.gameDetails.getNumOfHumanPlayers(), Program.gameDetails.getPlayers(), Program.gameDetails.getNumOfCandidates(), Program.gameDetails.getTurns(), Program.gameDetails.getCandidatesNames(), Program.gameDetails.getVotesList(), Program.gameDetails.getPoints(), Program.gameDetails.getPriorities(), Program.gameDetails.getAgents(), Program.gameDetails.getRounds()));
+                Program.games.Add(new Game(Program.gameDetails.getNumOfHumanPlayers(), Program.gameDetails.getPlayers(), Program.gameDetails.getNumOfCandidates(), Program.gameDetails.getCandidatesNames(), Program.gameDetails.getRounds(), Program.gameDetails.getVotesList(), Program.gameDetails.getPoints(), Program.gameDetails.getPriorities(), Program.gameDetails.getAgents(), Program.gameDetails.getIsRounds()));
+
                 for (int i = 0; i < Program.awaitingPlayersID.Count; i++) //inform the players the game begins
                     Clients.Client(Program.awaitingPlayersID.ElementAt(i)).StartGameMsg("start");
             }
@@ -33,8 +34,9 @@ namespace Server
                 if (Program.games[i].getStatus() == "init")
                     Program.games[i].addPlayerID(connectionId);
             }
+            int turn = Program.games[0].getTurn(connectionId);
             //msg,playerID, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, point, voted, turn
-            Clients.Client(connectionId).GameDetails("start", Program.games[0].getPlayerIndex(connectionId), Program.gameDetails.getNumOfCandidates(), Program.gameDetails.getNumOfTotalPlayers(), Program.gameDetails.getVotes(), Program.gameDetails.getTurns(), Program.createPrioritiesString(0, connectionId), Program.createCandNamesString(0, connectionId), Program.createCandIndexString(0, connectionId), 0, Program.createPointsString(0, connectionId), Program.createNumOfVotesString(0, connectionId), Program.games[0].getTurn(connectionId));
+            Clients.Client(connectionId).GameDetails("start", Program.games[0].getPlayerIndex(connectionId), Program.gameDetails.getNumOfCandidates(), Program.gameDetails.getNumOfTotalPlayers(), Program.games[0].getNumOfRounds(), Program.games[0].getTurnsLeft(), Program.createPrioritiesString(0, connectionId), Program.createCandNamesString(0, connectionId), Program.createCandIndexString(0, connectionId), 0, Program.createPointsString(0, connectionId), Program.createNumOfVotesString(0, connectionId), turn);
         }
 
         //sent when the client voted
@@ -43,7 +45,7 @@ namespace Server
             int status = Program.games[0].vote(candidate, playerIndex);
             if (status == 1) //the game cont.
             {
-                int next = Program.games[0].getNextTurn(id);
+                int next = Program.games[0].getNextTurn();
 
                 if (next == -1) //game over
                 {

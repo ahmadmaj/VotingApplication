@@ -8,33 +8,30 @@ namespace Server
 {
     public class GameDetails
     {
-        private int numOfParticipants;
         private int numOfTotalPlayers;
         private int numOfHumanPlayers;
         private int numOfCandidates;
         private int numOfVotes;
-        private int numOfTurnsInGame;
+        private int numOfRounds;
         private List<string> candidatesNames;
         private List<string> players;
         private List<int> points;
         private List<List<string>> priorities;
         private List<Agent> agents;
-        private Boolean rounds;
+        private Boolean isRounds;
 
-        public GameDetails(int participants, int humanPlayers, int players, int candidates, int votes, int turns, List<string> candNames, List<string> player, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round)
+        public GameDetails(int humanPlayers, int players, int candidates, int rounds, List<string> candNames, List<string> player, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round)
         {
-            this.numOfParticipants = participants;
             this.numOfHumanPlayers = humanPlayers;
             this.numOfTotalPlayers = players;
             this.numOfCandidates = candidates;
-            this.numOfVotes = votes;
-            this.numOfTurnsInGame = turns;
+            this.numOfRounds = rounds;
             this.candidatesNames = candNames;
             this.players = player;
             this.points = points;
             this.priorities = priority;
             this.agents = agent;
-            this.rounds = round;
+            this.isRounds = round;
         }
 
 
@@ -63,18 +60,19 @@ namespace Server
             return this.numOfVotes;
         }
 
+        public int getRounds()
+        {
+            return this.numOfRounds;
+
+        }
+
         public List<int> getVotesList()
         {
             List<int> ans = new List<int>();
             for (int i = 0; i < this.numOfTotalPlayers; i++)
-                ans.Add(this.numOfVotes);
+                ans.Add(this.numOfRounds);
 
             return ans;
-        }
-
-        public int getTurns()
-        {
-            return this.numOfTurnsInGame;
         }
 
         public List<int> getPoints()
@@ -96,9 +94,9 @@ namespace Server
             return this.agents;
         }
 
-        public Boolean getRounds()
+        public Boolean getIsRounds()
         {
-            return this.rounds;
+            return this.isRounds;
         }
 
     }

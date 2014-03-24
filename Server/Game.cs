@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,7 +15,8 @@ namespace Server
         private List<string> players;
         private List<string> playersID;
         private int numOfCandidates;
-        private int numOfTurns;
+        private int rounds; //number of rounds in the game
+       // private int numOfTurns;
         private List<string> candidatesNames;
         private List<int> votesPerPlayer; //votes left for each player
         //private List<List<int>> votedBy; //candidates, players who voted
@@ -22,26 +24,30 @@ namespace Server
         private List<int> points;
         private List<List<string>> priorities;
         private int turn; //index of the player who's turn it is
+        private int humanTurn; //index of the human player who's turn it is
+        private int computerTurn; //index of the agent who's turn it is
+        private Boolean firstTurn;
         private List<int> winners;
         private List<string> writeToFile;
         private List<Agent> agents;
-        private Boolean rounds;
+        private Boolean isRounds;
         private List<List<int>> playersVotes;
         private int roundNumber;
 
 
-        public Game(int humans, List<string> players, int candidates, int turns, List<string> candNames, List<int> vote, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round)
+        public Game(int humans, List<string> players, int candidates, List<string> candNames, int roundsNum, List<int> vote, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round)
         {
             this.status = "init";
             this.numOfHumanPlayers = humans;
             this.players = players;
             this.playersID = new List<string>();
             this.numOfCandidates = candidates;
-            this.numOfTurns = turns;
+           // this.numOfTurns = turns;
             this.candidatesNames = candNames;
             this.points = points;
             this.priorities = priority;
             this.votesPerPlayer = vote;
+            this.rounds = roundsNum;
             //this.votedBy = new List<List<int>>();
             //for (int i = 0; i < numOfCandidates; i++)
             //{
@@ -59,6 +65,9 @@ namespace Server
                 this.playersVotes[i].Add(-1);
             }
             this.turn = 0;
+            this.humanTurn = 0;
+            this.computerTurn = 0;
+            this.firstTurn = true;
             this.roundNumber = 1;
             this.winners = new List<int>();
 
@@ -67,23 +76,27 @@ namespace Server
             this.writeToFile.Add("number of candidates:," + this.numOfCandidates.ToString());
             this.writeToFile.Add("game ended after:,");
             string titles = "time,player,vote,current winner,";
+            for (int i = 0; i < this.numOfCandidates; i++)
+            {
+                titles = titles + "votes for candidate " + (i + 1) + ",";
+            }
             for (int i = 0; i < this.players.Count; i++)
             {
                 if (i == this.players.Count - 1)
-                    titles = titles + "points player" + (i+1);
+                    titles = titles + "points player" + (i + 1);
                 else
-                    titles = titles + "points player" + (i+1) + ",";
+                    titles = titles + "points player" + (i + 1) + ",";
             }
             this.writeToFile.Add(titles);
             this.agents = agent;
-            this.rounds = round;
+            this.isRounds = round;
 
         }
 
 
         public int vote(int candidate, int player)
         {
-            if (this.numOfTurns > 0 && this.votesPerPlayer[player] > 0)
+            if (this.votesPerPlayer[player] > 0)
             {
                 int candIndex = this.candidatesNames.IndexOf(this.priorities[player][candidate]);
                 if (this.playersVotes[player][0] == -1)
@@ -98,7 +111,7 @@ namespace Server
                 this.playersVotes[player][0] = candIndex;
 
                 this.votesPerPlayer[player]--;
-                this.numOfTurns--;
+               // this.numOfTurns--;
 
                 //update log
                 string time = DateTime.Now.ToString();
@@ -110,6 +123,14 @@ namespace Server
                     else
                         winnersString = winnersString + " " + this.candidatesNames[this.winners[i]];
                 }
+                string candidatesString = "";
+                for (int i = 0; i < numOfCandidates; i++)
+                {
+                    if (i == 0)
+                        candidatesString = this.votes[i].ToString();
+                    else
+                        candidatesString = candidatesString + "," + this.votes[i].ToString();
+                }
                 string pointsString = "";
                 for (int i = 0; i < currentPoints.Count; i++)
                 {
@@ -118,7 +139,7 @@ namespace Server
                     else
                         pointsString = pointsString + "," + currentPoints[i].ToString();
                 }
-                this.writeToFile.Add(time + "," + player.ToString() + "," + this.candidatesNames[candIndex] + "," + winnersString + "," + pointsString);
+                this.writeToFile.Add(time + "," + player.ToString() + "," + this.candidatesNames[candIndex] + "," + winnersString + "," + candidatesString + "," + pointsString);
 
 
                 Boolean gameOver = false;
@@ -128,7 +149,7 @@ namespace Server
                     gameOver = checkGameOver();
                 }
 
-                if (this.numOfTurns > 0 && !gameOver)
+                if (this.rounds >= this.roundNumber && !gameOver)
                     return 1; //the game is not over
                 else
                 {
@@ -141,7 +162,8 @@ namespace Server
                 }
                     
             }
-            else if (this.numOfTurns == 0){
+            else if (this.rounds < this.roundNumber)
+            {
                 writeToCSVFile();
                 return -1; //game over
             }
@@ -150,39 +172,63 @@ namespace Server
                 return -2;
         }
 
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public int getTurn(string playerID)
         {
-            if (this.playersID[turn] == playerID)
-                return 1;
+            if (this.players[this.turn] == "human")
+            {
+                this.firstTurn = false;
+                if (this.playersID[this.humanTurn] == playerID)
+                    return 1;
+                else
+                    return 0;
+            }
             else
-                return 0;
+            {
+                getNextTurn();
+                this.firstTurn = false;
+                if (this.playersID[this.humanTurn] == playerID)
+                    return 1;
+                else
+                    return 0;
+            }
+
         }
 
-        public int getNextTurn(string currentPlayerID)
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public int getNextTurn()
         {
-            int ans = turn + 1;
-            if (ans >= this.players.Count)
-                ans = 0;
+            if(!this.firstTurn) 
+                this.turn++;
+            if (this.turn >= this.players.Count)
+                this.turn = 0;
             int gameStatus = 1;
-            while (this.players[ans] != "human")
-            {
+            while (this.players[this.turn] != "human")
+            { 
                 //gameStatus = vote(0, ans);
-                if (this.rounds){
-                    int votefor = this.agents[0].vote(this.priorities[ans], this.candidatesNames, this.roundNumber);
-                    gameStatus = vote(votefor, ans);
+                if (this.isRounds)
+                {
+                    int votefor = this.agents[0].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
+                    gameStatus = vote(votefor, this.turn);
                 }
                 else{
-                    int votefor = this.agents[ans-this.numOfHumanPlayers].vote(this.priorities[ans], this.candidatesNames, this.roundNumber);
-                    gameStatus = vote(votefor, ans);
+                    int votefor = this.agents[this.computerTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
+                    gameStatus = vote(votefor, this.turn);
                 }
-                ans++;
-                if (ans >= this.players.Count)
-                    ans = 0;
+
+                this.turn++;
+                this.computerTurn++;
+                if (this.turn >= this.players.Count)
+                    this.turn = 0;
+                if (this.computerTurn >= this.agents.Count)
+                    this.computerTurn = 0;
             }
-            turn = ans;
+            if (!this.firstTurn) 
+                this.humanTurn++;
+            if (this.humanTurn >= this.playersID.Count)
+                this.humanTurn = 0;
             if (gameStatus == 1)
-                return ans;
+                return this.humanTurn;
             else if (gameStatus == -1)
                 return gameStatus;
             else
@@ -201,7 +247,21 @@ namespace Server
 
         public int getPlayerIndex(string player)
         {
-            return this.playersID.IndexOf(player);
+            int humanCounter = this.playersID.IndexOf(player)+1;
+            int ans = 0;
+            for (int i = 0; i < this.players.Count; i++)
+            {
+                if (this.players[i] == "human")
+                {
+                    humanCounter--;
+                    if (humanCounter == 0)
+                    {
+                        ans = i;
+                        break;
+                    }
+                }
+            }
+                return ans;
         }
 
         public List<string> getPlayers()
@@ -255,9 +315,22 @@ namespace Server
             return this.votesPerPlayer[player];
         }
 
+        public List<int> getVotesPerPlayer()
+        {
+            return this.votesPerPlayer;
+        }
+
+        public int getNumOfRounds()
+        {
+            return this.rounds;
+        }
+
         public int getTurnsLeft()
         {
-            return this.numOfTurns;
+            int ans = 0;
+            for (int i = 0; i < this.votesPerPlayer.Count; i++)
+                ans = ans + this.votesPerPlayer[i];
+            return ans;
         }
 
         public List<int> gameOverPoints()
