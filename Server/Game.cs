@@ -15,6 +15,7 @@ namespace Server
         private List<string> players;
         private List<string> playersID;
         private int numOfCandidates;
+
         private int rounds; //number of rounds in the game
        // private int numOfTurns;
         private List<string> candidatesNames;
