@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Server
@@ -10,24 +11,26 @@ namespace Server
     public class Game
     {
         private string status;
-        private int id;
+        static int nextId;
+        public int gameID {get; private set;}
         private int numOfHumanPlayers;
         private List<string> players;
-        private List<string> playersID;
+        public List<string> playersID;
         private int numOfCandidates;
         private int rounds; //number of rounds in the game
        // private int numOfTurns;
-        private List<string> candidatesNames;
+        public List<string> candidatesNames { get; private set; }
         private List<int> votesPerPlayer; //votes left for each player
         //private List<List<int>> votedBy; //candidates, players who voted
         private List<int> votes; //number of votes each candidate got
-        private List<int> points;
-        private List<List<string>> priorities;
+        public List<int> points { get; private set; }
+        public List<List<string>> priorities { get; private set; }
         private int turn; //index of the player who's turn it is
         private int humanTurn; //index of the human player who's turn it is
         private int computerTurn; //index of the agent who's turn it is
         private Boolean firstTurn;
         private List<int> winners;
+        private  WriteData file;
         private List<string> writeToFile;
         private List<Agent> agents;
         private Boolean isRounds;
@@ -37,6 +40,8 @@ namespace Server
 
         public Game(int humans, List<string> players, int candidates, List<string> candNames, int roundsNum, List<int> vote, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round)
         {
+            gameID = Interlocked.Increment(ref nextId);
+            file = new WriteData(gameID);
             this.status = "init";
             this.numOfHumanPlayers = humans;
             this.players = players;
@@ -393,14 +398,13 @@ namespace Server
         public void writeToCSVFile()
         {
             for (int i = 0; i < this.writeToFile.Count; i++)
-                Program.file.write(this.writeToFile[i]);
-            Program.file.close();
+                file.write(this.writeToFile[i]);
+            file.close();
         }
 
         public int getDefault(int player)
         {
             return this.priorities[player].IndexOf(this.candidatesNames[this.playersVotes[player][0]]);
-        } 
-
+        }
     }
 }

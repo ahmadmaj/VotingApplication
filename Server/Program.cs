@@ -14,21 +14,30 @@ namespace Server
     {
         public static int init = 0;
         public static GameDetails gameDetails;
-        public static List<string> awaitingPlayersID = new List<string>();
-        public static List<Game> games = new List<Game>();
-        public static WriteData file;
+        //public static List<string> awaitingPlayersID = new List<string>();
+        public static Dictionary<string, int> Players = new Dictionary<string, int>();   
+        public static Game AwaitingGame =null;
+        public static List<Game> PlayingGames = new List<Game>(); 
+        
 
         public static int count = 0;
         public static string first = "";
+
+        protected internal static Game getplayersGame(string id)
+        {
+            //return PlayingGames[0];
+            return PlayingGames.FirstOrDefault(playingGame => playingGame.gameID == Players[id]);
+        }
+
         static void Main(string[] args)
         {
-            string url = "http://132.72.23.212:9090";
+            string url = "http://localhost:9090";
             using (WebApp.Start(url))
             {
                 Console.WriteLine("Server running on {0}", url);
                 //Console.WriteLine("Please enter a configuration file");
                 //while (true)
-                //{
+                //{C:\Users\maor\Dropbox\Msc\Thesis\VotingApplication\Server\Startup.cs
                 //    String file = Console.ReadLine();
                 //    if (file != "")
                 //    {
@@ -52,7 +61,7 @@ namespace Server
                 //gameDetails = readConfigFile("C://Users//lena//Documents//Visual Studio 2013//Projects//VotingApplication//Server//configFile2_check.txt");
                 init = 1;
 
-                file = new WriteData();
+
 
                 Console.ReadLine();
             }
@@ -357,11 +366,12 @@ namespace Server
 
 
         //per player: cand.1 cand.2 .. (seperated with space)
-        public static string createPointsString(int game, string playerID)
+        public static string createPointsString(string playerID)
         {
+            Game thegame = getplayersGame(playerID);
             string ans = "";
-            List<int> points = Program.gameDetails.getPoints();
-            for (int i = 0; i < Program.gameDetails.getNumOfCandidates(); i++)
+            List<int> points = thegame.points;
+            for (int i = 0; i < thegame.getNumOfCandidates(); i++)
             {
                 ans = ans + "#" + points[i];
             }
@@ -369,12 +379,13 @@ namespace Server
         }
 
 
-        public static string createCandIndexString(int game, string playerID)
+        public static string createCandIndexString(string playerID)
         {
+            Game thegame = getplayersGame(playerID);
             string ans = "";
-            int player = Program.games[game].getPlayerIndex(playerID);
-            List<string> candNames = gameDetails.getCandidatesNames();
-            List<string> priority = gameDetails.getPriorities().ElementAt(player);
+            int player = thegame.getPlayerIndex(playerID);
+            List<string> candNames = thegame.candidatesNames;
+            List<string> priority = thegame.priorities.ElementAt(player);
 
             for (int i = 0; i < priority.Count; i++)
             {
@@ -385,10 +396,11 @@ namespace Server
 
 
         //per player: cand.1#cand.2# ... (seperated by #)
-        public static string createPrioritiesString(int game, string playerID)
+        public static string createPrioritiesString(string playerID)
         {
+            Game thegame = getplayersGame(playerID);
             string ans = "";
-            for (int i = 0; i < Program.gameDetails.getNumOfCandidates(); i++)
+            for (int i = 0; i < thegame.getNumOfCandidates(); i++)
             {
                 if (i == 0)
                 {
@@ -416,16 +428,17 @@ namespace Server
         }
 
         //c1 c2 c3 ... (seperated by #)
-        public static string createCandNamesString(int game, string playerID)
+        public static string createCandNamesString(string playerID)
         {
+            Game thegame = getplayersGame(playerID);
             string ans = "";
             //List<string> names = gameDetails.getCandidatesNames();
             //for (int i = 0; i < names.Count; i++)
             //    ans = ans + " " + names[i];
 
-            int player = Program.games[game].getPlayerIndex(playerID);
+            int player = thegame.getPlayerIndex(playerID);
             //List<string> candNames = gameDetails.getCandidatesNames();
-            List<string> priority = gameDetails.getPriorities().ElementAt(player);
+            List<string> priority = thegame.priorities.ElementAt(player);
 
             for (int i = 0; i < priority.Count; i++)
             {
@@ -453,24 +466,25 @@ namespace Server
         //}
 
         // seperetad by #
-        public static string createNumOfVotesString(int game, string playerID)
+        public static string createNumOfVotesString(string playerID)
         {
+            Game thegame = getplayersGame(playerID);
             string ans = "";
-            int player = Program.games[game].getPlayerIndex(playerID);
-            List<string> priority = gameDetails.getPriorities().ElementAt(player);
-            List<string> candNames = gameDetails.getCandidatesNames();
-            List<int> numOfVotes = games[game].getNumOfVotes();
+            int player = thegame.getPlayerIndex(playerID);
+            List<string> priority = thegame.priorities.ElementAt(player);
+            List<string> candNames = thegame.candidatesNames;
+            List<int> numOfVotes = thegame.getNumOfVotes();
             for (int i = 0; i < numOfVotes.Count; i++)
                 ans = ans + "#" + numOfVotes[candNames.IndexOf(priority[i])];
             return ans;
         }
 
-        public static string createNumOfVotesString(int game, int player)
+        public static string createNumOfVotesString(Game game, int playerID)
         {
             string ans = "";
-            List<string> priority = gameDetails.getPriorities().ElementAt(player);
-            List<string> candNames = gameDetails.getCandidatesNames();
-            List<int> numOfVotes = games[game].getNumOfVotes();
+            List<string> priority = game.priorities.ElementAt(playerID);
+            List<string> candNames = game.candidatesNames;
+            List<int> numOfVotes = game.getNumOfVotes();
             for (int i = 0; i < numOfVotes.Count; i++)
                 ans = ans + "#" + numOfVotes[candNames.IndexOf(priority[i])];
             return ans;
