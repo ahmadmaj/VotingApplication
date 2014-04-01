@@ -22,7 +22,7 @@ namespace Server
         public static string first = "";
         static void Main(string[] args)
         {
-            string url = "http://132.72.23.212:9090";
+            string url = "http://localhost:8080";
             using (WebApp.Start(url))
             {
                 Console.WriteLine("Server running on {0}", url);

@@ -35,8 +35,8 @@ namespace Server
                     Program.games[i].addPlayerID(connectionId);
             }
             int turn = Program.games[0].getTurn(connectionId);
-            //msg,playerID, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, point, voted, turn
-            Clients.Client(connectionId).GameDetails("start", Program.games[0].getPlayerIndex(connectionId), Program.gameDetails.getNumOfCandidates(), Program.gameDetails.getNumOfTotalPlayers(), Program.games[0].getNumOfRounds(), Program.games[0].getTurnsLeft(), Program.createPrioritiesString(0, connectionId), Program.createCandNamesString(0, connectionId), Program.createCandIndexString(0, connectionId), 0, Program.createPointsString(0, connectionId), Program.createNumOfVotesString(0, connectionId), turn);
+            //msg,playerID, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, point, voted, turn, who is voting
+            Clients.Client(connectionId).GameDetails("start", Program.games[0].getPlayerIndex(connectionId), Program.gameDetails.getNumOfCandidates(), Program.gameDetails.getNumOfTotalPlayers(), Program.games[0].getNumOfRounds(), Program.games[0].getTurnsLeft(), Program.createPrioritiesString(0, connectionId), Program.createCandNamesString(0, connectionId), Program.createCandIndexString(0, connectionId), 0, Program.createPointsString(0, connectionId), Program.createNumOfVotesString(0, connectionId), turn, Program.games[0].getCurrentTurn());
         }
 
         //sent when the client voted
@@ -60,16 +60,28 @@ namespace Server
                 }
                 else // game cont.
                 {
-                    //numOfCandidates, voted, turnsLeft
-                    for(int i=0; i<Program.games[0].getPlayersIDList().Count;i++){
-                        int player = Program.games[0].getPlayerIndex(Program.games[0].getPlayersIDList()[i]);
-                        Clients.Client(Program.games[0].getPlayersIDList()[i]).OtherVotedUpdate(Program.games[0].getNumOfCandidates(), Program.createNumOfVotesString(0, player), Program.games[0].getVotesLeft(player), Program.games[0].getTurnsLeft());
+                    while (Program.games[0].getPlayersType(next) == "computer")
+                    {
+                        for (int i = 0; i < Program.games[0].getPlayersIDList().Count; i++)
+                        {
+                            int player = Program.games[0].getPlayerIndex(Program.games[0].getPlayersIDList()[i]);
+                            Clients.Client(Program.games[0].getPlayersIDList()[i]).OtherVotedUpdate(Program.games[0].getNumOfCandidates(), Program.createNumOfVotesString(0, player), Program.games[0].getVotesLeft(player), Program.games[0].getTurnsLeft());
+                        }
+                        next = Program.games[0].getNextTurn();
                     }
-                    //numOfCandidates, voted, turnsLeft, candIndex, defaultCand
-                    Clients.Client(id).VotedUpdate(Program.games[0].getNumOfCandidates(), Program.createNumOfVotesString(0, playerIndex), Program.games[0].getVotesLeft(playerIndex), Program.games[0].getTurnsLeft(), Program.createCandIndexString(0, id), Program.games[0].getDefault(playerIndex));
-                   
-                    Clients.Client(Program.games[0].getPlayerID(next)).YourTurn();
 
+                    //numOfCandidates, voted, turnsLeft, playerVoted, votingNow
+                    for(int i=0; i<Program.games[0].getPlayersIDList().Count;i++){
+                        if (Program.games[0].getPlayersIDList()[i] != id)
+                        {
+                            int player = Program.games[0].getPlayerIndex(Program.games[0].getPlayersIDList()[i]);
+                            Clients.Client(Program.games[0].getPlayersIDList()[i]).OtherVotedUpdate(Program.games[0].getNumOfCandidates(), Program.createNumOfVotesString(0, player), Program.games[0].getVotesLeft(player), Program.games[0].getTurnsLeft(), (next-1), next);
+                        }
+                    }
+                    //numOfCandidates, voted, turnsLeft, candIndex, defaultCand, voted, votingNow
+                    Clients.Client(id).VotedUpdate(Program.games[0].getNumOfCandidates(), Program.createNumOfVotesString(0, playerIndex), Program.games[0].getVotesLeft(playerIndex), Program.games[0].getTurnsLeft(), Program.createCandIndexString(0, id), Program.games[0].getDefault(playerIndex),(next-1), next);
+                   
+                    Clients.Client(Program.games[0].getPlayerID(Program.games[0].getHumanTurn())).YourTurn();
                 }
 
             }
