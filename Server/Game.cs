@@ -192,31 +192,73 @@ namespace Server
             {
                 getNextTurn();
                 this.firstTurn = false;
+                while (this.players[this.turn] == "computer")
+                    getNextTurn();
                 if (this.playersID[this.humanTurn] == playerID)
                     return 1;
                 else
                     return 0;
+                   
             }
 
+
         }
+
+        //[MethodImpl(MethodImplOptions.Synchronized)]
+        //public int getNextTurn()
+        //{
+        //    if(!this.firstTurn) 
+        //        this.turn++;
+        //    if (this.turn >= this.players.Count)
+        //        this.turn = 0;
+        //    int gameStatus = 1;
+        //    while (this.players[this.turn] != "human")
+        //    { 
+        //        if (this.isRounds)
+        //        {
+        //            int votefor = this.agents[0].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
+        //            gameStatus = vote(votefor, this.turn);
+        //        }
+        //        else{
+        //            int votefor = this.agents[this.computerTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
+        //            gameStatus = vote(votefor, this.turn);
+        //        }
+
+        //        this.turn++;
+        //        this.computerTurn++;
+        //        if (this.turn >= this.players.Count)
+        //            this.turn = 0;
+        //        if (this.computerTurn >= this.agents.Count)
+        //            this.computerTurn = 0;
+        //    }
+        //    if (!this.firstTurn) 
+        //        this.humanTurn++;
+        //    if (this.humanTurn >= this.playersID.Count)
+        //        this.humanTurn = 0;
+        //    if (gameStatus == 1)
+        //        return this.humanTurn;
+        //    else if (gameStatus == -1)
+        //        return gameStatus;
+        //    else
+        //        return -2;
+        //}
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public int getNextTurn()
         {
-            if(!this.firstTurn) 
-                this.turn++;
+            //if (!this.firstTurn)
+            //    this.turn++;
             if (this.turn >= this.players.Count)
                 this.turn = 0;
             int gameStatus = 1;
-            while (this.players[this.turn] != "human")
-            { 
-                //gameStatus = vote(0, ans);
+            if (this.players[this.turn] != "human"){
                 if (this.isRounds)
                 {
                     int votefor = this.agents[0].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
                     gameStatus = vote(votefor, this.turn);
                 }
-                else{
+                else
+                {
                     int votefor = this.agents[this.computerTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
                     gameStatus = vote(votefor, this.turn);
                 }
@@ -227,13 +269,20 @@ namespace Server
                     this.turn = 0;
                 if (this.computerTurn >= this.agents.Count)
                     this.computerTurn = 0;
+
             }
-            if (!this.firstTurn) 
-                this.humanTurn++;
-            if (this.humanTurn >= this.playersID.Count)
-                this.humanTurn = 0;
+            else
+            {
+                this.turn++;
+                if (!this.firstTurn)
+                    this.humanTurn++;
+                if (this.humanTurn >= this.playersID.Count)
+                    this.humanTurn = 0;
+                if (this.turn >= this.players.Count)
+                    this.turn = 0;
+            }
             if (gameStatus == 1)
-                return this.humanTurn;
+                return this.turn;
             else if (gameStatus == -1)
                 return gameStatus;
             else
@@ -242,7 +291,7 @@ namespace Server
 
         public string getPlayerID(int player)
         {
-            return this.playersID.ElementAt(player);
+            return this.playersID.ElementAt(player-1);
         }
 
         public List<string> getPlayersIDList()
@@ -406,5 +455,21 @@ namespace Server
         {
             return this.priorities[player].IndexOf(this.candidatesNames[this.playersVotes[player][0]]);
         }
+
+        public string getPlayersType(int player)
+        {
+            return this.players[player];
+        }
+
+        public int getHumanTurn()
+        {
+            return this.humanTurn;
+        }
+
+        public int getCurrentTurn()
+        {
+            return this.turn;
+        }
+
     }
 }

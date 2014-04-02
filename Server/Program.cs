@@ -14,11 +14,11 @@ namespace Server
     {
         public static int init = 0;
         public static GameDetails gameDetails;
-        //public static List<string> awaitingPlayersID = new List<string>();
-        public static Dictionary<string, int> Players = new Dictionary<string, int>();   
-        public static Game AwaitingGame =null;
+        public static List<Game> games = new List<Game>();
+        public static Game AwaitingGame = null;
+        public static Dictionary<string, int> Players = new Dictionary<string, int>();
         public static List<Game> PlayingGames = new List<Game>(); 
-        
+
 
         public static int count = 0;
         public static string first = "";
@@ -31,7 +31,7 @@ namespace Server
 
         static void Main(string[] args)
         {
-            string url = "http://localhost:9090";
+            string url = "http://localhost:8010";
             using (WebApp.Start(url))
             {
                 Console.WriteLine("Server running on {0}", url);
