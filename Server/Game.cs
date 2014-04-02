@@ -291,7 +291,7 @@ namespace Server
 
         public string getPlayerID(int player)
         {
-            return this.playersID.ElementAt(player-1);
+            return this.playersID.ElementAt(player);
         }
 
         public List<string> getPlayersIDList()

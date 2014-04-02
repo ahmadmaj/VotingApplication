@@ -31,7 +31,7 @@ namespace Server
 
         static void Main(string[] args)
         {
-            string url = "http://localhost:8010";
+            string url = "http://localhost:8080";
             using (WebApp.Start(url))
             {
                 Console.WriteLine("Server running on {0}", url);
