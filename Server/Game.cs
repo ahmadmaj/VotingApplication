@@ -14,7 +14,7 @@ namespace Server
         static int nextId;
         public int gameID {get; private set;}
         private int numOfHumanPlayers;
-        private List<string> players;
+        private List<string> players; // players type (human, compter, replaced)
         public List<string> playersID;
         private int numOfCandidates;
         private int rounds; //number of rounds in the game
@@ -28,14 +28,17 @@ namespace Server
         private int turn; //index of the player who's turn it is
         private int humanTurn; //index of the human player who's turn it is
         private int computerTurn; //index of the agent who's turn it is
+        private int replaceTurn; //index of the replacing agent who's turn it is
         private Boolean firstTurn;
         private List<int> winners;
         private  WriteData file;
         private List<string> writeToFile;
         private List<Agent> agents;
+        private List<Agent> replacingAgents;
         private Boolean isRounds;
         private List<List<int>> playersVotes;
         private int roundNumber;
+        private Boolean gameOver; 
 
 
         public Game(int humans, List<string> players, int candidates, List<string> candNames, int roundsNum, List<int> vote, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round)
@@ -80,6 +83,15 @@ namespace Server
             this.writeToFile.Add("number of players:," + players.Count.ToString());
             this.writeToFile.Add("number of candidates:," + this.numOfCandidates.ToString());
             this.writeToFile.Add("game ended after:,");
+            this.writeToFile.Add("player,priorities");
+            for (int i = 0; i < this.players.Count; i++)
+            {
+                string priorityString = i.ToString();
+                for (int j = 0; j < this.priorities[i].Count; j++)
+                    priorityString = priorityString + "," + this.candidatesNames.IndexOf(this.priorities[i][j]);
+                this.writeToFile.Add(priorityString);
+
+            }
             string titles = "time,player,vote,current winner,";
             for (int i = 0; i < this.numOfCandidates; i++)
             {
@@ -95,15 +107,18 @@ namespace Server
             this.writeToFile.Add(titles);
             this.agents = agent;
             this.isRounds = round;
+            this.replacingAgents = new List<Agent>();
+            this.replaceTurn = -1;
+            this.gameOver = false;
 
         }
 
-
-        public int vote(int candidate, int player)
+        
+        public int vote(int candidatePriority, int player)
         {
             if (this.votesPerPlayer[player] > 0)
             {
-                int candIndex = this.candidatesNames.IndexOf(this.priorities[player][candidate]);
+                int candIndex = this.candidatesNames.IndexOf(this.priorities[player][candidatePriority]);
                 if (this.playersVotes[player][0] == -1)
                     this.votes[candIndex]++;
                 else if (this.playersVotes[player][0] != -1 && this.playersVotes[player][0] != candIndex)
@@ -124,9 +139,9 @@ namespace Server
                 string winnersString = "";
                 for(int i=0;i<this.winners.Count;i++){
                     if (i == 0)
-                        winnersString = this.candidatesNames[this.winners[i]];
+                        winnersString = this.winners[i].ToString();
                     else
-                        winnersString = winnersString + " " + this.candidatesNames[this.winners[i]];
+                        winnersString = winnersString + " " + this.winners[i].ToString();
                 }
                 string candidatesString = "";
                 for (int i = 0; i < numOfCandidates; i++)
@@ -144,10 +159,10 @@ namespace Server
                     else
                         pointsString = pointsString + "," + currentPoints[i].ToString();
                 }
-                this.writeToFile.Add(time + "," + player.ToString() + "," + this.candidatesNames[candIndex] + "," + winnersString + "," + candidatesString + "," + pointsString);
+                this.writeToFile.Add(time + "," + player.ToString() + "," + candIndex + "," + winnersString + "," + candidatesString + "," + pointsString);
 
 
-                Boolean gameOver = false;
+                //Boolean gameOver = false;
                 if (player == this.players.Count - 1)
                 {
                     this.roundNumber++;
@@ -197,11 +212,8 @@ namespace Server
                 if (this.playersID[this.humanTurn] == playerID)
                     return 1;
                 else
-                    return 0;
-                   
+                    return 0;                  
             }
-
-
         }
 
         //[MethodImpl(MethodImplOptions.Synchronized)]
@@ -251,7 +263,7 @@ namespace Server
             if (this.turn >= this.players.Count)
                 this.turn = 0;
             int gameStatus = 1;
-            if (this.players[this.turn] != "human"){
+            if (this.players[this.turn] == "computer"){
                 if (this.isRounds)
                 {
                     int votefor = this.agents[0].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
@@ -271,6 +283,17 @@ namespace Server
                     this.computerTurn = 0;
 
             }
+            else if (this.players[this.turn] == "replaced")
+            {
+               int votefor = this.replacingAgents[this.replaceTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
+                gameStatus = vote(votefor, this.turn);
+                this.replaceTurn++;
+                this.turn++;
+                if (this.replaceTurn >= this.replacingAgents.Count)
+                    this.replaceTurn = 0;
+                if (this.turn >= this.players.Count)
+                    this.turn = 0;
+            }
             else
             {
                 this.turn++;
@@ -280,6 +303,8 @@ namespace Server
                     this.humanTurn = 0;
                 if (this.turn >= this.players.Count)
                     this.turn = 0;
+                //if (this.replaceTurn >= this.replacingAgents.Count)
+                //    this.replaceTurn = 0;
             }
             if (gameStatus == 1)
                 return this.turn;
@@ -292,6 +317,10 @@ namespace Server
         public string getPlayerID(int player)
         {
             return this.playersID.ElementAt(player);
+        }
+        public void deletePlayerID(string id)
+        {
+            this.playersID.Remove(id);
         }
 
         public List<string> getPlayersIDList()
@@ -321,6 +350,13 @@ namespace Server
         public List<string> getPlayers()
         {
             return this.players;
+        }
+
+        public void replacePlayer(int index)
+        {
+            this.players[index] = "replaced";
+            this.replacingAgents.Add(new Agent("FIRST"));
+            this.replaceTurn++;
         }
 
         public int getNumOfCandidates()
@@ -469,6 +505,11 @@ namespace Server
         public int getCurrentTurn()
         {
             return this.turn;
+        }
+
+        public Boolean isGameOver()
+        {
+            return this.gameOver;
         }
 
     }

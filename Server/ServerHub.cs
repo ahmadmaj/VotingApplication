@@ -16,13 +16,34 @@ namespace Server
         {
             if (Program.AwaitingGame != null && Program.AwaitingGame.playersID != null)
                 foreach (string ids in Program.AwaitingGame.playersID)
-                if (Context.ConnectionId == ids){
+                    if (Context.ConnectionId == ids){
                         Program.AwaitingGame.playersID.Remove(ids);
                         break;
                     }
+
+            if (Program.PlayingGames.Count > 0)
+            {
+                Game theGame = Program.getplayersGame(Context.ConnectionId);
+                if (!theGame.isGameOver())
+                {
+                    int playerIndex = theGame.getPlayerIndex(Context.ConnectionId);
+                    theGame.deletePlayerID(Context.ConnectionId);
+                    theGame.replacePlayer(playerIndex);
+                    if (theGame.getCurrentTurn() == playerIndex)
+                    {
+                        int next = theGame.getNextTurn();
+                        if (next != -1)
+                            updatePlayers(theGame, Context.ConnectionId, playerIndex, next);
+                        else
+                            gameOver(theGame, Context.ConnectionId, playerIndex);
+                    }
+                }
+                    
+            }
+
             Program.Players.Remove(Context.ConnectionId);
             return null;
-            }
+        }
 
         //sent when a client wants to start a game
         public void ConnectMsg(string msg, string id)
@@ -82,19 +103,10 @@ namespace Server
                 int next = thegame.getNextTurn();
 
                 if (next == -1) //game over
-                {
-                    List<int> playersPoints = thegame.gameOverPoints();
-                    Clients.Client(id).GameOver(thegame.getNumOfCandidates(), Program.createNumOfVotesString(thegame, playerIndex), thegame.getVotesLeft(playerIndex), thegame.getTurnsLeft(), Program.createGameOverString(playersPoints), thegame.getWinner());
-
-                    for (int i = 0; i < thegame.getPlayersIDList().Count; i++)
-                    {
-                        int player = thegame.getPlayerIndex(thegame.getPlayersIDList()[i]);
-                        Clients.Client(thegame.getPlayersIDList()[i]).GameOver(thegame.getNumOfCandidates(), Program.createNumOfVotesString(thegame, player), thegame.getVotesLeft(player), thegame.getTurnsLeft(), Program.createGameOverString(playersPoints), thegame.getWinner());
-                    }
-                }
+                    gameOver(thegame, id, playerIndex);
                 else // game cont.
                 {
-                    while (thegame.getPlayersType(next) == "computer")
+                    while (next != -1 && (thegame.getPlayersType(next) == "computer" || thegame.getPlayersType(next) == "replaced"))
                     {
                         for (int i = 0; i < thegame.getPlayersIDList().Count; i++)
                         {
@@ -103,32 +115,43 @@ namespace Server
                         }
                         next = thegame.getNextTurn();
                     }
-
-                    //numOfCandidates, voted, turnsLeft, playerVoted, votingNow
-                    for(int i=0; i<thegame.getPlayersIDList().Count;i++){
-                        if (thegame.getPlayersIDList()[i] != id)
-                        {
-                        int player = thegame.getPlayerIndex(thegame.getPlayersIDList()[i]);
-                        Clients.Client(thegame.getPlayersIDList()[i]).OtherVotedUpdate(thegame.getNumOfCandidates(), Program.createNumOfVotesString(thegame, player), thegame.getVotesLeft(player), thegame.getTurnsLeft(), (next - 1), next);
-                        }
-                    }
-                    //numOfCandidates, voted, turnsLeft, candIndex, defaultCand, voted, votingNow
-                    Clients.Client(id).VotedUpdate(thegame.getNumOfCandidates(), Program.createNumOfVotesString(thegame, playerIndex), thegame.getVotesLeft(playerIndex), thegame.getTurnsLeft(), Program.createCandIndexString(id), thegame.getDefault(playerIndex), (next - 1), next);
-
-                    Clients.Client(thegame.getPlayerID(thegame.getHumanTurn())).YourTurn();
+                    if (next != -1)
+                        updatePlayers(thegame, id, playerIndex, next);
+                    else
+                        gameOver(thegame, id, playerIndex);
                 }
 
             }
             else if (status == -1) //game over
-            {
-                List<int> playersPoints = thegame.gameOverPoints();
-                Clients.Client(id).GameOver(thegame.getNumOfCandidates(), Program.createNumOfVotesString(thegame, playerIndex), thegame.getVotesLeft(playerIndex), thegame.getTurnsLeft(), Program.createGameOverString(playersPoints), thegame.getWinner());
+                gameOver(thegame, id, playerIndex);
+        }
 
-                for (int i = 0; i < thegame.getPlayersIDList().Count; i++)
+        private void updatePlayers(Game game, string id, int playerIndex, int next)
+        {
+            //numOfCandidates, voted, turnsLeft, playerVoted, votingNow
+            for (int i = 0; i < game.getPlayersIDList().Count; i++)
+            {
+                if (game.getPlayersIDList()[i] != id)
                 {
-                    int player = thegame.getPlayerIndex(thegame.getPlayersIDList()[i]);
-                    Clients.Client(thegame.getPlayersIDList()[i]).GameOver(thegame.getNumOfCandidates(), Program.createNumOfVotesString(thegame,player), thegame.getVotesLeft(player), thegame.getTurnsLeft(), Program.createGameOverString(playersPoints), thegame.getWinner());
+                    int player = game.getPlayerIndex(game.getPlayersIDList()[i]);
+                    Clients.Client(game.getPlayersIDList()[i]).OtherVotedUpdate(game.getNumOfCandidates(), Program.createNumOfVotesString(game, player), game.getVotesLeft(player), game.getTurnsLeft(), (next - 1), next);
                 }
+            }
+            //numOfCandidates, voted, turnsLeft, candIndex, defaultCand, voted, votingNow
+            Clients.Client(id).VotedUpdate(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playerIndex), game.getVotesLeft(playerIndex), game.getTurnsLeft(), Program.createCandIndexString(id), game.getDefault(playerIndex), (next - 1), next);
+
+            Clients.Client(game.getPlayerID(game.getHumanTurn())).YourTurn();
+        }
+
+        private void gameOver(Game game, string id, int playerIndex)
+        {
+            List<int> playersPoints = game.gameOverPoints();
+            Clients.Client(id).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playerIndex), game.getVotesLeft(playerIndex), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner());
+
+            for (int i = 0; i < game.getPlayersIDList().Count; i++)
+            {
+                int player = game.getPlayerIndex(game.getPlayersIDList()[i]);
+                Clients.Client(game.getPlayersIDList()[i]).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, player), game.getVotesLeft(player), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner());
             }
         }
     }

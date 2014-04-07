@@ -207,6 +207,7 @@
 
             main.client.gameOver = function (numOfCandidates, voted, votesL, turnsL, points, winner) {
 
+                imageClick = false;
                 $('#votesLeft').text('Remaining votes: ' + votesL);
                 $('#turnsLeft').text('Game terminates in: ' + turnsL);
                 var votedBy = voted.split("#");
