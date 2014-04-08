@@ -32,8 +32,23 @@ namespace Server
                     if (theGame.getCurrentTurn() == playerIndex)
                     {
                         int next = theGame.getNextTurn();
-                        if (next != -1)
-                            updatePlayers(theGame, Context.ConnectionId, playerIndex, next);
+                        if (next != -1){
+                            if (theGame.getPlayersIDList().Count > 0)
+                            {
+                                if (theGame.getPlayersIDList().Count - 1 == theGame.getHumanTurn())
+                                {
+                                    theGame.setHumanTurn(0);
+                                    updateOtherPlayers(theGame, Context.ConnectionId, playerIndex, next);
+                                    updatePlayer(theGame, Context.ConnectionId, playerIndex, next);
+                                }
+                                else
+                                {
+                                    updateOtherPlayers(theGame, Context.ConnectionId, playerIndex, next);
+                                    updatePlayer(theGame, Context.ConnectionId, playerIndex, next);
+                                }
+                            }
+                        }
+                            
                         else
                             gameOver(theGame, Context.ConnectionId, playerIndex);
                     }
@@ -52,10 +67,10 @@ namespace Server
             if (Program.AwaitingGame == null)
             {
                 Game newGame = new Game(Program.gameDetails.getNumOfHumanPlayers(),
-                    Program.gameDetails.getPlayers(), Program.gameDetails.getNumOfCandidates(),
-                    Program.gameDetails.getCandidatesNames(), Program.gameDetails.getRounds(),
-                    Program.gameDetails.getVotesList(), Program.gameDetails.getPoints(),
-                    Program.gameDetails.getPriorities(), Program.gameDetails.getAgents(),
+                    new List<string>(Program.gameDetails.getPlayers()), Program.gameDetails.getNumOfCandidates(),
+                    new List<string>(Program.gameDetails.getCandidatesNames()), Program.gameDetails.getRounds(),
+                    new List<int>(Program.gameDetails.getVotesList()), new List<int>(Program.gameDetails.getPoints()),
+                    new List<List<string>>(Program.gameDetails.getPriorities()),new List<Agent>(Program.gameDetails.getAgents()),
                     Program.gameDetails.getIsRounds());
                 Program.AwaitingGame = newGame;
             }
@@ -115,8 +130,11 @@ namespace Server
                         }
                         next = thegame.getNextTurn();
                     }
-                    if (next != -1)
-                        updatePlayers(thegame, id, playerIndex, next);
+                    if (next != -1){
+                        updateOtherPlayers(thegame, id, playerIndex, next);
+                        updatePlayer(thegame, id, playerIndex, next);
+                    }
+                        
                     else
                         gameOver(thegame, id, playerIndex);
                 }
@@ -126,7 +144,7 @@ namespace Server
                 gameOver(thegame, id, playerIndex);
         }
 
-        private void updatePlayers(Game game, string id, int playerIndex, int next)
+        private void updateOtherPlayers(Game game, string id, int playerIndex, int next)
         {
             //numOfCandidates, voted, turnsLeft, playerVoted, votingNow
             for (int i = 0; i < game.getPlayersIDList().Count; i++)
@@ -137,6 +155,11 @@ namespace Server
                     Clients.Client(game.getPlayersIDList()[i]).OtherVotedUpdate(game.getNumOfCandidates(), Program.createNumOfVotesString(game, player), game.getVotesLeft(player), game.getTurnsLeft(), (next - 1), next);
                 }
             }
+
+        }
+
+        private void updatePlayer(Game game, string id, int playerIndex, int next)
+        {
             //numOfCandidates, voted, turnsLeft, candIndex, defaultCand, voted, votingNow
             Clients.Client(id).VotedUpdate(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playerIndex), game.getVotesLeft(playerIndex), game.getTurnsLeft(), Program.createCandIndexString(id), game.getDefault(playerIndex), (next - 1), next);
 

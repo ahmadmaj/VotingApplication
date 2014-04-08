@@ -502,6 +502,11 @@ namespace Server
             return this.humanTurn;
         }
 
+        public void setHumanTurn(int n)
+        {
+            this.humanTurn = n;
+        }
+
         public int getCurrentTurn()
         {
             return this.turn;
