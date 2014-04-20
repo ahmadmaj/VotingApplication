@@ -29,10 +29,13 @@ namespace Server
                     int playerIndex = theGame.getPlayerIndex(Context.ConnectionId);
                     theGame.deletePlayerID(Context.ConnectionId);
                     theGame.replacePlayer(playerIndex);
-                    if (theGame.getCurrentTurn() == playerIndex)
+                    if (theGame.getPlayersIDList().Count == 0)
+                        theGame.endGame();
+                    else if (theGame.getPlayersIDList().Count > 0 && theGame.getCurrentTurn() == playerIndex)
                     {
                         int next = theGame.getNextTurn();
-                        if (next != -1){
+                        if (next != -1 && theGame.getPlayersIDList().Count > 0)
+                        {
                             if (theGame.getPlayersIDList().Count > 0)
                             {
                                 if (theGame.getPlayersIDList().Count - 1 == theGame.getHumanTurn())
@@ -48,9 +51,14 @@ namespace Server
                                 }
                             }
                         }
-                            
                         else
                             gameOver(theGame, Context.ConnectionId, playerIndex);
+                            
+                    }
+                    else
+                    {
+                        if (theGame.getPlayersIDList().Count == 0)
+                            theGame.endGame();
                     }
                 }
                     

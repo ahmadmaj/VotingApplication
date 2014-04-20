@@ -567,5 +567,12 @@ namespace Server
             return ans;
         }
 
+        public void endGame()
+        {
+            this.gameOver = true;
+            this.writeToFile[2] = "game ended after:,all players left";
+            writeToCSVFile();
+        }
+
     }
 }
