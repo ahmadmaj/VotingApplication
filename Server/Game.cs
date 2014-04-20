@@ -21,7 +21,8 @@ namespace Server
        // private int numOfTurns;
         public List<string> candidatesNames { get; private set; }
         private List<int> votesPerPlayer; //votes left for each player
-        //private List<List<int>> votedBy; //candidates, players who voted
+        private Boolean whoVoted; //to show in the game who voted for the player
+        private List<List<int>> votedBy; //candidates, players who voted
         private List<int> votes; //number of votes each candidate got
         public List<int> points { get; private set; }
         public List<List<string>> priorities { get; private set; }
@@ -41,7 +42,7 @@ namespace Server
         private Boolean gameOver; 
 
 
-        public Game(int humans, List<string> players, int candidates, List<string> candNames, int roundsNum, List<int> vote, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round)
+        public Game(int humans, List<string> players, int candidates, List<string> candNames, int roundsNum, List<int> vote, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round, Boolean voted)
         {
             gameID = Interlocked.Increment(ref nextId);
             file = new WriteData(gameID);
@@ -56,11 +57,12 @@ namespace Server
             this.priorities = priority;
             this.votesPerPlayer = vote;
             this.rounds = roundsNum;
-            //this.votedBy = new List<List<int>>();
-            //for (int i = 0; i < numOfCandidates; i++)
-            //{
-            //    votedBy.Add(new List<int>());
-            //}
+            this.whoVoted = voted;
+            this.votedBy = new List<List<int>>();
+            for (int i = 0; i < numOfCandidates; i++)
+            {
+                votedBy.Add(new List<int>());
+            }
             this.votes = new List<int>();
             for (int i = 0; i < this.numOfCandidates; i++)
                 this.votes.Add(0);
@@ -110,15 +112,16 @@ namespace Server
             this.replacingAgents = new List<Agent>();
             this.replaceTurn = -1;
             this.gameOver = false;
+            
 
         }
 
-        
         public int vote(int candidatePriority, int player)
         {
             if (this.votesPerPlayer[player] > 0)
             {
                 int candIndex = this.candidatesNames.IndexOf(this.priorities[player][candidatePriority]);
+                updateVotedBy(candIndex, player);
                 if (this.playersVotes[player][0] == -1)
                     this.votes[candIndex]++;
                 else if (this.playersVotes[player][0] != -1 && this.playersVotes[player][0] != candIndex)
@@ -476,10 +479,24 @@ namespace Server
         {
             string ans = "";
             for (int i = 0; i < this.winners.Count; i++)
-                ans = ans + " ," + this.candidatesNames[this.winners[i]];
+            {
+                if (i == 0)
+                    ans = this.candidatesNames[this.winners[i]];
+                else
+                    ans = ans + ", " + this.candidatesNames[this.winners[i]];
+
+            }
+                
             return ans;
         }
 
+        public string getCurrentWinner(int player)
+        {
+            string ans = "";
+            for (int i = 0; i < this.winners.Count; i++)
+                ans = ans + "#" + this.priorities[player].IndexOf(this.candidatesNames[this.winners[i]]);
+            return ans;
+        }
         public void writeToCSVFile()
         {
             for (int i = 0; i < this.writeToFile.Count; i++)
@@ -515,6 +532,39 @@ namespace Server
         public Boolean isGameOver()
         {
             return this.gameOver;
+        }
+
+        public Boolean isVotedDisplay()
+        {
+            return this.whoVoted;
+        }
+
+        private void updateVotedBy(int candIndex, int player){
+            for (int i = 0; i < this.numOfCandidates; i++)
+            {
+                if (this.votedBy[i].Contains(player))
+                    this.votedBy[i].Remove(player);
+            }
+            this.votedBy[candIndex].Add(player);
+        }
+
+        public string createWhoVotedString(int player)
+        {
+            string ans = "";
+            for (int i = 0; i < this.priorities[player].Count; i++)
+            {
+                ans = ans + "#";
+                List<int> playersWhoVoted = this.votedBy[this.candidatesNames.IndexOf(this.priorities[player][i])];
+                for (int j = 0; j < playersWhoVoted.Count; j++)
+                {
+                    if (j == 0)
+                        ans = ans + "player " + (playersWhoVoted[j] + 1);
+                    else
+                        ans = ans + ", player " + (playersWhoVoted[j] + 1);
+                }
+            }
+
+            return ans;
         }
 
     }

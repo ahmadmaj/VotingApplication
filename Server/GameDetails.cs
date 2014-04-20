@@ -19,8 +19,9 @@ namespace Server
         private List<List<string>> priorities;
         private List<Agent> agents;
         private Boolean isRounds;
+        private Boolean whoVoted;
 
-        public GameDetails(int humanPlayers, int players, int candidates, int rounds, List<string> candNames, List<string> player, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round)
+        public GameDetails(int humanPlayers, int players, int candidates, int rounds, List<string> candNames, List<string> player, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round, Boolean voted)
         {
             this.numOfHumanPlayers = humanPlayers;
             this.numOfTotalPlayers = players;
@@ -32,6 +33,7 @@ namespace Server
             this.priorities = priority;
             this.agents = agent;
             this.isRounds = round;
+            this.whoVoted = voted;
         }
 
 
@@ -97,6 +99,11 @@ namespace Server
         public Boolean getIsRounds()
         {
             return this.isRounds;
+        }
+
+        public Boolean getShowWhoVoted()
+        {
+            return this.whoVoted;
         }
 
     }

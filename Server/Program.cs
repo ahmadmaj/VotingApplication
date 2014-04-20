@@ -72,6 +72,7 @@ namespace Server
         //  number_of_candidates: <number>
         //  players_order: <human/computer>
         //  number_of_rounds: <number>
+        //  show_who_voted: <yes/no>
         //  agents: <number of agent files>
         //  <agent type> <path>
         //  ...
@@ -137,7 +138,7 @@ namespace Server
                     numOfRounds = Convert.ToInt32(line[1]);
                 else
                 {
-                    Console.WriteLine("error while reading the file - votesPlayer");
+                    Console.WriteLine("error while reading the file - number_of_rounds");
                     return null;
                 }
 
@@ -146,6 +147,28 @@ namespace Server
                 {
                     if (playersOrder[i] == "human")
                         numOfHumanPlayers++;
+                }
+
+                //show_who_voted
+                Boolean whoVoted = false;
+                nextLine = sr.ReadLine();
+                line = nextLine.Split(' ');
+                if (line[0] == "show_who_voted:")
+                {
+                    if (line[1] == "yes")
+                        whoVoted = true;
+                    else if (line[1] == "no")
+                        whoVoted = false;
+                    else
+                    {
+                        Console.WriteLine("error while reading the file - show_who_voted, wrond argument");
+                        return null;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("error while reading the file - show_who_voted");
+                    return null;
                 }
 
                 //agents
@@ -205,7 +228,7 @@ namespace Server
                 }
                 else
                 {
-                    Console.WriteLine("error while reading the file - candidatesnames");
+                    Console.WriteLine("error while reading the file - candidates_names");
                     return null;
                 }
 
@@ -249,7 +272,7 @@ namespace Server
 
 
 
-                return new GameDetails(numOfHumanPlayers, numOfPlayers, numberOfCandidates, numOfRounds, candnames, playersOrder, points, priorities, agents, isRounds);
+                return new GameDetails(numOfHumanPlayers, numOfPlayers, numberOfCandidates, numOfRounds, candnames, playersOrder, points, priorities, agents, isRounds, whoVoted);
 
             }
             catch (Exception e)
@@ -325,7 +348,7 @@ namespace Server
             }
             catch (Exception e)
             {
-                Debug.WriteLine("the file could not be read - priorities");
+                Debug.WriteLine("the file could not be read - agentsFile");
                 Debug.WriteLine(e.Message);
                 return null;
             }
@@ -356,7 +379,7 @@ namespace Server
             }
             catch (Exception e)
             {
-                Debug.WriteLine("the file could not be read - priorities");
+                Debug.WriteLine("the file could not be read - prioritiesFile");
                 Debug.WriteLine(e.Message);
                 return null;
             }
@@ -444,7 +467,6 @@ namespace Server
             {
                 ans = ans + "#" + priority[i];
             }
-
             return ans;
         }
 

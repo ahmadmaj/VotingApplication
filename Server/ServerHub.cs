@@ -71,7 +71,7 @@ namespace Server
                     new List<string>(Program.gameDetails.getCandidatesNames()), Program.gameDetails.getRounds(),
                     new List<int>(Program.gameDetails.getVotesList()), new List<int>(Program.gameDetails.getPoints()),
                     new List<List<string>>(Program.gameDetails.getPriorities()),new List<Agent>(Program.gameDetails.getAgents()),
-                    Program.gameDetails.getIsRounds());
+                    Program.gameDetails.getIsRounds(), Program.gameDetails.getShowWhoVoted());
                 Program.AwaitingGame = newGame;
             }
             Program.AwaitingGame.addPlayerID(id);
@@ -103,9 +103,9 @@ namespace Server
                     Program.AwayingGames[i].addPlayerID(connectionId);
             }*/
             int turn = thegame.getTurn(connectionId);
-            //msg,playerID, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, point, voted, turn, who is voting
-            Clients.Client(connectionId).GameDetails("start", thegame.getPlayerIndex(connectionId), thegame.getNumOfCandidates(), thegame.getNumOfPlayers(), thegame.getNumOfRounds(), thegame.getTurnsLeft(), Program.createPrioritiesString(connectionId), Program.createCandNamesString(connectionId), Program.createCandIndexString(connectionId), 0, 
-              Program.createPointsString(connectionId), Program.createNumOfVotesString(connectionId), turn, thegame.getCurrentTurn());
+            //msg,playerID, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, defaultCand, points, votes, isVoted, voted, turn, whoIsVoting, currentWinnersIndex
+            Clients.Client(connectionId).GameDetails("start", thegame.getPlayerIndex(connectionId), thegame.getNumOfCandidates(), thegame.getNumOfPlayers(), thegame.getNumOfRounds(), thegame.getTurnsLeft(), Program.createPrioritiesString(connectionId), Program.createCandNamesString(connectionId), Program.createCandIndexString(connectionId),0,
+              Program.createPointsString(connectionId), Program.createNumOfVotesString(connectionId), thegame.isVotedDisplay(), thegame.createWhoVotedString(thegame.getPlayerIndex(connectionId)), turn, thegame.getCurrentTurn(), thegame.getCurrentWinner(thegame.getPlayerIndex(connectionId)));
         }
 
         //sent when the client voted
@@ -126,7 +126,7 @@ namespace Server
                         for (int i = 0; i < thegame.getPlayersIDList().Count; i++)
                         {
                             int player = thegame.getPlayerIndex(thegame.getPlayersIDList()[i]);
-                            Clients.Client(thegame.getPlayersIDList()[i]).OtherVotedUpdate(thegame.getNumOfCandidates(), Program.createNumOfVotesString(thegame, player), thegame.getVotesLeft(player), thegame.getTurnsLeft(), (next - 1), next);
+                            Clients.Client(thegame.getPlayersIDList()[i]).OtherVotedUpdate(thegame.getNumOfCandidates(), Program.createNumOfVotesString(thegame, player), thegame.getVotesLeft(player), thegame.getTurnsLeft(), (next - 1), next, thegame.getCurrentWinner(player), thegame.createWhoVotedString(player));
                         }
                         next = thegame.getNextTurn();
                     }
@@ -146,13 +146,13 @@ namespace Server
 
         private void updateOtherPlayers(Game game, string id, int playerIndex, int next)
         {
-            //numOfCandidates, voted, turnsLeft, playerVoted, votingNow
+            //numOfCandidates, voted, turnsLeft, playerVoted, votingNow, currentWinnersIndex,whoVoted
             for (int i = 0; i < game.getPlayersIDList().Count; i++)
             {
                 if (game.getPlayersIDList()[i] != id)
                 {
                     int player = game.getPlayerIndex(game.getPlayersIDList()[i]);
-                    Clients.Client(game.getPlayersIDList()[i]).OtherVotedUpdate(game.getNumOfCandidates(), Program.createNumOfVotesString(game, player), game.getVotesLeft(player), game.getTurnsLeft(), (next - 1), next);
+                    Clients.Client(game.getPlayersIDList()[i]).OtherVotedUpdate(game.getNumOfCandidates(), Program.createNumOfVotesString(game, player), game.getVotesLeft(player), game.getTurnsLeft(), (next - 1), next, game.getCurrentWinner(player), game.createWhoVotedString(player));
                 }
             }
 
@@ -160,8 +160,8 @@ namespace Server
 
         private void updatePlayer(Game game, string id, int playerIndex, int next)
         {
-            //numOfCandidates, voted, turnsLeft, candIndex, defaultCand, voted, votingNow
-            Clients.Client(id).VotedUpdate(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playerIndex), game.getVotesLeft(playerIndex), game.getTurnsLeft(), Program.createCandIndexString(id), game.getDefault(playerIndex), (next - 1), next);
+            //numOfCandidates, voted, turnsLeft, candIndex, defaultCand, voted, votingNow, currentWinnersIndex, whoVoted
+            Clients.Client(id).VotedUpdate(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playerIndex), game.getVotesLeft(playerIndex), game.getTurnsLeft(), Program.createCandIndexString(id), game.getDefault(playerIndex), (next - 1), next, game.getCurrentWinner(playerIndex), game.createWhoVotedString(playerIndex));
 
             Clients.Client(game.getPlayerID(game.getHumanTurn())).YourTurn();
         }
@@ -169,12 +169,12 @@ namespace Server
         private void gameOver(Game game, string id, int playerIndex)
         {
             List<int> playersPoints = game.gameOverPoints();
-            Clients.Client(id).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playerIndex), game.getVotesLeft(playerIndex), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner());
+            Clients.Client(id).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playerIndex), game.getVotesLeft(playerIndex), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner(), game.getCurrentWinner(playerIndex), game.createWhoVotedString(playerIndex));
 
             for (int i = 0; i < game.getPlayersIDList().Count; i++)
             {
                 int player = game.getPlayerIndex(game.getPlayersIDList()[i]);
-                Clients.Client(game.getPlayersIDList()[i]).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, player), game.getVotesLeft(player), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner());
+                Clients.Client(game.getPlayersIDList()[i]).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, player), game.getVotesLeft(player), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner(), game.getCurrentWinner(playerIndex), game.createWhoVotedString(playerIndex));
             }
         }
     }
