@@ -39,10 +39,12 @@ namespace Server
         private Boolean isRounds;
         private List<List<int>> playersVotes;
         private int roundNumber;
-        private Boolean gameOver; 
+        private Boolean gameOver;
+        private Boolean startSecondrnd;
+        private Boolean fileCreated;
 
 
-        public Game(int humans, List<string> players, int candidates, List<string> candNames, int roundsNum, List<int> vote, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round, Boolean voted)
+        public Game(int humans, List<string> players, int candidates, List<string> candNames, int roundsNum, List<int> vote, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round, Boolean voted, String start)
         {
             gameID = Interlocked.Increment(ref nextId);
             file = new WriteData(gameID);
@@ -81,6 +83,7 @@ namespace Server
             this.roundNumber = 1;
             this.winners = new List<int>();
 
+            this.fileCreated = false;
             this.writeToFile = new List<string>();
             this.writeToFile.Add("number of players:," + players.Count.ToString());
             this.writeToFile.Add("number of candidates:," + this.numOfCandidates.ToString());
@@ -112,8 +115,13 @@ namespace Server
             this.replacingAgents = new List<Agent>();
             this.replaceTurn = -1;
             this.gameOver = false;
-            
-
+            if (start != "no")
+            {
+                startSecondrnd = true;
+                startFromSecondRound(start);
+            }
+            else
+                startSecondrnd = false;
         }
 
         public int vote(int candidatePriority, int player)
@@ -469,10 +477,23 @@ namespace Server
         // check if all players voted for the same candidate for the last 2 turns
         public Boolean checkGameOver()
         {
-            for (int i = 0; i < this.playersVotes.Count; i++)
-                if (this.playersVotes[i][0] != this.playersVotes[i][1])
-                    return false;
-            return true;
+            if (startSecondrnd && this.roundNumber > 2)
+            {
+                for (int i = 0; i < this.playersVotes.Count; i++)
+                    if (this.playersVotes[i][0] != this.playersVotes[i][1])
+                        return false;
+                return true;
+            }
+            else if (!startSecondrnd)
+            {
+                for (int i = 0; i < this.playersVotes.Count; i++)
+                    if (this.playersVotes[i][0] != this.playersVotes[i][1])
+                        return false;
+                return true;
+            }
+            else
+                return false;
+
         }
 
         public string getWinner()
@@ -499,9 +520,11 @@ namespace Server
         }
         public void writeToCSVFile()
         {
+            this.fileCreated = true;
             for (int i = 0; i < this.writeToFile.Count; i++)
                 file.write(this.writeToFile[i]);
             file.close();
+            
         }
 
         public int getDefault(int player)
@@ -570,8 +593,47 @@ namespace Server
         public void endGame()
         {
             this.gameOver = true;
-            this.writeToFile[2] = "game ended after:,all players left";
-            writeToCSVFile();
+            if (!fileCreated)
+            {
+                this.writeToFile[2] = "game ended after:,all players left";
+                writeToCSVFile();
+            }
+        }
+
+        private void startFromSecondRound(string firstRound)
+        {
+            if (firstRound == "first")
+            { //voted by
+                // votes
+                for (int i = 0; i < this.players.Count; i++)
+                {
+                    int candIndex = this.candidatesNames.IndexOf(this.priorities[i][0]);
+                    this.votedBy[candIndex].Add(i);
+                    this.votes[candIndex]++;
+                    this.playersVotes[i][0] = candIndex;
+                }
+            }
+            else if (firstRound == "random")
+            {
+                for (int i = 0; i < this.players.Count; i++)
+                {
+                    Random rnd = new Random();
+                    int randomCand = rnd.Next(0, this.priorities[i].Count - 1);
+                    this.votedBy[randomCand].Add(i);
+                    this.votes[randomCand]++;
+                    this.playersVotes[i][0] = randomCand;
+                }
+            }
+        }
+
+        public int turnsToWait(int player)
+        {
+            if (player > this.turn)
+                return (player - this.turn);
+            else if (player == this.turn)
+                return 0;
+            else
+                return (this.players.Count - this.turn + player);
         }
 
     }

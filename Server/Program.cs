@@ -171,6 +171,26 @@ namespace Server
                     return null;
                 }
 
+                //start_from_second_round
+                string startSecondRnd = "";
+                nextLine = sr.ReadLine();
+                line = nextLine.Split(' ');
+                if (line[0] == "start_from_second_round:")
+                {
+                    if (line[1] == "no" || line[1] == "first" || line[1] == "random")
+                        startSecondRnd = line[1];
+                    else
+                    {
+                        Console.WriteLine("error while reading the file - start_from_second_round, wrond argument");
+                        return null;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("error while reading the file - start_from_second_round");
+                    return null;
+                }
+
                 //agents
                 List<Agent> agents = new List<Agent>();
                 Boolean isRounds = false;
@@ -272,7 +292,7 @@ namespace Server
 
 
 
-                return new GameDetails(numOfHumanPlayers, numOfPlayers, numberOfCandidates, numOfRounds, candnames, playersOrder, points, priorities, agents, isRounds, whoVoted);
+                return new GameDetails(numOfHumanPlayers, numOfPlayers, numberOfCandidates, numOfRounds, candnames, playersOrder, points, priorities, agents, isRounds, whoVoted, startSecondRnd);
 
             }
             catch (Exception e)

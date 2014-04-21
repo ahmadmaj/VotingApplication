@@ -70,7 +70,7 @@
                 }
             };
             
-            main.client.gameDetails = function (msg, playerI, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, defaultCand, point, votes, isVoted, voted, turn, voting, winner) {
+            main.client.gameDetails = function (msg, playerI, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, defaultCand, point, votes, isVoted, voted, turn, voting, winner, turnsWait) {
                 //$('playerTurn').val(turn);
                 votesProgressInterval = 190 / numOfCandidates;
                 numOfImages = numOfCandidates;
@@ -83,7 +83,7 @@
                     var table1 = $('<table border="0" width="100%" style="height:50%"></table>');
                     row11 = $('<tr border="0" width="100%" style="height:100%"></tr>');
                     cell11 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label style="font-family:Arial"> There are ' + numPlayers + ' players</label> <br/> <br/> <label id="votesLeft" style="font-family:Arial">Remaining votes: ' + numVotes + '</label> <br/><br/> <label id="turnsLeft" style="font-family:Arial"> Game terminates in: ' + numTurns + ' turns</label>');
-                    cell12 = $('<td width="60%" align="center" style="height:100%"></td>').html('<label id="turnStatus" style="font-family:Arial" ></label><br><br><label id="voteStatus" style="font-family:Arial font:bold" ></label><img id="waitImg" src="/images/wait.gif" style="height:15%"><br><br><label id="playerVoted" style="font-family:Arial" ></label> <label id="gameOverTxt" style="font-family:Arial" ></label><br><br><div id="secbar"><div id="secs"></div></div>');
+                    cell12 = $('<td width="60%" align="center" style="height:100%"></td>').html('<label id="turnStatus" style="font-family:Arial" ></label><br><br><label id="voteStatus" style="font-family:Arial font:bold" ></label><img id="waitImg" src="/images/wait.gif" style="height:15%"><br><br><label id="turnsToWait" style="font-family:Arial"></label><label id="playerVoted" style="font-family:Arial"></label><label id="gameOverTxt" style="font-family:Arial"></label><br><br><div id="secbar"><div id="secs"></div></div>');
                     //cell13 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label id="votesLeft" style="font-family:Arial">Remaining votes: ' + numVotes + '</label> <br/> <label id="turnsLeft" style="font-family:Arial"> Game terminates in: ' + numTurns + ' turns</label>');
                     cell13 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label></label>');
                     table1.append(row11);
@@ -176,14 +176,16 @@
                     if (turn == 1) {
                         imageClick = true;
                         $('#waitImg').hide();
-                        $('#playerVoted').text('');
+                        //$('#playerVoted').text('');
+                        $('#turnsToWait').text('');
                         $('#turnStatus').text("It's your turn");
                         $('#voteStatus').text('VOTE NOW!');
                         progressBarFunc();
                     }
                     else {
                         imageClick = false;
-                        $('#turnStatus').text('Please wait for player ' + (voting+1) + ' to vote');
+                        $('#turnStatus').text('Please wait for player ' + (voting + 1) + ' to vote');
+                        $('#turnsToWait').text('Your turn is in ' + turnsWait + ' steps');
                         $('#voteStatus').text('');
                         $('#waitImg').show();
                     }
@@ -193,16 +195,18 @@
             main.client.yourTurn = function () {
                 imageClick = true;
                 $('#waitImg').hide();
-                $('#playerVoted').text('');
+                //$('#playerVoted').text('');
+                $('#turnsToWait').text('');
                 $('#turnStatus').text("It's your turn");
                 $('#voteStatus').text('VOTE NOW!');
                 $(".images").fadeTo("fast", 1);
                 progressBarFunc();
             };
 
-            main.client.votedUpdate = function (numOfCandidates, votes, votesL, turnsL, candIndex, defaultCand, playerV, voting, winner, whoVoted) {
+            main.client.votedUpdate = function (numOfCandidates, votes, votesL, turnsL, candIndex, defaultCand, playerV, voting, winner, whoVoted, turnsWait) {
                 defaultVote = defaultCand;
-                $('#playerVoted').text('player ' + (playerV + 1) + ' voted');
+                $('#turnsToWait').text('Your turn is in ' + turnsWait + ' steps');
+                //$('#playerVoted').text('player ' + (playerV + 1) + ' voted');
                 $('#turnStatus').text('Please wait for player ' + (voting+1) + ' to vote');
                 $('#votesLeft').text('Remaining votes: ' + votesL);
                 $('#turnsLeft').text('Game terminates in: ' + turnsL);
@@ -249,7 +253,7 @@
                 }
             };
 
-            main.client.otherVotedUpdate = function (numOfCandidates, votes, votesL, turnsL, playerV, voting, winner, whoVoted) {
+            main.client.otherVotedUpdate = function (numOfCandidates, votes, votesL, turnsL, playerV, voting, winner, whoVoted, turnswait) {
                 $('#turnStatus').text('Please wait for player ' + (voting+1) + ' to vote');
                 $('#votesLeft').text('Remaining votes: ' + votesL);
                 $('#turnsLeft').text('Game terminates in: ' + turnsL);
@@ -279,8 +283,8 @@
                     }, 250);
                     $('#num' + i).text(numOfVotes[i + 1]);
                 }
-
-                $('#playerVoted').text('player ' + (playerV+1) + ' voted');
+                $('#turnsToWait').text('Your turn is in ' + turnswait + ' steps');
+                //$('#playerVoted').text('player ' + (playerV+1) + ' voted');
 
             };
 
@@ -319,7 +323,8 @@
 
                 var pPoints = points.split('#');
                 $('#waitImg').hide();
-                $('#playerVoted').text('');
+                $('#turnsToWait').text('');
+                //$('#playerVoted').text('');
                 $('#turnStatus').text('GAME OVER!!!');
                 $('#gameOverTxt').html('The winning candidate is ' + winner + '<br/> Your score is: ' + pPoints[playerIndex + 1]);
 
