@@ -581,9 +581,9 @@ namespace Server
                 for (int j = 0; j < playersWhoVoted.Count; j++)
                 {
                     if (j == 0)
-                        ans = ans + "player " + (playersWhoVoted[j] + 1);
+                        ans = ans + "p" + (playersWhoVoted[j] + 1);
                     else
-                        ans = ans + ", player " + (playersWhoVoted[j] + 1);
+                        ans = ans + ",p" + (playersWhoVoted[j] + 1);
                 }
             }
 
