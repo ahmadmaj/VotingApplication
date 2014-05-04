@@ -84,9 +84,8 @@
                     //first table
                     var table1 = $('<table border="0" width="100%" style="height:50%"></table>');
                     row11 = $('<tr border="0" width="100%" style="height:100%"></tr>');
-                    cell11 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label style="font-family:Arial"> There are ' + numPlayers + ' players</label> <br/> <br/> <label id="votesLeft" style="font-family:Arial">Remaining votes: ' + numVotes + '</label> <br/><br/> <label id="turnsLeft" style="font-family:Arial"> Game terminates in: ' + numTurns + ' turns</label>');
+                    cell11 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label style="font-family:Arial"> There are ' + numPlayers + ' players</label> <br/> <br/> <label id="turnsLeft" style="font-family:Arial"> Game ends in: ' + numTurns + ' turns</label>');
                     cell12 = $('<td width="60%" align="center" style="height:100%"></td>').html('<label id="turnStatus" style="font-family:Arial" ></label><br><br><label id="voteStatus" style="font-family:Arial font:bold" ></label><img id="waitImg" src="/images/wait.gif" style="height:15%"><br><br><label id="turnsToWait" style="font-family:Arial"></label><label id="playerVoted" style="font-family:Arial"></label><label id="gameOverTxt" style="font-family:Arial"></label><br><br><div id="secbar"><div id="secs"></div></div>');
-                    //cell13 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label id="votesLeft" style="font-family:Arial">Remaining votes: ' + numVotes + '</label> <br/> <label id="turnsLeft" style="font-family:Arial"> Game terminates in: ' + numTurns + ' turns</label>');
                     cell13 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label></label>');
                     table1.append(row11);
                     row11.append(cell11);
@@ -125,9 +124,9 @@
                             var pcellWidth = cellWidth * 0.5;
                             var icellWidth = cellWidth * 0.5;
                             for (var i = 0; i < numOfCandidates; i++) {
-                                if (i == 0)
-                                    var url = "/images/user" + (candIndexes[i + 1]) + "_default.png";
-                                else
+                                //if (i == 0)
+                                //    var url = "/images/user" + (candIndexes[i + 1]) + "_default.png";
+                                //else
                                     var url = "/images/user" + (candIndexes[i + 1]) + ".png";
                                 var size = 80 - (8 * i);
                                 //cell23 = $('<td class="imgCells" width=cellWidth + "%" align="center" style="height:60%"></td>').
@@ -157,7 +156,7 @@
                         }
                         else if (j == 3) {
                             for (var i = 0; i < numOfCandidates; i++) {
-                                cell24 = $('<td width=cellWidth + "%" align="center" style="height:10%"></td>').html('<label style="font-family:Arial">' + names[i + 1] + '</label>');
+                                cell24 = $('<td width=cellWidth + "%" align="center" style="height:10%"></td>').html('<label style="font-family:Arial; font-style:italic; font-weight: bold">' + names[i + 1] + '</label>');
                                 row24.append(cell24);
                             }
                         }
@@ -178,25 +177,7 @@
                     $('#tableContainer').append(table2);
 
                     var winners = winner.split("#");
-                    //var red = 0;
-                    //for (var i = 0; i < numOfCandidates; i++) {
-                    //    red = 0;
-                    //    for (var j = 1; j < winners.length; j++) {
-                    //        if (winners[j] == i) {
-                    //            $('#inner' + winners[j]).css('background-image', 'url("/images/progressBar2Red.png")');
-                    //            red = 1;
-                    //        }
-                    //    }
-                    //    if (red == 0)
-                    //        $('#inner' + i).css('background-image', 'url("/images/progressBar2.png")');
-                    //}
 
-                    //for (var i = 0; i < numOfCandidates; i++) {
-                    //    $('#inner'+i).animate({
-                    //        height: (numOfVotes[i + 1] * votesProgressInterval)
-                    //    }, 250);
-                    //    $('#num' + i).text(numOfVotes[i + 1]);
-                    //}
                     for (var i = 0; i < numOfCandidates; i++) {
                         var cVoted = whoVoted[i+1].split(',');
                         var red = 0;
@@ -235,7 +216,6 @@
                        
                     }
 
-
                     if (turn == 1) {
                         imageClick = true;
                         $('#waitImg').hide();
@@ -271,8 +251,8 @@
                 $('#turnsToWait').text('Your turn is in ' + turnsWait + ' steps');
                 //$('#playerVoted').text('player ' + (playerV + 1) + ' voted');
                 $('#turnStatus').text('Please wait for player ' + (voting+1) + ' to vote');
-                $('#votesLeft').text('Remaining votes: ' + votesL);
-                $('#turnsLeft').text('Game terminates in: ' + turnsL);
+                //$('#votesLeft').text('Remaining votes: ' + votesL);
+                $('#turnsLeft').text('Game ends in: ' + turnsL);
                 var numOfVotes = votes.split("#");
                 var winners = winner.split("#");
                 var whoVotedString = whoVoted.split("#");
@@ -283,26 +263,6 @@
                 //    }
                 //}
 
-
-                //var red = 0;
-                //for (var i = 0; i < numOfCandidates; i++) {
-                //    red = 0;
-                //    for (var j = 1; j < winners.length; j++) {
-                //        if (winners[j] == i) {
-                //            $('#inner' + winners[j]).css('background-image', 'url("/images/progressBar2Red.png")');
-                //            red = 1;
-                //        }
-                //    }
-                //    if (red == 0)
-                //        $('#inner' + i).css('background-image', 'url("/images/progressBar2.png")');
-                //}
-
-                //for (var i = 0; i < numOfCandidates; i++) {
-                //    $('#inner' + i).animate({
-                //        height: (numOfVotes[i + 1] * votesProgressInterval)
-                //    }, 250);
-                //    $('#num' + i).text(numOfVotes[i + 1]);
-                //}
 
                 for (var i = 0; i < numOfCandidates; i++) {
                     for (var j = 0; j < numOfPlayers; j++) {
@@ -349,48 +309,32 @@
                 }
 
                 var candIndexes = candIndex.split('#');
-                for (var i = 0; i < numOfCandidates; i++) {
-                    if (i == defaultCand) {
-                        var url = "/images/user" + (candIndexes[i + 1]) + "_default.png";
-                        $('#' + i).attr('src', url);
-                    } else {
-                        var url = "/images/user" + (candIndexes[i + 1]) + ".png";
-                        $('#' + i).attr('src', url);
-                    }
-                }
+                //for (var i = 0; i < numOfCandidates; i++) {
+                //    if (i == defaultCand) {
+                //        var url = "/images/user" + (candIndexes[i + 1]) + "_default.png";
+                //        $('#' + i).attr('src', url);
+                //    } else {
+                //        var url = "/images/user" + (candIndexes[i + 1]) + ".png";
+                //        $('#' + i).attr('src', url);
+                //    }
+                //}
             };
 
             main.client.otherVotedUpdate = function (numOfCandidates, votes, votesL, turnsL, playerV, voting, winner, whoVoted, turnswait) {
                 $('#turnStatus').text('Please wait for player ' + (voting+1) + ' to vote');
-                $('#votesLeft').text('Remaining votes: ' + votesL);
-                $('#turnsLeft').text('Game terminates in: ' + turnsL);
+                //$('#votesLeft').text('Remaining votes: ' + votesL);
+                $('#turnsLeft').text('Game ends in: ' + turnsL);
                 var numOfVotes = votes.split("#");
                 var winners = winner.split("#");
                 var whoVotedString = whoVoted.split("#");
+
                 //if (showWhoVoted == true) {
                     
                 //    for (var i = 0; i < numOfCandidates; i++) {
                 //        $('#voted' + i).text('Who voted: ' + whoVotedString[i + 1]);
                 //    }
                 //}
-                //var red = 0;
-                //for (var i = 0; i < numOfCandidates; i++) {
-                //    red = 0;
-                //    for (var j = 1; j < winners.length; j++) {
-                //        if (winners[j] == i) {
-                //            $('#inner' + winners[j]).css('background-image', 'url("/images/progressBar2Red.png")');
-                //            red = 1;
-                //        }
-                //    }
-                //    if(red == 0)
-                //        $('#inner' + i).css('background-image', 'url("/images/progressBar2.png")');
-                //}
-                //for (var i = 0; i < numOfCandidates; i++) {
-                //    $('#inner' + i).animate({
-                //        height: (numOfVotes[i + 1] * votesProgressInterval)
-                //    }, 250);
-                //    $('#num' + i).text(numOfVotes[i + 1]);
-                //}
+
                 for (var i = 0; i < numOfCandidates; i++) {
                     for (var j = 0; j < numOfPlayers; j++) {
                         $('#pcell' + i + j).css('background-image', 'none');
@@ -442,8 +386,8 @@
             main.client.gameOver = function (numOfCandidates, votes, votesL, turnsL, points, winner, currentWinner, whoVoted) {
 
                 imageClick = false;
-                $('#votesLeft').text('Remaining votes: ' + votesL);
-                $('#turnsLeft').text('Game terminates in: ' + turnsL);
+                //$('#votesLeft').text('Remaining votes: ' + votesL);
+                $('#turnsLeft').text('Game ends in: ' + turnsL);
                 var numOfVotes = votes.split("#");
                 var winners = currentWinner.split("#");
                 var whoVotedString = whoVoted.split("#");
@@ -453,24 +397,7 @@
                 //        $('#voted' + i).text('Who voted: ' + whoVotedString[i + 1]);
                 //    }
                 //}
-                //var red = 0;
-                //for (var i = 0; i < numOfCandidates; i++) {
-                //    red = 0;
-                //    for (var j = 1; j < winners.length; j++) {
-                //        if (winners[j] == i) {
-                //            $('#inner' + winners[j]).css('background-image', 'url("/images/progressBar2Red.png")');
-                //            red = 1;
-                //        }
-                //    }
-                //    if (red == 0)
-                //        $('#inner' + i).css('background-image', 'url("/images/progressBar2.png")');
-                //}
-                //for (var i = 0; i < numOfCandidates; i++) {
-                //    $('#inner' + i).animate({
-                //        height: (numOfVotes[i + 1] * votesProgressInterval)
-                //    }, 250);
-                //    $('#num' + i).text(numOfVotes[i + 1]);
-                //}
+
                 for (var i = 0; i < numOfCandidates; i++) {
                     for (var j = 0; j < numOfPlayers; j++) {
                         $('#pcell' + i + j).css('background-image', 'none');
@@ -520,7 +447,10 @@
                 $('#turnsToWait').text('');
                 //$('#playerVoted').text('');
                 $('#turnStatus').text('GAME OVER!!!');
-                $('#gameOverTxt').html('The winning candidate is ' + winner + '<br/> Your score is: ' + pPoints[playerIndex + 1]);
+                if (winner.indexOf(',')>=0)
+                    $('#gameOverTxt').html('The winning candidates are: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
+                else
+                    $('#gameOverTxt').html('The winning candidate is: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
 
             };
             

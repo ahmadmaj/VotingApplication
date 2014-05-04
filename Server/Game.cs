@@ -47,7 +47,6 @@ namespace Server
         public Game(int humans, List<string> players, int candidates, List<string> candNames, int roundsNum, List<int> vote, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round, Boolean voted, String start)
         {
             gameID = Interlocked.Increment(ref nextId);
-            file = new WriteData(gameID);
             this.status = "init";
             this.numOfHumanPlayers = humans;
             this.players = players;
@@ -83,6 +82,7 @@ namespace Server
             this.roundNumber = 1;
             this.winners = new List<int>();
 
+            this.file = new WriteData(gameID);
             this.fileCreated = false;
             this.writeToFile = new List<string>();
             this.writeToFile.Add("number of players:," + players.Count.ToString());
