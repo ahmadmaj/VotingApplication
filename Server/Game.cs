@@ -42,6 +42,7 @@ namespace Server
         private int roundNumber;
         private Boolean gameOver;
         private Boolean startSecondrnd;
+        private Boolean firstRound;
         private Boolean fileCreated;
 
 
@@ -118,8 +119,10 @@ namespace Server
             this.gameOver = false;
             if (start != "no")
             {
-                startSecondrnd = true;
+                this.startSecondrnd = true;
+                this.firstRound = true;
                 startFromSecondRound(start);
+                
             }
             else
                 startSecondrnd = false;
@@ -210,6 +213,7 @@ namespace Server
             if (this.players[this.turn] == "human")
             {
                 this.firstTurn = false;
+                this.firstRound = false;
                 if (this.playersID[this.humanTurn] == playerID)
                     return 1;
                 else
@@ -221,6 +225,7 @@ namespace Server
                 this.firstTurn = false;
                 while (this.players[this.turn] == "computer")
                     getNextTurn();
+                this.firstRound = false;
                 if (this.playersID[this.humanTurn] == playerID)
                     return 1;
                 else
@@ -279,13 +284,15 @@ namespace Server
                 if (this.isRounds)
                 {
                     int votefor = this.agents[0].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
-                    Thread.Sleep(5000);
+                    if (!firstRound)
+                        Thread.Sleep(5000);
                     gameStatus = vote(votefor, this.turn);
                 }
                 else
                 {
                     int votefor = this.agents[this.computerTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
-                    Thread.Sleep(5000);
+                    if (!firstRound)
+                        Thread.Sleep(5000);
                     gameStatus = vote(votefor, this.turn);
                 }
 
@@ -299,8 +306,9 @@ namespace Server
             }
             else if (this.players[this.turn] == "replaced")
             {
-               int votefor = this.replacingAgents[this.replaceTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
-               Thread.Sleep(5000);
+                int votefor = this.replacingAgents[this.replaceTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
+                if (!firstRound)
+                    Thread.Sleep(5000);
                 gameStatus = vote(votefor, this.turn);
                 this.replaceTurn++;
                 this.turn++;
@@ -522,6 +530,8 @@ namespace Server
                 ans = ans + "#" + this.priorities[player].IndexOf(this.candidatesNames[this.winners[i]]);
             return ans;
         }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void writeToCSVFile()
         {
             this.fileCreated = true;
@@ -633,6 +643,7 @@ namespace Server
             return ans;
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void endGame()
         {
             this.gameOver = true;

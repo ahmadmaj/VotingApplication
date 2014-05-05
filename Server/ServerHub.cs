@@ -12,6 +12,7 @@ namespace Server
     [HubName("serverHub")]
     public class ServerHub : Hub
     {
+
         public override Task OnDisconnected()
         {
             if (Program.AwaitingGame != null && Program.AwaitingGame.playersID != null)
@@ -107,9 +108,10 @@ namespace Server
                     Program.AwayingGames[i].addPlayerID(connectionId);
             }*/
             int turn = thegame.getTurn(connectionId);
-            //msg,playerID, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, defaultCand, points, votes, isVoted, voted, turn, whoIsVoting, currentWinnersIndex, turnsToWait
+            //msg,playerID, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, defaultCand, points, votes, isVoted, voted, playerString, turn, whoIsVoting, currentWinnersIndex, turnsToWait
             Clients.Client(connectionId).GameDetails("start", thegame.getPlayerIndex(connectionId), thegame.getNumOfCandidates(), thegame.getNumOfPlayers(), thegame.getNumOfRounds(), thegame.getTurnsLeft(), Program.createPrioritiesString(connectionId), Program.createCandNamesString(connectionId), Program.createCandIndexString(connectionId),0,
               Program.createPointsString(connectionId), Program.createNumOfVotesString(connectionId), thegame.isVotedDisplay(), thegame.createWhoVotedString(thegame.getPlayerIndex(connectionId)), ("p" + (thegame.getPlayerIndex(connectionId)+1).ToString()), turn, thegame.getCurrentTurn(), thegame.getCurrentWinner(thegame.getPlayerIndex(connectionId)), thegame.turnsToWait(thegame.getPlayerIndex(connectionId)));
+
         }
 
         //sent when the client voted
@@ -150,7 +152,7 @@ namespace Server
 
         private void updateOtherPlayers(Game game, string id, int playerIndex, int next)
         {
-            //numOfCandidates, voted, turnsLeft, playerVoted, votingNow, currentWinnersIndex,whoVoted, turnsToWait
+            //numOfCandidates, voted, turnsLeft, playerVoted, votingNow, currentWinnersIndex,whoVoted, playerString, turnsToWait
             for (int i = 0; i < game.getPlayersIDList().Count; i++)
             {
                 if (game.getPlayersIDList()[i] != id)
@@ -164,7 +166,7 @@ namespace Server
 
         private void updatePlayer(Game game, string id, int playerIndex, int next)
         {
-            //numOfCandidates, voted, turnsLeft, candIndex, defaultCand, voted, votingNow, currentWinnersIndex, whoVoted, turnsToWait
+            //numOfCandidates, voted, turnsLeft, candIndex, defaultCand, voted, votingNow, currentWinnersIndex, whoVoted, playerString, turnsToWait
             Clients.Client(id).VotedUpdate(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playerIndex), game.getVotesLeft(playerIndex), game.getTurnsLeft(), Program.createCandIndexString(id), game.getDefault(playerIndex), (next - 1), next, game.getCurrentWinner(playerIndex), game.createWhoVotedString(playerIndex), ("p" + (playerIndex+1).ToString()), game.turnsToWait(playerIndex));
 
             Clients.Client(game.getPlayerID(game.getHumanTurn())).YourTurn();
