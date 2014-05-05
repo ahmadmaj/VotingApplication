@@ -279,11 +279,13 @@ namespace Server
                 if (this.isRounds)
                 {
                     int votefor = this.agents[0].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
+                    Thread.Sleep(5000);
                     gameStatus = vote(votefor, this.turn);
                 }
                 else
                 {
                     int votefor = this.agents[this.computerTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
+                    Thread.Sleep(5000);
                     gameStatus = vote(votefor, this.turn);
                 }
 
@@ -298,6 +300,7 @@ namespace Server
             else if (this.players[this.turn] == "replaced")
             {
                int votefor = this.replacingAgents[this.replaceTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
+               Thread.Sleep(5000);
                 gameStatus = vote(votefor, this.turn);
                 this.replaceTurn++;
                 this.turn++;
