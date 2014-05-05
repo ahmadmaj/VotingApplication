@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Server
 {
@@ -577,13 +578,52 @@ namespace Server
             for (int i = 0; i < this.priorities[player].Count; i++)
             {
                 ans = ans + "#";
+                //Debug.Print("---- candidate" + i.ToString());
                 List<int> playersWhoVoted = this.votedBy[this.candidatesNames.IndexOf(this.priorities[player][i])];
+                int index = -1;
                 for (int j = 0; j < playersWhoVoted.Count; j++)
                 {
-                    if (j == 0)
-                        ans = ans + "p" + (playersWhoVoted[j] + 1);
-                    else
-                        ans = ans + ",p" + (playersWhoVoted[j] + 1);
+                    //Debug.Print(playersWhoVoted[j].ToString());
+                    if (j==0 && playersWhoVoted.Contains(player)){
+                        index = playersWhoVoted.IndexOf(player);
+                        if (j != index)
+                            ans = ans + "p" + (playersWhoVoted[j] + 1);
+                        else if (playersWhoVoted.Count > 1)
+                        {
+                            j++;
+                            ans = ans + "p" + (playersWhoVoted[j] + 1);
+                            if(j == playersWhoVoted.Count-1)
+                                ans = ans + ",p" + (player + 1);
+
+                        }
+                        else
+                            ans = ans + "p" + (player + 1);
+                    }
+                    else if (j == (playersWhoVoted.Count - 1) && playersWhoVoted.Contains(player))
+                    {
+                        if (j != index)
+                        {
+                            ans = ans + ",p" + (playersWhoVoted[j] + 1);
+                            ans = ans + ",p" + (player + 1);
+                        }
+                        else
+                            ans = ans + ",p" + (player + 1);
+                    }
+                    else if(playersWhoVoted.Contains(player)){
+                        if (j == index)
+                            continue;
+                        else
+                        {
+                            ans = ans + ",p" + (playersWhoVoted[j] + 1);
+                        }
+                    }
+                    else{
+                        if (j == 0)
+                            ans = ans + "p" + (playersWhoVoted[j] + 1);
+                        else
+                            ans = ans + ",p" + (playersWhoVoted[j] + 1);
+                    }
+
                 }
             }
 
