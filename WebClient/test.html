@@ -6,212 +6,32 @@
         html, body {
             height: 100%;
         }
-        /*#progressTable {
-            background-image: none;
-            -webkit-background-size: cover;
-            -moz-background-size: cover;
-            -o-background-size: cover;
-            background-size: cover;
-        }*/
-        .pr {
-            background-image: none;
-            -webkit-background-size: 100%;
-            -moz-background-size: 100%;
-            -o-background-size: 100%;
-            background-size: 100%;
-            background-position:inherit;
-        }
-        #cell1 {
-            border-top-left-radius: 6px;
-            border-top-right-radius: 6px;
-        }
+
     </style>
 
-    <!--<style type="text/css">
-        .outer {
-            width: 30px;
-            height: 100px;
-            border: 2px solid #ccc;
-            overflow: hidden;
-            position: relative;
-            -moz-border-radius: 4px;
-            -webkit-border-radius: 4px;
-            border-radius: 4px;
-            /*vertical-align: middle;
-            display: inline-block;*/
-            display: inline-block;
-            /*float: left;*/
-        }
-
-        .inner {
-            width: 100%;
-            overflow: hidden;
-            /*left: -2px;*/
-            position: absolute;
-            /*border: 2px solid #999;*/
-            border-top-width: 0;
-            /*background-color: #999;*/
-            background-image: url('/images/progressBar2Red.png');
-            background-size: 30px;
-            bottom: 0;
-            height: 0%;
-            /*vertical-align: middle;
-            display: inline-block;*/
-            /*float: left;*/
-            display: inline-block;
-        }
-        .img1 {
-            position: relative;
-            /*vertical-align: middle;
-            display: inline-block;*/
-            /*float: left;*/
-            display: inline-block;
-        }
-        .div1, .skill {
-            /*position:relative;
-            align-items:center;
-            align-content:center;*/
-            /*float: left;*/
-            display: inline-block;
-            align-items:center;
-            /*display:inline-block*/
-        }
-    </style >-->
 </head > 
 <body> 
     <script src="Scripts/jquery-2.1.0.min.js" > </script >
     <script src="Scripts/jquery-ui-1.10.4.min.js" > </script >
-    <!-- <link href="StyleGame.css" rel="stylesheet" / >-->
 
-
-   <!-- <div class="div1">-->
-        <!--<div class="skill">
-            <label id="num"></label><br />
-            <div class="outer">
-                <div class="inner">
-                </div>
-            </div>
-        </div>
-        <img class="img1" src="/images/user5.png" style=" height:30%" />-->
+    <img class="images" id="0" src="/images/user1.png" />
+    <img class="images" id="1" src="/images/user2.png" />
+    <script>
+        $('.images').hover(
+            function (event) {
+                var originalSrc = $(this).attr("src");
+                var srcon = "/images/user" + parseInt(originalSrc.substring(12, 13)) + "_on2.png";
+                $("#" + event.target.id).attr("src", srcon);
+            },
+            function (event) {
+                var originalSrc = $(this).attr("src");
+                var imgsrc = "/images/user" + parseInt(originalSrc.substring(12, 13)) + ".png";
+                $("#" + event.target.id).attr("src", imgsrc);
+            }
+         );
         
-    <!--</div>-->
-    <!--<script>
-        $('.inner').animate({
-            height: 20
-        }, 250);
-    </script>-->
-    
-
-    <!--<script>
-        var count = 10;
-        $('.skill').on('click', 'button', function progress() {
-            $('.inner').animate({
-                height: count
-            }, 250);
-            $('#num').text(count);
-            count = count+10;
-        });
-    </script>-->
-
-
-    <!--<table border="1" width="100%" style="height:50%">
-        <tr>
-            <td width="33%" style="height:100%" align="center">
-                <div style="display: inline-block">
-                    <table class="pr" id="progressTable" width="10%" style="display: inline-block; height: 100%; border-radius: 8px; border: solid; border-color: #808080; border-width: 2px; " cellspacing="0">
-                        <tr width="100%" style="height:20%">
-                            <td id="cell1" width="100%" align="center" style="border: none; display:list-item"><label>p1</label></td>
-                        </tr>
-                        <tr width="100%" style="height:20%">
-                            <td id="cell2" width="100%" align="center" style="border: none;"><label>p2</label></td>
-                        </tr>
-                        <tr width="100%" style="height:20%">
-                            <td id="cell3" width="100%" align="center" style="border: none">p3</td>
-                        </tr>
-                        <tr width="100%" style="height:20%">
-                            <td id="cell4" width="100%" align="center" style="border: none">p4</td>
-                        </tr>
-                        <tr width="100%" style="height:20%">
-                            <td id="cell5" width="100%" align="center" style="border: none">p5</td>
-                        </tr>
-                    </table>
-                    <img class="images" src="/images/user1.png" style="display: inline-block" width="80%">
-                </div>
-
-            </td>
-            <td width="33%"></td>
-            <td width="33%"></td>
-        </tr>
-    </table>
-    <script>
-        $('#cell1').css('background-image', "url('/images/progressBar2.png')");
-        $('#cell2').css('background-image', "url('/images/progressBar2.png')");
-    </script>-->
-    <script>
-        var wp = 33 * 0.1;
-        var wi = 33 * 0.9;
     </script>
-    <table border="1" width="100%" style="height:50%">
-        <tr>
-            <!--<td width="33%" style="height: 100% " align="center" valign="middle">
-                <div id="cellDiv" style="height:100%; display: inline-block; position: relative; vertical-align:central">
-                    <div id="outer" width="10%" style="border: 2px solid #ccc; width: 10%; display: inline-block; height:50%">
-                        <div class="inner" id="inner1" width="10%"><label>p1</label></div>
-                        <div class="inner" id="inner2" width="10%"><label>p2</label></div>
-                        <div class="inner" id="inner3" width="10%"><label>p3</label></div>
-                    </div>
 
-                    <script>
-                        //var divHeight = $("#outer").height();
-                        //var cellHeight = divHeight / 3;
-                        $('.inner').height("33.3%");
-                    </script>
-                </div>
-                <div width="90%" style="display: inline-block; height:100%">
-                    <img id=" img" class="images" src="/images/user2.png" style=" display:inline-block" width="70%">
-                </div>
-            </td>-->
-            <td id="c1" style="border:none" align="center">
-                <!--<div id="outer" style="border: 2px solid #ccc; height: 90%; width: 100%">
-                    <div class="inner" id="inner1" width="100%" style="height: 33.3%;"><label>p1</label></div>
-                    <div class="inner" id="inner2" width="100%" style="height: 33.3%; display: table-cell; vertical-align: middle;"><label>p2</label></div>
-                    <div class="inner" id="inner3" width="100%" style="height: 33.3%; text-align:center;">p3</div>
-                </div>-->
-                <table class="pr" id="progressTable" width="100%" style="height: 100%; border-radius: 8px; border: solid; border-color: #808080; border-width: 2px; " cellspacing="0">
-                    <tr width="100%" style="height:20%">
-                        <td id="cell1" width="100%" align="center" style="border: none;" ><label>p1</label></td>
-                    </tr>
-                    <tr width="100%" style="height:20%">
-                        <td id="cell2" width="100%" align="center" style="border: none;"><label>p2</label></td>
-                    </tr>
-                    <tr width="100%" style="height:20%">
-                        <td id="cell3" width="100%" align="center" style="border: none">p3</td>
-                    </tr>
-                    <tr width="100%" style="height:20%">
-                        <td id="cell4" width="100%" align="center" style="border: none">p4</td>
-                    </tr>
-                    <tr width="100%" style="height:20%">
-                        <td id="cell5" width="100%" align="center" style="border: none">p5</td>
-                    </tr>
-                </table>
-            </td>
-            <td id="c2" style="border:none" align="center">
-                <img id=" img" class="images" src="/images/user2.png" style=" display:inline-block" width="80%">
-            </td>
-            <script>
-                $("#c1").width(wp + "%");
-                $("#c2").width(wi + "%");
-            </script>
-            <td width="33%"></td>
-            <td width="33%"></td>
-
-        </tr>
-    </table>
-    <script>
-        $('#cell1').css('background-image', "url('/images/progressBar2.png')");
-        $('#cell2').css('background-image', "url('/images/progressBar2.png')");
-        //$('#inner3').css('background-image', "url('/images/progressBar2.png')");
-    </script>
 </body >
 </html >
         
