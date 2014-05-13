@@ -14,7 +14,7 @@ label {
 }
 
 #secbar .ui-progressbar-value {
-    background-image: url('/images/progressBar.png');
+    background-image: url('images/progressBar.png');
 }
 
 #secs {
@@ -49,7 +49,7 @@ label {
     overflow: hidden;
     position: absolute;
     border-top-width: 0;
-    background-image: url('/images/progressBar2.png');
+    background-image: url('images/progressBar2.png');
     background-size: 20px;
     bottom: 0;
     height: 0%;
