@@ -12,9 +12,9 @@ namespace Server
         private int numOfHumanPlayers;
         private int numOfCandidates;
         private int numOfVotes;
-        private int numOfRounds;
+        private int numOfRounds; //number of rounds in the game
         private List<string> candidatesNames;
-        private List<string> players;
+        private List<string> players; // players type (human, compter, replaced)
         private List<int> points;
         private List<List<string>> priorities;
         private List<Agent> agents;

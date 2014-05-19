@@ -14,9 +14,9 @@ namespace Server
     {
         public static int init = 0;
         public static GameDetails gameDetails;
-        public static List<Game> games = new List<Game>();
         public static Game AwaitingGame = null;
-        public static Dictionary<string, int> Players = new Dictionary<string, int>();
+        public static Dictionary<string, int> Players = new Dictionary<string, int>();  //for each playID the gameID he is in
+        public static Dictionary<string, UserVoter> ConnIDtoUser = new Dictionary<string, UserVoter>(); //for each playID the User class he is
         public static List<Game> PlayingGames = new List<Game>(); 
 
 
@@ -25,13 +25,12 @@ namespace Server
 
         protected internal static Game getplayersGame(string id)
         {
-            //return PlayingGames[0];
-            return PlayingGames.FirstOrDefault(playingGame => playingGame.gameID == Players[id]);
+            return PlayingGames.FirstOrDefault(playingGame => Players.ContainsKey(id) && playingGame.gameID == Players[id]);
         }
 
         static void Main(string[] args)
         {
-            string url = "http://hdm.ise.bgu.ac.il:8010";
+            string url = "http://localhost:8010";
             using (WebApp.Start(url))
             {
                 Console.WriteLine("Server running on {0}", url);
@@ -421,7 +420,7 @@ namespace Server
             return ans;
         }
 
-
+        /*
         public static string createCandIndexString(string playerID)
         {
             Game thegame = getplayersGame(playerID);
@@ -435,7 +434,7 @@ namespace Server
                 ans = ans + "#" + (candNames.IndexOf(priority[i]) + 1);
             }
             return ans;
-        }
+        }*/
 
 
         //per player: cand.1#cand.2# ... (seperated by #)
@@ -540,8 +539,5 @@ namespace Server
                 ans = ans + "#" + points[i];
             return ans;
         }
-
-
-
     }
 }

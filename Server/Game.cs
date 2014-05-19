@@ -9,12 +9,12 @@ using System.Diagnostics;
 
 namespace Server
 {
-    public class Game
+    public class Game : IComparable
     {
         private string status;
         static int nextId;
         public int gameID {get; private set;}
-        private int numOfHumanPlayers;
+        public int numOfHumanPlayers { get; private set; }
         private List<string> players; // players type (human, compter, replaced)
         public List<string> playersID;
         private int numOfCandidates;
@@ -416,9 +416,10 @@ namespace Server
             return this.votes;
         }
 
-        public void addPlayerID(string playerID)
+        public void addPlayerID(UserVoter playerID)
         {
-            this.playersID.Add(playerID);
+            this.playersID.Add(playerID.id);
+            Program.ConnIDtoUser.Add(playerID.id,playerID);
             if (playersID.Count == this.numOfHumanPlayers)
                 this.status = "playing";
         }
@@ -688,6 +689,16 @@ namespace Server
                 return 0;
             else
                 return (this.players.Count - this.turn + player);
+        }
+        public int CompareTo(object obj)
+        {
+            if (obj == null) return 1;
+
+            Game otherGame = obj as Game;
+            if (otherGame != null)
+                return this.gameID - otherGame.gameID;
+            else
+                throw new ArgumentException("Object is not a Game");
         }
 
     }
