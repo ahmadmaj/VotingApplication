@@ -66,7 +66,7 @@ namespace Server
                 }  
             }
 
-            Program.Players.Remove(Context.ConnectionId);
+            Program.ConnIDtoUser.Remove(Context.ConnectionId);
             return null;
         }
 
@@ -77,17 +77,11 @@ namespace Server
             //Program.awaitingPlayersID.Add(id);
             if (Program.AwaitingGame == null)
             {
-                Game newGame = new Game(Program.gameDetails.getNumOfHumanPlayers(),
-                    new List<string>(Program.gameDetails.getPlayers()), Program.gameDetails.getNumOfCandidates(),
-                    new List<string>(Program.gameDetails.getCandidatesNames()), Program.gameDetails.getRounds(),
-                    new List<int>(Program.gameDetails.getVotesList()), new List<int>(Program.gameDetails.getPoints()),
-                    new List<List<string>>(Program.gameDetails.getPriorities()),new List<Agent>(Program.gameDetails.getAgents()),
-                    Program.gameDetails.getIsRounds(), Program.gameDetails.getShowWhoVoted(), Program.gameDetails.getStartSecondRound());
+                Game newGame = new Game(Program.gameDetails);
                 Program.AwaitingGame = newGame;
             }
             UserVoter newplayer = new UserVoter(id, Program.AwaitingGame);
             Program.AwaitingGame.addPlayerID(newplayer);
-            Program.Players.Add(id, Program.AwaitingGame.gameID);
             if (Program.AwaitingGame.getPlayersIDList().Count == Program.AwaitingGame.numOfHumanPlayers)
             {
                 Game startRunning = Program.AwaitingGame;
@@ -196,7 +190,6 @@ namespace Server
                 }
                 playerUser.score += sum/i;               
                 Clients.Client(playerid).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playeridx), game.getVotesLeft(playeridx), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner(), game.getCurrentWinner(playeridx), game.createWhoVotedString(playeridx), ("p" + (playerIndex + 1).ToString()));
-                //playerUser.calcScore(game.getCurrentWinner(playeridx).Split('#'));
             }
         }
     }

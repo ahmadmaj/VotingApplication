@@ -25,7 +25,10 @@ namespace Server
 
         protected internal static Game getplayersGame(string id)
         {
-            return PlayingGames.FirstOrDefault(playingGame => Players.ContainsKey(id) && playingGame.gameID == Players[id]);
+            Game currGame = null;
+            if (ConnIDtoUser.ContainsKey(id))
+                currGame = ConnIDtoUser[id].CurrGame;
+            return currGame;
         }
 
         static void Main(string[] args)
