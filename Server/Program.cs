@@ -13,7 +13,8 @@ namespace Server
     public class Program
     {
         public static int init = 0;
-        public static GameDetails gameDetails;
+        private static LinkedList<GameDetails> gameDetailsList = new LinkedList<GameDetails>();
+        public static LinkedListNode<GameDetails> gameDetails;
         public static Game AwaitingGame = null;
         public static Dictionary<string, int> Players = new Dictionary<string, int>();  //for each playID the gameID he is in
         public static Dictionary<string, UserVoter> ConnIDtoUser = new Dictionary<string, UserVoter>(); //for each playID the User class he is
@@ -56,13 +57,14 @@ namespace Server
                 //    }
                 //}
                 string curpath = Directory.GetCurrentDirectory();
-                if (args.Length > 2)
-                    gameDetails = readConfigFile(curpath + args[1]);
+                if (args.Length > 0)
+                    foreach (string confile in args)
+                        gameDetailsList.AddFirst(readConfigFile(curpath + "\\" + confile));
                 else
-                    gameDetails = readConfigFile(curpath + "\\configFile2_check.txt");
+                    gameDetailsList.AddFirst(readConfigFile(curpath + "\\configFile2_check.txt"));
                 //gameDetails = readConfigFile("C://Users//lena//Documents//Visual Studio 2013//Projects//VotingApplication//Server//configFile2_check.txt");
                 init = 1;
-
+                gameDetails = gameDetailsList.First;
 
 
                 Console.ReadLine();

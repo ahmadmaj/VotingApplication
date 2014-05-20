@@ -77,7 +77,8 @@ namespace Server
             //Program.awaitingPlayersID.Add(id);
             if (Program.AwaitingGame == null)
             {
-                Game newGame = new Game(Program.gameDetails);
+                Game newGame = new Game(Program.gameDetails.Value);
+                Program.gameDetails = Program.gameDetails.Next ?? Program.gameDetails.List.First;
                 Program.AwaitingGame = newGame;
             }
             UserVoter newplayer = new UserVoter(id, Program.AwaitingGame);
@@ -104,8 +105,6 @@ namespace Server
             UserVoter playerUser = Program.ConnIDtoUser[connectionId];
             foreach (string t in priority)
                 playerUser.CurrPriority.Add(candNames.IndexOf(t) + 1);
-
-
 
             int turn = thegame.getTurn(connectionId);
             Clients.Client(connectionId).GameDetails("start", thegame.getPlayerIndex(connectionId), thegame.getNumOfCandidates(), thegame.getNumOfPlayers(), thegame.getNumOfRounds(), thegame.getTurnsLeft(), Program.createPrioritiesString(connectionId), Program.createCandNamesString(connectionId), playerUser.currPriToString(),0,
@@ -167,9 +166,12 @@ namespace Server
 
         private void updatePlayer(Game game, string id, int playerIndex, int next)
         {
-            UserVoter playerUser = Program.ConnIDtoUser[id];
-            //numOfCandidates, voted, turnsLeft, candIndex, defaultCand, voted, votingNow, currentWinnersIndex, whoVoted, playerString, turnsToWait
-            Clients.Client(id).VotedUpdate(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playerIndex), game.getVotesLeft(playerIndex), game.getTurnsLeft(), playerUser.currPriToString(), game.getDefault(playerIndex), (next - 1), next, game.getCurrentWinner(playerIndex), game.createWhoVotedString(playerIndex), ("p" + (playerIndex+1).ToString()), game.turnsToWait(playerIndex));
+            if (Program.ConnIDtoUser.ContainsKey(id))
+            {
+                UserVoter playerUser = Program.ConnIDtoUser[id];
+                //numOfCandidates, voted, turnsLeft, candIndex, defaultCand, voted, votingNow, currentWinnersIndex, whoVoted, playerString, turnsToWait
+                Clients.Client(id).VotedUpdate(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playerIndex), game.getVotesLeft(playerIndex), game.getTurnsLeft(), playerUser.currPriToString(), game.getDefault(playerIndex), (next - 1), next, game.getCurrentWinner(playerIndex), game.createWhoVotedString(playerIndex), ("p" + (playerIndex+1).ToString()), game.turnsToWait(playerIndex));
+            }
 
             Clients.Client(game.getPlayerID(game.getHumanTurn())).YourTurn();
         }
