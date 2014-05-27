@@ -35,7 +35,8 @@ namespace Server
 
         public void write(string line)
         {
-            file.WriteLine(line);
+            if(file.BaseStream != null)
+                file.WriteLine(line);
         }
 
         public void close()

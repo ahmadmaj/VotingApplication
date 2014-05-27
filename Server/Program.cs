@@ -17,8 +17,7 @@ namespace Server
         public static List<Game> games = new List<Game>();
         public static Game AwaitingGame = null;
         public static Dictionary<string, int> Players = new Dictionary<string, int>();
-        public static List<Game> PlayingGames = new List<Game>(); 
-
+        public static List<Game> PlayingGames = new List<Game>();
 
         public static int count = 0;
         public static string first = "";
@@ -57,7 +56,7 @@ namespace Server
                 if (args.Length > 2)
                     gameDetails = readConfigFile(curpath + args[1]);
                 else
-                    gameDetails = readConfigFile(curpath + "\\configFile2_check.txt");
+                    gameDetails = readConfigFile(curpath + "\\test.txt");
                 //gameDetails = readConfigFile("C://Users//lena//Documents//Visual Studio 2013//Projects//VotingApplication//Server//configFile2_check.txt");
                 init = 1;
 

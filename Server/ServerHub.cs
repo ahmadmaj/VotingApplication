@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
+using System.Threading;
 
 namespace Server
 {
@@ -39,7 +40,7 @@ namespace Server
                         {
                             if (theGame.getPlayersIDList().Count > 0)
                             {
-                                if (theGame.getPlayersIDList().Count - 1 == theGame.getHumanTurn())
+                                if (theGame.getPlayersIDList().Count - 1 == theGame.getHumanTurn() || theGame.getPlayersIDList().Count <= theGame.getHumanTurn())
                                 {
                                     theGame.setHumanTurn(0);
                                     updateOtherPlayers(theGame, Context.ConnectionId, playerIndex, next);
@@ -58,7 +59,13 @@ namespace Server
                     else
                     {
                         if (theGame.getPlayersIDList().Count == 0)
-                            theGame.endGame();
+                            theGame.endGame(); 
+
+                        if (theGame.getPlayersIDList().Count <= theGame.getHumanTurn())
+                        {
+                            theGame.setHumanTurn(0);
+                        }
+
                     }
                 }  
             }
@@ -174,13 +181,14 @@ namespace Server
 
         private void gameOver(Game game, string id, int playerIndex)
         {
+            //to seperade playerIndex when msg sent in order to dend the right playerString
             List<int> playersPoints = game.gameOverPoints();
             Clients.Client(id).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playerIndex), game.getVotesLeft(playerIndex), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner(), game.getCurrentWinner(playerIndex), game.createWhoVotedString(playerIndex), ("p" + (playerIndex + 1).ToString()));
 
             for (int i = 0; i < game.getPlayersIDList().Count; i++)
             {
                 int player = game.getPlayerIndex(game.getPlayersIDList()[i]);
-                Clients.Client(game.getPlayersIDList()[i]).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, player), game.getVotesLeft(player), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner(), game.getCurrentWinner(player), game.createWhoVotedString(player), ("p" + (playerIndex + 1).ToString()));
+                Clients.Client(game.getPlayersIDList()[i]).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, player), game.getVotesLeft(player), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner(), game.getCurrentWinner(player), game.createWhoVotedString(player), ("p" + (player + 1).ToString()));
             }
         }
     }
