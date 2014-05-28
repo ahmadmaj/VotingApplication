@@ -666,6 +666,7 @@ namespace Server
                     this.votes[candIndex]++;
                     this.playersVotes[i][0] = candIndex;
                 }
+                gameOverPoints();
             }
             else if (firstRound == "random")
             {
@@ -677,6 +678,7 @@ namespace Server
                     this.votes[randomCand]++;
                     this.playersVotes[i][0] = randomCand;
                 }
+                gameOverPoints();
             }
         }
 
