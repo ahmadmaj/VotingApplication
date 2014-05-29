@@ -61,7 +61,7 @@ namespace Server
                     foreach (string confile in args)
                         gameDetailsList.AddFirst(readConfigFile(curpath + "\\" + confile));
                 else
-                    gameDetails = readConfigFile(curpath + "\\configFile2_check.txt");
+                    gameDetailsList.AddFirst(readConfigFile(curpath + "\\configFile2_check.txt"));
                 //gameDetails = readConfigFile("C://Users//lena//Documents//Visual Studio 2013//Projects//VotingApplication//Server//configFile2_check.txt");
                 init = 1;
                 gameDetails = gameDetailsList.First;

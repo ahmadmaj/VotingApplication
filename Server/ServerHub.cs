@@ -197,8 +197,8 @@ namespace Server
                     sum+=playersPoints[playerUser.CurrPriority.IndexOf(Convert.ToInt32(str)+1)];
                     i++;
                 }
-                playerUser.score += sum/i;               
-                Clients.Client(game.getPlayersIDList()[i]).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, player), game.getVotesLeft(player), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner(), game.getCurrentWinner(player), game.createWhoVotedString(player), ("p" + (playerIndex + 1).ToString()));
+                playerUser.score += sum/i;
+                Clients.Client(playerid).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playeridx), game.getVotesLeft(playeridx), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner(), game.getCurrentWinner(playeridx), game.createWhoVotedString(playeridx), ("p" + (playerIndex + 1).ToString()));
             }
         }
     }
