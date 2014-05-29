@@ -8,19 +8,19 @@ namespace Server
 {
     public class GameDetails
     {
-        private int numOfTotalPlayers;
-        private int numOfHumanPlayers;
-        private int numOfCandidates;
-        private int numOfVotes;
-        private int numOfRounds;
-        private List<string> candidatesNames;
-        private List<string> players;
-        private List<int> points;
-        private List<List<string>> priorities;
-        private List<Agent> agents;
-        private Boolean isRounds;
-        private Boolean whoVoted;
-        private string startSecondRound;
+        public int numOfTotalPlayers { get; private set; }
+        public int numOfHumanPlayers { get; private set; }
+        public int numOfCandidates { get; private set; }
+        public int numOfVotes { get; private set; }
+        public int numOfRounds { get; private set; }//number of rounds in the game
+        public List<string> candidatesNames { get; private set; }
+        public List<string> players { get; private set; } // players type (human, compter, replaced)
+        public List<int> points { get; private set; }
+        public List<List<string>> priorities { get; private set; }
+        public List<Agent> agents { get; private set; }
+        public Boolean isRounds { get; private set; }
+        public Boolean whoVoted { get; private set; }
+        public string startSecondRound { get; private set; }
 
         public GameDetails(int humanPlayers, int players, int candidates, int rounds, List<string> candNames, List<string> player, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round, Boolean voted, string start)
         {
@@ -38,38 +38,6 @@ namespace Server
             this.startSecondRound = start;
         }
 
-
-        public int getNumOfHumanPlayers()
-        {
-            return this.numOfHumanPlayers;
-        }
-
-        public int getNumOfTotalPlayers()
-        {
-            return this.numOfTotalPlayers;
-        }
-
-        public List<string> getPlayers()
-        {
-            return this.players;
-        }
-
-        public int getNumOfCandidates()
-        {
-            return this.numOfCandidates;
-        }
-
-        public int getVotes()
-        {
-            return this.numOfVotes;
-        }
-
-        public int getRounds()
-        {
-            return this.numOfRounds;
-
-        }
-
         public List<int> getVotesList()
         {
             List<int> ans = new List<int>();
@@ -77,40 +45,6 @@ namespace Server
                 ans.Add(this.numOfRounds);
 
             return ans;
-        }
-
-        public List<int> getPoints()
-        {
-            return this.points;
-        }
-        public List<List<string>> getPriorities()
-        {
-            return this.priorities;
-        }
-
-        public List<string> getCandidatesNames()
-        {
-            return this.candidatesNames;
-        }
-
-        public List<Agent> getAgents()
-        {
-            return this.agents;
-        }
-
-        public Boolean getIsRounds()
-        {
-            return this.isRounds;
-        }
-
-        public Boolean getShowWhoVoted()
-        {
-            return this.whoVoted;
-        }
-
-        public string getStartSecondRound()
-        {
-            return this.startSecondRound;
         }
 
     }

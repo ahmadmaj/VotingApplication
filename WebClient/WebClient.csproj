@@ -137,7 +137,6 @@
     <Content Include="images\user7_default.png" />
     <Content Include="images\user8.png" />
     <Content Include="images\user8_default.png" />
-    <Content Include="MainPage.html" />
     <Content Include="packages.config" />
     <None Include="Scripts\jquery-2.1.0.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.0.js" />

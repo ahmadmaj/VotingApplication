@@ -13,10 +13,11 @@ namespace Server
     public class Program
     {
         public static int init = 0;
-        public static GameDetails gameDetails;
-        public static List<Game> games = new List<Game>();
+        private static LinkedList<GameDetails> gameDetailsList = new LinkedList<GameDetails>();
+        public static LinkedListNode<GameDetails> gameDetails;
         public static Game AwaitingGame = null;
-        public static Dictionary<string, int> Players = new Dictionary<string, int>();
+        public static Dictionary<string, int> Players = new Dictionary<string, int>();  //for each playID the gameID he is in
+        public static Dictionary<string, UserVoter> ConnIDtoUser = new Dictionary<string, UserVoter>(); //for each playID the User class he is
         public static List<Game> PlayingGames = new List<Game>();
 
         public static int count = 0;
@@ -24,13 +25,15 @@ namespace Server
 
         protected internal static Game getplayersGame(string id)
         {
-            //return PlayingGames[0];
-            return PlayingGames.FirstOrDefault(playingGame => playingGame.gameID == Players[id]);
+            Game currGame = null;
+            if (ConnIDtoUser.ContainsKey(id))
+                currGame = ConnIDtoUser[id].CurrGame;
+            return currGame;
         }
 
         static void Main(string[] args)
         {
-            string url = "http://hdm.ise.bgu.ac.il:8010";
+            string url = "http://localhost:8010";
             //string url = "http://localhost:8010";
             using (WebApp.Start(url))
             {
@@ -54,13 +57,14 @@ namespace Server
                 //    }
                 //}
                 string curpath = Directory.GetCurrentDirectory();
-                if (args.Length > 2)
-                    gameDetails = readConfigFile(curpath + args[1]);
+                if (args.Length > 0)
+                    foreach (string confile in args)
+                        gameDetailsList.AddFirst(readConfigFile(curpath + "\\" + confile));
                 else
-                    gameDetails = readConfigFile(curpath + "\\test.txt");
+                    gameDetails = readConfigFile(curpath + "\\configFile2_check.txt");
                 //gameDetails = readConfigFile("C://Users//lena//Documents//Visual Studio 2013//Projects//VotingApplication//Server//configFile2_check.txt");
                 init = 1;
-
+                gameDetails = gameDetailsList.First;
 
 
                 Console.ReadLine();
@@ -421,7 +425,7 @@ namespace Server
             return ans;
         }
 
-
+        /*
         public static string createCandIndexString(string playerID)
         {
             Game thegame = getplayersGame(playerID);
@@ -435,7 +439,7 @@ namespace Server
                 ans = ans + "#" + (candNames.IndexOf(priority[i]) + 1);
             }
             return ans;
-        }
+        }*/
 
 
         //per player: cand.1#cand.2# ... (seperated by #)
@@ -540,8 +544,5 @@ namespace Server
                 ans = ans + "#" + points[i];
             return ans;
         }
-
-
-
     }
 }

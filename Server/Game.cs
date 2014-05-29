@@ -9,12 +9,12 @@ using System.Diagnostics;
 
 namespace Server
 {
-    public class Game
+    public class Game : IComparable
     {
         private string status;
         static int nextId;
         public int gameID {get; private set;}
-        private int numOfHumanPlayers;
+        public int numOfHumanPlayers { get; private set; }
         private List<string> players; // players type (human, compter, replaced)
         public List<string> playersID;
         private int numOfCandidates;
@@ -33,7 +33,7 @@ namespace Server
         private int replaceTurn; //index of the replacing agent who's turn it is
         private Boolean firstTurn;
         private List<int> winners;
-        private  WriteData file;
+        private WriteData file;
         private List<string> writeToFile;
         private List<Agent> agents;
         private List<Agent> replacingAgents;
@@ -46,21 +46,22 @@ namespace Server
         private Boolean fileCreated;
 
 
-        public Game(int humans, List<string> players, int candidates, List<string> candNames, int roundsNum, List<int> vote, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round, Boolean voted, String start)
+        public Game(GameDetails gamedets)
         {
+            string start = gamedets.startSecondRound;
             gameID = Interlocked.Increment(ref nextId);
             this.status = "init";
-            this.numOfHumanPlayers = humans;
-            this.players = players;
+            this.numOfHumanPlayers = gamedets.numOfHumanPlayers;
+            this.players = gamedets.players;
             this.playersID = new List<string>();
-            this.numOfCandidates = candidates;
+            this.numOfCandidates = gamedets.numOfCandidates;
            // this.numOfTurns = turns;
-            this.candidatesNames = candNames;
-            this.points = points;
-            this.priorities = priority;
-            this.votesPerPlayer = vote;
-            this.rounds = roundsNum;
-            this.whoVoted = voted;
+            this.candidatesNames = gamedets.candidatesNames;
+            this.points = gamedets.points;
+            this.priorities = gamedets.priorities;
+            this.votesPerPlayer = gamedets.getVotesList();
+            this.rounds = gamedets.numOfRounds;
+            this.whoVoted = gamedets.whoVoted;
             this.votedBy = new List<List<int>>();
             for (int i = 0; i < numOfCandidates; i++)
             {
@@ -87,7 +88,7 @@ namespace Server
             this.file = new WriteData(gameID);
             this.fileCreated = false;
             this.writeToFile = new List<string>();
-            this.writeToFile.Add("number of players:," + players.Count.ToString());
+            this.writeToFile.Add("number of players:," + gamedets.players.Count.ToString());
             this.writeToFile.Add("number of candidates:," + this.numOfCandidates.ToString());
             this.writeToFile.Add("game ended after:,");
             this.writeToFile.Add("player,priorities");
@@ -112,8 +113,8 @@ namespace Server
                     titles = titles + "points player" + (i + 1) + ",";
             }
             this.writeToFile.Add(titles);
-            this.agents = agent;
-            this.isRounds = round;
+            this.agents = gamedets.agents;
+            this.isRounds = gamedets.isRounds;
             this.replacingAgents = new List<Agent>();
             this.replaceTurn = -1;
             this.gameOver = false;
@@ -416,9 +417,10 @@ namespace Server
             return this.votes;
         }
 
-        public void addPlayerID(string playerID)
+        public void addPlayerID(UserVoter playerID)
         {
-            this.playersID.Add(playerID);
+            this.playersID.Add(playerID.id);
+            Program.ConnIDtoUser.Add(playerID.id,playerID);
             if (playersID.Count == this.numOfHumanPlayers)
                 this.status = "playing";
         }
@@ -690,6 +692,16 @@ namespace Server
                 return 0;
             else
                 return (this.players.Count - this.turn + player);
+        }
+        public int CompareTo(object obj)
+        {
+            if (obj == null) return 1;
+
+            Game otherGame = obj as Game;
+            if (otherGame != null)
+                return this.gameID - otherGame.gameID;
+            else
+                throw new ArgumentException("Object is not a Game");
         }
 
     }
