@@ -52,14 +52,14 @@ namespace Server
             gameID = Interlocked.Increment(ref nextId);
             this.status = "init";
             this.numOfHumanPlayers = gamedets.numOfHumanPlayers;
-            this.players = gamedets.players;
+            this.players = new List<string>(gamedets.players);
             this.playersID = new List<string>();
             this.numOfCandidates = gamedets.numOfCandidates;
            // this.numOfTurns = turns;
-            this.candidatesNames = gamedets.candidatesNames;
-            this.points = gamedets.points;
-            this.priorities = gamedets.priorities;
-            this.votesPerPlayer = gamedets.getVotesList();
+            this.candidatesNames = new List<string>(gamedets.candidatesNames);
+            this.points = new List<int>(gamedets.points);
+            this.priorities = new List<List<string>>(gamedets.priorities);
+            this.votesPerPlayer = new List<int>(gamedets.getVotesList());
             this.rounds = gamedets.numOfRounds;
             this.whoVoted = gamedets.whoVoted;
             this.votedBy = new List<List<int>>();
@@ -419,8 +419,8 @@ namespace Server
 
         public void addPlayerID(UserVoter playerID)
         {
-            this.playersID.Add(playerID.id);
-            Program.ConnIDtoUser.Add(playerID.id,playerID);
+            this.playersID.Add(playerID.connectionID);
+            Program.ConnIDtoUser.Add(playerID.connectionID,playerID);
             if (playersID.Count == this.numOfHumanPlayers)
                 this.status = "playing";
         }
