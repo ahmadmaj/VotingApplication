@@ -30,8 +30,8 @@ namespace Server
                 if (theGame != null && !theGame.isGameOver())
                 {
                     int playerIndex = theGame.getPlayerIndex(Context.ConnectionId);
+                    theGame.replacePlayer(playerIndex, Context.ConnectionId);
                     theGame.deletePlayerID(Context.ConnectionId);
-                    theGame.replacePlayer(playerIndex);
                     if (theGame.getPlayersIDList().Count == 0)
                         theGame.endGame();
                     else if (theGame.getPlayersIDList().Count > 0 && theGame.getCurrentTurn() == playerIndex)

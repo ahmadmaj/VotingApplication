@@ -86,6 +86,7 @@
     <Compile Include="Agent.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameDetails.cs" />
+    <Compile Include="ReplacingAgent.cs" />
     <Compile Include="UserVoter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

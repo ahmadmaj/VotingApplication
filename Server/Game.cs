@@ -35,10 +35,11 @@ namespace Server
         private WriteData file;
         private List<string> writeToFile;
         private List<Agent> agents;
-        private List<Agent> replacingAgents;
+        private List<ReplacingAgent> replacingAgents;
+        private List<string> playersDisconnected;
         private Boolean isRounds;
         private List<List<int>> playersVotes;
-        private int roundNumber;
+        private int roundNumber; //current round
         private Boolean gameOver;
         private Boolean startSecondrnd;
         private Boolean firstRound;
@@ -114,7 +115,8 @@ namespace Server
             this.writeToFile.Add(titles);
             this.agents = gamedets.agents;
             this.isRounds = gamedets.isRounds;
-            this.replacingAgents = new List<Agent>();
+            this.replacingAgents = new List<ReplacingAgent>();
+            this.playersDisconnected = new List<string>();
             this.replaceTurn = -1;
             this.gameOver = false;
             if (start != "no")
@@ -174,7 +176,21 @@ namespace Server
                     else
                         pointsString = pointsString + "," + currentPoints[i].ToString();
                 }
-                this.writeToFile.Add(time + "," + player.ToString() + "," + candIndex + "," + winnersString + "," + candidatesString + "," + pointsString);
+
+                String playerID = "";
+                if (this.players[player] == "computer")
+                {
+                    if (this.isRounds)
+                        playerID = "comp_" + this.computerTurn + "_" + this.agents[0].getType();
+                    else
+                        playerID = "comp_" + this.computerTurn + "_" + this.agents[this.computerTurn].getType();
+                }
+                else if (this.players[player] == "replaced")
+                    playerID = "replace_" + this.replacingAgents[this.replaceTurn].getPlayerID().ToString() + "_" + this.replacingAgents[this.replaceTurn].getType();
+                else
+                    playerID = Program.ConnIDtoUser[this.playersID[this.humanTurn]].userID.ToString();
+                     
+                this.writeToFile.Add(time + "," + playerID.ToString() + "," + candIndex + "," + winnersString + "," + candidatesString + "," + pointsString);
 
 
                 //Boolean gameOver = false;
@@ -232,45 +248,6 @@ namespace Server
                     return 0;                  
             }
         }
-
-        //[MethodImpl(MethodImplOptions.Synchronized)]
-        //public int getNextTurn()
-        //{
-        //    if(!this.firstTurn) 
-        //        this.turn++;
-        //    if (this.turn >= this.players.Count)
-        //        this.turn = 0;
-        //    int gameStatus = 1;
-        //    while (this.players[this.turn] != "human")
-        //    { 
-        //        if (this.isRounds)
-        //        {
-        //            int votefor = this.agents[0].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
-        //            gameStatus = vote(votefor, this.turn);
-        //        }
-        //        else{
-        //            int votefor = this.agents[this.computerTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
-        //            gameStatus = vote(votefor, this.turn);
-        //        }
-
-        //        this.turn++;
-        //        this.computerTurn++;
-        //        if (this.turn >= this.players.Count)
-        //            this.turn = 0;
-        //        if (this.computerTurn >= this.agents.Count)
-        //            this.computerTurn = 0;
-        //    }
-        //    if (!this.firstTurn) 
-        //        this.humanTurn++;
-        //    if (this.humanTurn >= this.playersID.Count)
-        //        this.humanTurn = 0;
-        //    if (gameStatus == 1)
-        //        return this.humanTurn;
-        //    else if (gameStatus == -1)
-        //        return gameStatus;
-        //    else
-        //        return -2;
-        //}
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public int getNextTurn()
@@ -375,11 +352,13 @@ namespace Server
             return this.players;
         }
 
-        public void replacePlayer(int index)
+        public void replacePlayer(int index, string id)
         {
             this.players[index] = "replaced";
-            this.replacingAgents.Add(new Agent("FIRST"));
+            this.replacingAgents.Add(new ReplacingAgent("FIRST", Program.ConnIDtoUser[id].userID));
             this.replaceTurn++;
+            string disconnect = Program.ConnIDtoUser[id].userID.ToString() + "," + this.roundNumber.ToString();
+            this.playersDisconnected.Add(disconnect);
         }
 
         public int getNumOfCandidates()
@@ -536,6 +515,14 @@ namespace Server
         public void writeToCSVFile()
         {
             this.fileCreated = true;
+            this.writeToFile.Insert(7, "disconnected player id, round");
+            int j = 8;
+            for (int i = 0; i < this.playersDisconnected.Count; i++)
+            {
+                this.writeToFile.Insert(j, this.playersDisconnected[i]);
+                j++;
+            }
+
             for (int i = 0; i < this.writeToFile.Count; i++)
                 file.write(this.writeToFile[i]);
             file.close();

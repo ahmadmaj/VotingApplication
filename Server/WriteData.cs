@@ -12,25 +12,13 @@ namespace Server
     {
         private string path;
         private System.IO.StreamWriter file;
+
         public WriteData(int gameID)
         {
-            string filename = generateName(gameID);
-            while (System.IO.File.Exists(filename))
-            {
-                filename = generateName(gameID);
-            }
-            Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\logs\\");
-            path = string.Format(Directory.GetCurrentDirectory() + "{0}" + filename, "\\logs\\");
-            //path = @"C:\Users\Lena\Documents\Visual Studio 2013\Projects\VotingApplication\Server\" + filename;
-            file = new System.IO.StreamWriter(path, true);
-        }
-
-        private string generateName(int gameID)
-        {
-            Random rnd = new Random();
-            int num = rnd.Next(1,10000);
-
-            return DateTime.Now.ToString("dd_MM_yyyy") + "_Game" + gameID +"_"+ num + ".csv";
+            string filename = gameID.ToString() + "_" + DateTime.Now.ToString("hhmm_ddMMyy") + ".csv";
+            Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\logs\\" + Program.logFolder + "\\");
+            this.path = string.Format(Directory.GetCurrentDirectory() + "{0}" + filename, "\\logs\\" + Program.logFolder + "\\");
+            this.file = new System.IO.StreamWriter(path, true);
         }
 
         public void write(string line)

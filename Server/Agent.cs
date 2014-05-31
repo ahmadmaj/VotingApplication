@@ -12,9 +12,12 @@ namespace Server
         private int priority;
         private List<List<int>> roundsList;
         private List<string> turns;
+        private int Id;
+        private string agentType;
 
         public Agent(string type)
         {
+            this.agentType = type;
             if (type == "RANDOM")
             {
                 this.id = 1;
@@ -34,12 +37,14 @@ namespace Server
 
         public Agent(string type, int p)
         {
+            this.agentType = type;
             this.id = 4;
             this.priority = p;
         }
 
         public Agent(string type, List<List<int>> rounds)
         {
+            this.agentType = type;
             if (type == "ROUNDS")
             {
                 this.id = 5;
@@ -49,6 +54,7 @@ namespace Server
 
         public Agent(string type, List<string> votes)
         {
+            this.agentType = type;
             if (type == "TURNS")
             {
                 this.id = 6;
@@ -117,6 +123,10 @@ namespace Server
                 return true;
             else
                 return false;
+        }
+
+        public string getType(){
+            return this.agentType;
         }
     }
 }
