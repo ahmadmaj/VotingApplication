@@ -26,11 +26,12 @@ label {
 }
 
 #secs {
+    position: inherit;
     display: none;
     float: left;
-    margin-top: 5px;
+    padding-top: 0.5%;
     font-weight: bold;
-    font-size: 70%;
+    font-size: 100%;
     /*text-shadow: 1px 1px 0 #808080;*/
     /*text-align: center;
             align-content: center;
@@ -113,3 +114,8 @@ label {
     font-size:smaller;
 }
 
+#numToWait {
+    font-size: 150%;
+    color: purple;
+    font-weight: bold;
+}

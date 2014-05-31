@@ -32,7 +32,7 @@
                 $('#secbar').progressbar({
                     value: val,
                     change: function () {
-                        $('#secs').css('display', 'block').css('font-size','20px').text(sec);
+                        $('#secs').css('display', 'block').text(sec);
                     },
                     complete: function () { }
                 });
@@ -62,13 +62,15 @@
             main = $.connection.serverHub;
 
             main.client.startGameMsg = function (msg) {
-                if (msg == "wait")
+                if (msg == "wait") {
                     $('#status').text("Please wait for the other players, the game will start shortly...");
+                    $('#StartGame').prop('disabled', true);
+                }
                 else if (msg == "start") {
                     $("#MainPage").hide();
                     main.server.gameDetailsMsg($.connection.hub.id);
                     //window.open("/GamePage.html", "_self", false);
-                        $('#turnStatus').text('Please wait for your turn');
+                    $('#turnStatus').text('Please wait for your turn');
                 }
             };
             
@@ -92,7 +94,18 @@
                         cell11 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label style="font-family:Arial"> There are ' + numPlayers + ' players</label> <br/> <br/> <label id="turnsLeft" style="font-family:Arial"> Game ends in: ' + numTurns + ' turns</label>');
                     }
 
-                    cell12 = $('<td width="60%" align="center" style="height:100%"></td>').html('<label id="turnStatus" style="font-family:Arial" ></label><br><br><label id="voteStatus" style="font-family:Arial font:bold" ></label><img id="waitImg" src="images/wait.gif" style="height:15%"><br><br><label id="turnsToWait" style="font-family:Arial"></label><label id="playerVoted" style="font-family:Arial"></label><label id="gameOverTxt" style="font-family:Arial"></label><br><br><div id="secbar"><div id="secs"></div></div>');
+                    cell12 = $('<td width="60%" align="center" style="height:100%"></td>').html(
+                        '<label id="turnStatus" style="font-family:Arial" ></label>' +
+                        '<br><br>' +
+                        '<label id="voteStatus" style="font-family:Arial font:bold" ></label>' +
+                        '<img id="waitImg" src="images/wait.gif" style="height:15%"><br><br>' +
+                        '<label id="turnsToWait" style="font-family:Arial">Your turn is in <label id="numToWait"></label> steps</label>' +
+                        '<label id="playerVoted" style="font-family:Arial"></label>' +
+                        '<label id="gameOverTxt" style="font-family:Arial"></label>' +
+                        '<br><br>' +
+                        '<div id="secbar"><div id="secs">' +
+                        '</div>' +
+                        '</div>');
                     cell13 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label></label>');
                     table1.append(row11);
                     row11.append(cell11);
@@ -237,7 +250,7 @@
                         imageClick = true;
                         $('#waitImg').hide();
                         //$('#playerVoted').text('');
-                        $('#turnsToWait').text('');
+                        $('#turnsToWait').hide();
                         $('#turnStatus').text("It's your turn");
                         $('#voteStatus').text('VOTE NOW!');
                         $(".images").css('cursor', 'pointer');
@@ -257,8 +270,9 @@
                     }
                     else {
                         imageClick = false;
+                        $('#turnsToWait').show();
                         $('#turnStatus').text('Please wait for player ' + (voting + 1) + ' to vote');
-                        $('#turnsToWait').text('Your turn is in ' + turnsWait + ' steps');
+                        $('#numToWait').text(turnsWait);
                         $('#voteStatus').text('');
                         $('#waitImg').show();
                         $(".images").css('cursor', 'auto');
@@ -275,7 +289,7 @@
                     $(this).attr("src", imgsrc);
                 });
                 //$('#playerVoted').text('');
-                $('#turnsToWait').text('');
+                $('#turnsToWait').hide();
                 $('#turnStatus').text("It's your turn");
                 $('#voteStatus').text('VOTE NOW!');
                 //$(".images").fadeTo("fast", 1);
@@ -297,7 +311,8 @@
 
             main.client.votedUpdate = function (numOfCandidates, votes, votesL, turnsL, candIndex, defaultCand, playerV, voting, winner, whoVoted, playerString, turnsWait) {
                 defaultVote = defaultCand;
-                $('#turnsToWait').text('Your turn is in ' + turnsWait + ' steps');
+                $('#turnsToWait').show();
+                $('#numToWait').text(turnsWait);
                 //$('#playerVoted').text('player ' + (playerV + 1) + ' voted');
                 $('#turnStatus').text('Please wait for player ' + (voting+1) + ' to vote');
                 //$('#votesLeft').text('Remaining votes: ' + votesL);
@@ -444,7 +459,8 @@
                         $('#progNum' + i).css('margin-right', '8px');
                     }
                 }
-                $('#turnsToWait').text('Your turn is in ' + turnswait + ' steps');
+                $('#turnsToWait').show();
+                $('#numToWait').text(turnswait);
                 //$('#playerVoted').text('player ' + (playerV+1) + ' voted');
 
             };
@@ -521,7 +537,7 @@
 
                 var pPoints = points.split('#');
                 $('#waitImg').hide();
-                $('#turnsToWait').text('');
+                $('#turnsToWait').hide();
                 //$('#playerVoted').text('');
                 $('#turnStatus').text('GAME OVER!!!');
                 if (winner.indexOf(',')>=0)
