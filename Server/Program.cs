@@ -32,7 +32,6 @@ namespace Server
         static void Main(string[] args)
         {
             string url = "http://localhost:8010";
-
             using (WebApp.Start<Startup>("http://+:8010"))
             {
                 Console.WriteLine("Server running on {0}", url);
@@ -59,7 +58,7 @@ namespace Server
                     foreach (string confile in args)
                         gameDetailsList.AddFirst(readConfigFile(curpath + "\\" + confile));
                 else
-                    gameDetailsList.AddFirst(readConfigFile(curpath + "\\configFile2.txt"));
+                    gameDetailsList.AddFirst(readConfigFile(curpath + "\\configFile2_check.txt"));
                 //gameDetails = readConfigFile("C://Users//lena//Documents//Visual Studio 2013//Projects//VotingApplication//Server//configFile2_check.txt");
                 init = 1;
                 gameDetails = gameDetailsList.First;

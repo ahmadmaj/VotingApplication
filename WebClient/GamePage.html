@@ -37,7 +37,8 @@
                     complete: function () { }
                 });
                 if (sec == 0) {
-                    $('#' + defaultVote).trigger('click');
+                    backFromDown = true;
+                    $('#' + defaultVote).trigger('mouseup');
                 }
 
             }, 1000);
@@ -571,6 +572,7 @@
                 var originalSrc = $(this).attr("src");
                 var srcClick = "images/user" + parseInt(originalSrc.substring(11, 12)) + "_hover.png";
                 $("#" + event.target.id).attr("src", srcClick);
+
                 clearInterval(barInterval);
                 $('#secbar').hide();
                 $('#turnStatus').text('Please wait for your turn');
@@ -580,6 +582,7 @@
                 imageClick = false;
                 backFromDown = false;
                 $(".images").css('cursor', 'auto');
+
                 main.server.voteDetails($.connection.hub.id, playerIndex, event.target.id);
             }
         });

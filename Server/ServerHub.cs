@@ -197,7 +197,7 @@ namespace Server
                     i++;
                 }
                 playerUser.score += sum/i;
-                Clients.Client(playerid).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playeridx), game.getVotesLeft(playeridx), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner(), game.getCurrentWinner(playeridx), game.createWhoVotedString(playeridx), ("p" + (playerIndex + 1).ToString()));
+                Clients.Client(playerid).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playeridx), game.getVotesLeft(playeridx), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner(), game.getCurrentWinner(playeridx), game.createWhoVotedString(playeridx), ("p" + (playeridx + 1).ToString()));
             }
         }
     }
