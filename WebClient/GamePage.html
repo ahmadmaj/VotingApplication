@@ -314,7 +314,7 @@
                 //$('#playerVoted').text('player ' + (playerV + 1) + ' voted');
                 $('#turnStatus').text('Please wait for player ' + (voting+1) + ' to vote');
                 //$('#votesLeft').text('Remaining votes: ' + votesL);
-                $('#turnsLeft').text('Game ends in: ' + turnsL + ' turns');
+                $('#turnsLeftnum').text(turnsL);
                 var numOfVotes = votes.split("#");
                 var winners = winner.split("#");
                 var whoVotedString = whoVoted.split("#");
@@ -393,7 +393,7 @@
             main.client.otherVotedUpdate = function (numOfCandidates, votes, votesL, turnsL, playerV, voting, winner, whoVoted, playerString, turnswait) {
                 $('#turnStatus').text('Please wait for player ' + (voting+1) + ' to vote');
                 //$('#votesLeft').text('Remaining votes: ' + votesL);
-                $('#turnsLeft').text('Game ends in: ' + turnsL + ' turns');
+                $('#turnsLeftnum').text(turnsL);
                 var numOfVotes = votes.split("#");
                 var winners = winner.split("#");
                 var whoVotedString = whoVoted.split("#");
@@ -469,7 +469,7 @@
                 $(".images").css('cursor', 'auto');
                 $(".images").hover().unbind();
                 //$('#votesLeft').text('Remaining votes: ' + votesL);
-                $('#turnsLeft').text('Game ends in: ' + turnsL + ' turns');
+                $('#turnsLeftnum').text(turnsL);
                 var numOfVotes = votes.split("#");
                 var winners = currentWinner.split("#");
                 var whoVotedString = whoVoted.split("#");
