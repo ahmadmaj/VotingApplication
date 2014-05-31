@@ -119,3 +119,19 @@ label {
     color: purple;
     font-weight: bold;
 }
+#numP {
+    font-size: 120%;
+    color: royalblue;
+    font-weight: bold;
+}
+#currplayer {
+    font-size: 110%;
+    font-weight: bold;
+    color: royalblue;
+
+}
+#turnsLeftnum {
+    font-size: 110%;
+    font-weight: bold;
+    color: crimson;
+}

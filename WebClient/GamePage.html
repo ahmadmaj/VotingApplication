@@ -82,18 +82,12 @@
                 numOfImages = numOfCandidates;
                 playerIndex = playerI;
                 showWhoVoted = isVoted;
-
                 //create table
                 $(function () {
                     //first table
                     var table1 = $('<table border="0" width="100%" style="height:50%"></table>');
                     row11 = $('<tr border="0" width="100%" style="height:100%"></tr>');
-                    if (showWhoVoted == true) {
-                        cell11 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label style="font-family:Arial"> There are ' + numPlayers + ' players, you are ' + playerString +'</label> <br/> <br/> <label id="turnsLeft" style="font-family:Arial"> Game ends in: ' + numTurns + ' turns</label>');
-                    }
-                    else {
-                        cell11 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label style="font-family:Arial"> There are ' + numPlayers + ' players</label> <br/> <br/> <label id="turnsLeft" style="font-family:Arial"> Game ends in: ' + numTurns + ' turns</label>');
-                    }
+                    cell11 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label style="font-family:Arial"> There are <label id=numP>' + numPlayers + '</label> players<label id=showPlayers>, you are <label id=currplayer>' + playerString +'</label></label></label> <br/> <br/> <label id="turnsLeft" style="font-family:Arial"> Game ends in: <label id=turnsLeftnum>' + numTurns + '</label> turns</label>');
 
                     cell12 = $('<td width="60%" align="center" style="height:100%"></td>').html(
                         '<label id="turnStatus" style="font-family:Arial" ></label>' +
@@ -113,7 +107,7 @@
                     row11.append(cell12);
                     row11.append(cell13);
                     $('#tableContainer').append(table1);
-
+ 
                     //second table
                     var table2 = $('<table width="100%" style="height:50%; table-layout: fixed; border:none" ></table>');
                     row21 = $('<tr width="100%" style="height:10%"></tr>'); //priority
@@ -279,6 +273,9 @@
                         $(".images").css('cursor', 'auto');
                     }
                 });
+                if (showWhoVoted == false) {
+                    $('#showPlayers').hide();
+                }
             }; //details function
 
             main.client.yourTurn = function () {
