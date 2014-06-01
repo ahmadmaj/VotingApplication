@@ -1,4 +1,5 @@
 ﻿<!DOCTYPE html>
+   
 <html>
 <head>
     <title>Voting Game</title>
@@ -8,9 +9,7 @@
           <input id="StartGame" type="button" value="Press To Start The Game" /><br>
          <label id="status"></label>
     </div>
-    <div id="tableContainer" style="height: 90%"></div><br><br>
-    <label id="test"></label>
-   <!-- <label id="test"></label>-->
+    <div id="tableContainer"></div>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
     <!--Reference the jQuery library. -->
     <link href="StyleGame.css" rel="stylesheet" />
@@ -23,7 +22,6 @@
         function progressBarFunc() {
             $('#secbar').progressbar({ value: '101.667' });
             $('#secbar').show();
-            //  $('#secs').css('display', 'block').text("60");
             var sec = 61;
             var val = 101.667;
             barInterval = setInterval(function () {
@@ -32,7 +30,7 @@
                 $('#secbar').progressbar({
                     value: val,
                     change: function () {
-                        $('#secs').css('display', 'block').text(sec);
+                        $('#secs').text(sec);
                     },
                     complete: function () { }
                 });
@@ -85,23 +83,22 @@
                 //create table
                 $(function () {
                     //first table
-                    var table1 = $('<table border="0" width="100%" style="height:50%"></table>');
-                    row11 = $('<tr border="0" width="100%" style="height:100%"></tr>');
-                    cell11 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label style="font-family:Arial"> There are <label id=numP>' + numPlayers + '</label> players<label id=showPlayers>, you are <label id=currplayer>' + playerString +'</label></label></label> <br/> <br/> <label id="turnsLeft" style="font-family:Arial"> Game ends in: <label id=turnsLeftnum>' + numTurns + '</label> turns</label>');
+                    var table1 = $('<table id=topTable></table>');
+                    row11 = $('<tr border="0" width="100%"></tr>');
+                    cell11 = $('<td width="25%" align="left" valign="top"></td>').html('<td id=infopanel><label style="font-family:Arial"> There are <label id=numP>' + numPlayers + '</label> players<label id=showPlayers>, you are <label id=currplayer>' + playerString + '</label></label></label> <br/> <label id="turnsLeft" style="font-family:Arial"> Game ends in: <label id=turnsLeftnum>' + numTurns + '</label> turns</label></td>');
 
-                    cell12 = $('<td width="60%" align="center" style="height:100%"></td>').html(
-                        '<label id="turnStatus" style="font-family:Arial" ></label>' +
-                        '<br><br>' +
-                        '<label id="voteStatus" style="font-family:Arial font:bold" ></label>' +
-                        '<img id="waitImg" src="images/wait.gif" style="height:15%"><br><br>' +
-                        '<label id="turnsToWait" style="font-family:Arial">Your turn is in <label id="numToWait"></label> steps</label>' +
-                        '<label id="playerVoted" style="font-family:Arial"></label>' +
-                        '<label id="gameOverTxt" style="font-family:Arial"></label>' +
-                        '<br><br>' +
-                        '<div id="secbar"><div id="secs">' +
-                        '</div>' +
+                    cell12 = $('<td width="50%" align="center" style="vertical-align:middle;"></td>').html(
+                        '<p><label id="turnStatus" style="font-family:Arial" ></label></p>' +
+                        '<p><label id="voteStatus" style="font-family:Arial font:bold" ></label></p>' +
+                        '<p id="waitImg"><img src="images/wait.gif" style="height:inherit;"></p>' +
+                        '<p><label id="turnsToWait" style="font-family:Arial">Your turn is in <label id="numToWait"></label> steps</label></p>' +
+                        '<p><label id="playerVoted" style="font-family:Arial"></label></p>' +
+                        '<p><label id="gameOverTxt" style="font-family:Arial"></label></p>' +
+                        '<div id="secbar">' +
+                        '<span id="secs">' +
+                        '</span>' +
                         '</div>');
-                    cell13 = $('<td width="20%" align="left" valign="top" style="height:100%"></td>').html('<label></label>');
+                    cell13 = $('<td width="25%" align="left" valign="top"></td>').html('<label></label>');
                     table1.append(row11);
                     row11.append(cell11);
                     row11.append(cell12);
@@ -109,7 +106,7 @@
                     $('#tableContainer').append(table1);
  
                     //second table
-                    var table2 = $('<table width="100%" style="height:50%; table-layout: fixed; border:none" ></table>');
+                    var table2 = $('<table id=bottomTable></table>');
                     row21 = $('<tr width="100%" style="height:10%"></tr>'); //priority
                     row22 = $('<tr width="100%" style="height:10%"></tr>'); //points
                     row23 = $('<tr width="100%" style="height:60%"></tr>'); //pic

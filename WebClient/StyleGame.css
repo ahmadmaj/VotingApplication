@@ -1,8 +1,18 @@
-﻿html, body {
+﻿html,body,#tableContainer {
     height: 100%;
-    margin: 0px;
+  min-height:  100%;
+  margin: 0;
 }
-
+#topTable {
+    display: inline-table;
+    height: 50%;
+    width: 100%;
+}
+#bottomTable {
+    display: inline-table;
+    height: 50%;
+    width: 100%;
+}
 #MainPage {
     text-align: center;
     padding-top: 15px;
@@ -16,9 +26,9 @@ label {
 
 #secbar {
     width: 50%;
-    height: 10%;
-    /*position: absolute;
-            right: 50%;*/
+    text-align:center;
+    line-height: 200%
+         /*   right: 50%;*/
 }
 
 #secbar .ui-progressbar-value {
@@ -26,19 +36,13 @@ label {
 }
 
 #secs {
-    position: inherit;
-    display: none;
-    float: left;
-    padding-top: 0.5%;
     font-weight: bold;
-    font-size: 100%;
+    position: absolute;
     /*text-shadow: 1px 1px 0 #808080;*/
     /*text-align: center;
             align-content: center;
             align-items: center;
             align-self: center;*/
-    position: absolute;
-    left: 49%;
 }
 
 /*.outer {
@@ -128,10 +132,37 @@ label {
     font-size: 110%;
     font-weight: bold;
     color: royalblue;
-
 }
+
 #turnsLeftnum {
     font-size: 110%;
     font-weight: bold;
     color: crimson;
+}
+#infopanel {
+    padding-top: 50px;
+    color: black;
+    border: solid 1px #2d2d2d;   
+    background:lightgray;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    padding: 2%;
+    border-radius: 5px;
+    display: inline-block;
+    -moz-box-shadow: 7px 10px 17px #101410;
+    -webkit-box-shadow: 7px 10px 17px #101410;
+    box-shadow: 7px 10px 17px #101410;
+}
+#tableContainer > table:nth-child(1) > tbody > tr > td:nth-child(1) {
+    padding-top: 1%;
+}
+#waitImg {
+    height: 50%;
+    display: inline-table;
+}
+
+#voteStatus {
+    padding-top: 50%;
+    font-family: Arial;
+    font-weight: bold;
 }
