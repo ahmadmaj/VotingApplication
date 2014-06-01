@@ -166,4 +166,13 @@ label {
     padding-top: 50%;
     font-family: Arial;
     font-weight: bold;
+    font-size: xx-large;
+    text-shadow: 1px 2px 3px #666;
+
+}
+#turnStatus {
+    font-size: large;
+}
+#turnsToWait {
+    font-size: large;
 }
