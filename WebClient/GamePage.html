@@ -292,7 +292,7 @@
                     $('#showPlayers').hide();
                 }
                 $('#nextGameB').click(function () {
-                    game.server.connectMsg('connect', $.connection.hub.id);
+                    game.server.nextGame($.connection.hub.id);
                 });
             }; //details function
 

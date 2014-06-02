@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace Server
         public static Dictionary<string, int> Players = new Dictionary<string, int>();  //for each playID the gameID he is in
         public static Dictionary<string, UserVoter> ConnIDtoUser = new Dictionary<string, UserVoter>(); //for each playID the User class he is
         public static List<Game> PlayingGames = new List<Game>();
+        public static List<string> waitingRoom { get; set; }
         public static String logFolder = "";
 
         public static int count = 0;

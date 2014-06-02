@@ -14,7 +14,6 @@ namespace Server
     [HubName("serverHub")]
     public class ServerHub : Hub
     {
-
         public override Task OnDisconnected()
         {
             if (Program.AwaitingGame != null && Program.AwaitingGame.playersID != null)
@@ -83,7 +82,6 @@ namespace Server
             if (Program.AwaitingGame == null)
             {
                 Game newGame = new Game(Program.gameDetails.Value);
-                Program.gameDetails = Program.gameDetails.Next ?? Program.gameDetails.List.First;
                 Program.AwaitingGame = newGame;
             }
             UserVoter newplayer;
@@ -161,6 +159,26 @@ namespace Server
             }
         }
 
+
+        public void nextGame(string id)
+        {
+
+            if (Program.waitingRoom == null) Program.waitingRoom = new List<string>();
+            Program.waitingRoom.Add(id);
+            if (Program.waitingRoom.Count == 4)
+            {
+                var random = new Random();
+                var result = Program.waitingRoom.OrderBy(i => random.Next()).Take(4).OrderBy(i => i);
+                Program.gameDetails = Program.gameDetails.Next ?? Program.gameDetails.List.First;
+                foreach (string player in result)
+                    ConnectMsg("connect",player);
+                Program.waitingRoom = null;
+            }
+            else
+                Clients.Client(id).StartGameMsg("wait");
+        }
+        
+        
         private void updateOtherPlayers(Game game, string id, int playerIndex, int next)
         {
             //numOfCandidates, voted, turnsLeft, playerVoted, votingNow, currentWinnersIndex,whoVoted, playerString, turnsToWait
@@ -201,5 +219,7 @@ namespace Server
             }
             Program.PlayingGames.Remove(game);
         }
+   
+        
     }
 }
