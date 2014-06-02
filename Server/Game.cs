@@ -113,7 +113,7 @@ namespace Server
                     titles = titles + "points player" + (i + 1) + ",";
             }
             this.writeToFile.Add(titles);
-            this.agents = gamedets.agents;
+            this.agents = new List<Agent>(gamedets.agents);
             this.isRounds = gamedets.isRounds;
             this.replacingAgents = new List<ReplacingAgent>();
             this.playersDisconnected = new List<string>();
@@ -398,7 +398,8 @@ namespace Server
         public void addPlayerID(UserVoter playerID)
         {
             this.playersID.Add(playerID.connectionID);
-            Program.ConnIDtoUser.Add(playerID.connectionID,playerID);
+            if (!Program.ConnIDtoUser.ContainsKey(playerID.connectionID)) 
+                Program.ConnIDtoUser.Add(playerID.connectionID,playerID);
             if (playersID.Count == this.numOfHumanPlayers)
                 this.status = "playing";
         }

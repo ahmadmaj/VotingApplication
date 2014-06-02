@@ -9,7 +9,7 @@
           <input id="StartGame" type="button" value="Press To Start The Game" /><br>
          <label id="status"></label>
     </div>
-    <div id="tableContainer"></div>
+    <div id="tableContainer" hidden></div>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
     <!--Reference the jQuery library. -->
     <link href="StyleGame.css" rel="stylesheet" />
@@ -43,49 +43,65 @@
         };
     </script>
     <script>
+        $.connection.hub.url = "http://localhost:8010/signalr";
         var barInterval;
         var numOfImages;
         var numOfPlayers = 0;
         var playerIndex;
-        var defaultVote = 0;
-        var imageClick = false;
-        var backFromDown = false;
-        var main;
+        var defaultVote;
+        var imageClick;
+        var backFromDown;
+        var game;
         var votesProgressInterval = 0;
         var showWhoVoted = false;
         $(function () {
             //Set the hubs URL for the connection
-            $.connection.hub.url = "http://localhost:8010/signalr";
+            
 
             // Declare a proxy to reference the hub.
-            main = $.connection.serverHub;
+            game = $.connection.serverHub;
 
-            main.client.startGameMsg = function (msg) {
+            game.client.startGameMsg = function (msg) {
+
                 if (msg == "wait") {
                     $('#status').text("Please wait for the other players, the game will start shortly...");
+                    $('#nextGamestatus').text("Please wait for the other players, the game will start shortly...");
                     $('#StartGame').prop('disabled', true);
+                    $('#nextGameB').prop('disabled', true);
                 }
                 else if (msg == "start") {
+                    $('#status').text('');
+                    $('#nextGamestatus').text('');
                     $("#MainPage").hide();
-                    main.server.gameDetailsMsg($.connection.hub.id);
+                    $('#tableContainer').show();
+                    game.server.gameDetailsMsg($.connection.hub.id);
                     //window.open("/GamePage.html", "_self", false);
                     $('#turnStatus').text('Please wait for your turn');
                 }
             };
             
-            main.client.gameDetails = function (msg, playerI, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, defaultCand, point, votes, isVoted, voted, playerString, turn, voting, winner, turnsWait) {
+            game.client.gameDetails = function (msg, playerI, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, defaultCand, point, votes, isVoted, voted, playerString, turn, voting, winner, turnsWait) {
                 //$('playerTurn').val(turn);
+                $("#tableContainer").empty();
                 votesProgressInterval = 190 / numPlayers;
                 numOfPlayers = numPlayers;
                 numOfImages = numOfCandidates;
                 playerIndex = playerI;
                 showWhoVoted = isVoted;
+                imageClick = false;
+                backFromDown = false;
+
+                defaultVote = 0;
                 //create table
                 $(function () {
                     //first table
                     var table1 = $('<table id=topTable></table>');
                     row11 = $('<tr border="0" width="100%"></tr>');
-                    cell11 = $('<td width="25%" align="left" valign="top"></td>').html('<td id=infopanel><label style="font-family:Arial"> There are <label id=numP>' + numPlayers + '</label> players<label id=showPlayers>, you are <label id=currplayer>' + playerString + '</label></label></label> <br/> <label id="turnsLeft" style="font-family:Arial"> Game ends in: <label id=turnsLeftnum>' + numTurns + '</label> turns</label></td>');
+                    cell11 = $('<td width="25%" align="left" valign="top"></td>').html('<td id=infopanel>' +
+                        '<label style="font-family:Arial"> There are <label id=numP>' + numPlayers + '</label> players' +
+                        '<label id=showPlayers>, you are <label id=currplayer>' + playerString + '</label></label></label> <br/>' +
+                        ' <label id="turnsLeft" style="font-family:Arial"> Game ends in: <label id=turnsLeftnum>' + numTurns + '</label> turns' +
+                        '</label></td>');
 
                     cell12 = $('<td width="50%" align="center" style="vertical-align:middle;"></td>').html(
                         '<p><label id="turnStatus"></label></p>' +
@@ -93,7 +109,9 @@
                         '<p id="waitImg"><img src="images/wait.gif" style="height:inherit;"></p>' +
                         '<p><label id="turnsToWait">Your turn is in <label id="numToWait"></label> steps</label></p>' +
                         '<p><label id="playerVoted"></label></p>' +
-                        '<p><label id="gameOverTxt"></label></p>' +
+                        '<p><label id="gameOverTxt" hidden></label></p>' +
+                        '<p id="nextGameP" hidden><input id="nextGameB" type="button" value="Ready for another game" /><br>' +
+                        '<label id="nextGamestatus"></label></p>' +
                         '<div id="secbar">' +
                         '<span id="secs">' +
                         '</span>' +
@@ -104,7 +122,7 @@
                     row11.append(cell12);
                     row11.append(cell13);
                     $('#tableContainer').append(table1);
- 
+                    
                     //second table
                     var table2 = $('<table id=bottomTable></table>');
                     row21 = $('<tr width="100%" style="height:10%"></tr>'); //priority
@@ -140,7 +158,7 @@
                                 //if (i == 0)
                                 //    var url = "images/user" + (candIndexes[i + 1]) + "_default.png";
                                 //else
-                                    var url = "images/user" + (candIndexes[i + 1]) + ".png";
+                                var url = "images/user" + (candIndexes[i + 1]) + ".png";
                                 var size = 80 - (8 * i);
                                 //cell23 = $('<td class="imgCells" width=cellWidth + "%" align="center" style="height:60%"></td>').
                                 //    html('<div class="progress"><label class="progNum" id="num' + i + '">' + numOfVotes[i + 1] + '</label><br /><div class="outer"> <div class="inner" id="inner'+i+'"></div></div></div> <img class="images" id="' + i + '" src="' + url + '" style="height:' + size + '%">');
@@ -237,7 +255,7 @@
                         }
                        
                     }
-
+                    
                     if (turn == 1) {
                         imageClick = true;
                         $('#waitImg').hide();
@@ -257,7 +275,7 @@
                                 var imgsrc = "images/user" + parseInt(originalSrc.substring(11,12)) + ".png";
                                 $("#" + event.target.id).attr("src", imgsrc);
                             }
-                         );
+                        );
                         progressBarFunc();
                     }
                     else {
@@ -273,9 +291,12 @@
                 if (showWhoVoted == false) {
                     $('#showPlayers').hide();
                 }
+                $('#nextGameB').click(function () {
+                    game.server.connectMsg('connect', $.connection.hub.id);
+                });
             }; //details function
 
-            main.client.yourTurn = function () {
+            game.client.yourTurn = function () {
                 imageClick = true;
                 $('#waitImg').hide();
                 $(".images").each(function () {
@@ -300,11 +321,11 @@
                         var imgsrc = "images/user" + parseInt(originalSrc.substring(11,12)) + ".png";
                         $("#" + event.target.id).attr("src", imgsrc);
                     }
-                 );
+                );
                 progressBarFunc();
             };
 
-            main.client.votedUpdate = function (numOfCandidates, votes, votesL, turnsL, candIndex, defaultCand, playerV, voting, winner, whoVoted, playerString, turnsWait) {
+            game.client.votedUpdate = function (numOfCandidates, votes, votesL, turnsL, candIndex, defaultCand, playerV, voting, winner, whoVoted, playerString, turnsWait) {
                 defaultVote = defaultCand;
                 $('#turnsToWait').show();
                 $('#numToWait').text(turnsWait);
@@ -387,7 +408,7 @@
                 //}
             };
 
-            main.client.otherVotedUpdate = function (numOfCandidates, votes, votesL, turnsL, playerV, voting, winner, whoVoted, playerString, turnswait) {
+            game.client.otherVotedUpdate = function (numOfCandidates, votes, votesL, turnsL, playerV, voting, winner, whoVoted, playerString, turnswait) {
                 $('#turnStatus').text('Please wait for player ' + (voting+1) + ' to vote');
                 //$('#votesLeft').text('Remaining votes: ' + votesL);
                 $('#turnsLeftnum').text(turnsL);
@@ -460,8 +481,7 @@
 
             };
 
-            main.client.gameOver = function (numOfCandidates, votes, votesL, turnsL, points, winner, currentWinner, whoVoted, playerString) {
-
+            game.client.gameOver = function (numOfCandidates, votes, votesL, turnsL, points, winner, currentWinner, whoVoted, playerString) {
                 imageClick = false;
                 $(".images").css('cursor', 'auto');
                 $(".images").hover().unbind();
@@ -539,17 +559,18 @@
                     $('#gameOverTxt').html('The winning candidates are: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
                 else
                     $('#gameOverTxt').html('The winning candidate is: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
-
+                //main.server.connectMsg('connect', $.connection.hub.id);
+                $('#nextGameP').show();
+                $('#gameOverTxt').show();
             };
             
             $.connection.hub.start().done(function () {
                 $('#StartGame').click(function () {
                     // Call the Send method on the hub.
-                    main.server.connectMsg('connect', $.connection.hub.id);
+                    game.server.connectMsg('connect', $.connection.hub.id);
                 });
             });
-        });
-        
+        }); 
         $(document).on('mousedown', '.images', function (event) {
             if (imageClick) {
                 $(".images").hover().unbind();
@@ -559,7 +580,7 @@
                 var srcClick = "images/user" + parseInt(originalSrc.substring(11,12)) + "_click.png";
                 $("#" + event.target.id).attr("src",srcClick);               
                 backFromDown = true;
-                }
+            }
         });
         $(document).on('mouseup', '.images', function(event) {
             if (imageClick && backFromDown) {
@@ -577,9 +598,9 @@
                 backFromDown = false;
                 $(".images").css('cursor', 'auto');
 
-                main.server.voteDetails($.connection.hub.id, playerIndex, event.target.id);
+                game.server.voteDetails($.connection.hub.id, playerIndex, event.target.id);
             }
         });
-            </script>
+    </script>
 </body>
 </html>

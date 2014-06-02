@@ -86,8 +86,14 @@ namespace Server
                 Program.gameDetails = Program.gameDetails.Next ?? Program.gameDetails.List.First;
                 Program.AwaitingGame = newGame;
             }
-            UserVoter newplayer = new UserVoter(id, Program.AwaitingGame);
+            UserVoter newplayer;
+            if (!Program.ConnIDtoUser.TryGetValue(id,out newplayer))
+                newplayer = new UserVoter(id);
+            
             Program.AwaitingGame.addPlayerID(newplayer);
+            newplayer.JoinGame(Program.AwaitingGame);
+
+
             if (Program.AwaitingGame.getPlayersIDList().Count == Program.AwaitingGame.numOfHumanPlayers)
             {
                 Game startRunning = Program.AwaitingGame;
@@ -189,16 +195,11 @@ namespace Server
             {
                 int playeridx = game.getPlayerIndex(playerid);
                 UserVoter playerUser = Program.ConnIDtoUser[playerid];
-                int sum = 0;
-                int i = 0;
-                foreach (string str in game.getCurrentWinner(playeridx).Split('#').Where(str => str.Length>0))
-                {
-                    sum+=playersPoints[playerUser.CurrPriority.IndexOf(Convert.ToInt32(str)+1)];
-                    i++;
-                }
-                playerUser.score += sum/i;
+                playerUser.score += playersPoints[playeridx];
                 Clients.Client(playerid).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playeridx), game.getVotesLeft(playeridx), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner(), game.getCurrentWinner(playeridx), game.createWhoVotedString(playeridx), ("p" + (playeridx + 1).ToString()));
+                playerUser.StoreHistory();
             }
+            Program.PlayingGames.Remove(game);
         }
     }
 }

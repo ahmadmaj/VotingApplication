@@ -28,7 +28,6 @@ label {
     width: 50%;
     text-align:center;
     line-height: 200%
-         /*   right: 50%;*/
 }
 
 #secbar .ui-progressbar-value {
@@ -38,11 +37,6 @@ label {
 #secs {
     font-weight: bold;
     position: absolute;
-    /*text-shadow: 1px 1px 0 #808080;*/
-    /*text-align: center;
-            align-content: center;
-            align-items: center;
-            align-self: center;*/
 }
 
 /*.outer {
