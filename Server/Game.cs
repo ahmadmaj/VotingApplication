@@ -516,8 +516,9 @@ namespace Server
         public void writeToCSVFile()
         {
             this.fileCreated = true;
-            this.writeToFile.Insert(7, "disconnected player id, round");
-            int j = 8;
+            int firstRows = 4 + this.players.Count;
+            this.writeToFile.Insert(firstRows, "disconnected player id, round");
+            int j = firstRows+1;
             for (int i = 0; i < this.playersDisconnected.Count; i++)
             {
                 this.writeToFile.Insert(j, this.playersDisconnected[i]);
