@@ -296,7 +296,12 @@
                 //        $('#voted' + i).text('Who voted: ' + whoVotedString[i + 1]);
                 //    }
                 //}
-
+                for (var i = 0; i < numOfCandidates; i++) {
+                                       for (var j = 0; j < numOfPlayers; j++) {
+                                             $('#pcell' + i + j).css('background-image', 'none');
+                                              $('#plabel' + i + j).text("");
+                                          }
+                                   }
                 updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
 
                 var candIndexes = candIndex.split('#');
@@ -334,7 +339,7 @@
                     }
                 }
 
-                updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes);
+                updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
 
                 $('#turnsToWait').show();
                 $('#numToWait').text(turnswait);
