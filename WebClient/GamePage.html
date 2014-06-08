@@ -208,53 +208,7 @@
                     $('#tableContainer').append(table2);
 
                     var winners = winner.split("#");
-
-                    for (var i = 0; i < numOfCandidates; i++) {
-                        var cVoted = whoVoted[i+1].split(',');
-                        var glow = 0;
-                        for (var j = 1; j < winners.length; j++) {
-                            if (winners[j] == i)
-                                glow = 1;
-                        }
-
-                        for (var j = numOfPlayers - 1, k = 0; j >= (numOfPlayers - numOfVotes[i + 1]), k < cVoted.length; j--, k++) {
-                            if (cVoted[k] != "") {
-                                if (glow == 1) {
-                                    $('#progBars' + i).css('border-color', '#FFCC00');
-                                    $('#progBars' + i).css('border-width', '2px');
-                                    $('#progBars' + i).css('box-shadow', '0 0 15px #FFCC00');
-                                }
-                                else {
-                                    $('#progBars' + i).css('border-color', '#C0C0C0');
-                                    $('#progBars' + i).css('border-width', '2px');
-                                    $('#progBars' + i).css('box-shadow', 'none');
-                                }
-                                if (playerString == cVoted[k])
-                                    $('#pcell' + i + j).css('background-image', "url('images/progressBar2green2.png')");
-                                else
-                                    $('#pcell' + i + j).css('background-image', "url('images/progressBar2p2.png')");
-
-                                if (showWhoVoted == true)
-                                    $('#plabel' + i + j).text(cVoted[k]);
-                            }
-                            else {
-                                $('#progBars' + i).css('border-color', '#C0C0C0');
-                                $('#progBars' + i).css('border-width', '2px');
-                                $('#progBars' + i).css('box-shadow', 'none');
-                            }
-                        }
-
-                        if (numOfVotes[i + 1] < 10) {
-                            $('#progNum' + i).text(numOfVotes[i + 1]);
-                            $('#progNum' + i).css('margin-right','10px');
-                        }
-                            
-                        else if (numOfVotes[i + 1] < 100) {
-                            $('#progNum' + i).text(numOfVotes[i + 1]);
-                            $('#progNum' + i).css('margin-right', '8px');
-                        }
-                       
-                    }
+                    updateVoteBars(numOfCandidates, whoVoted, winners, numOfVotes, playerString);
                     
                     if (turn == 1) {
                         imageClick = true;
@@ -343,58 +297,7 @@
                 //    }
                 //}
 
-                for (var i = 0; i < numOfCandidates; i++) {
-                    for (var j = 0; j < numOfPlayers; j++) {
-                        $('#pcell' + i + j).css('background-image', 'none');
-                        $('#plabel' + i + j).text("");
-                    }
-                }
-
-                for (var i = 0; i < numOfCandidates; i++) {
-                    var cVoted = whoVotedString[i + 1].split(',');
-                    var glow = 0;
-                    for (var j = 1; j < winners.length; j++) {
-                        if (winners[j] == i)
-                            glow = 1;
-                    }
-
-                    for (var j = numOfPlayers - 1, k = 0; j >= (numOfPlayers - numOfVotes[i + 1]), k < cVoted.length; j--, k++) {
-                        if (cVoted[k] != "") {
-                            if (glow == 1) {
-                                $('#progBars' + i).css('border-color', '#FFCC00');
-                                $('#progBars' + i).css('border-width', '2px');
-                                $('#progBars' + i).css('box-shadow', '0 0 15px #FFCC00');
-                            }
-                            else {
-                                $('#progBars' + i).css('border-color', '#C0C0C0');
-                                $('#progBars' + i).css('border-width', '2px');
-                                $('#progBars' + i).css('box-shadow', 'none');
-                            }
-                            if (playerString == cVoted[k])
-                                $('#pcell' + i + j).css('background-image', "url('images/progressBar2green2.png')");
-                            else
-                                $('#pcell' + i + j).css('background-image', "url('images/progressBar2p2.png')");
-
-                            if (showWhoVoted == true)
-                                $('#plabel' + i + j).text(cVoted[k]);
-                        }
-                        else {
-                            $('#progBars' + i).css('border-color', '#C0C0C0');
-                            $('#progBars' + i).css('border-width', '2px');
-                            $('#progBars' + i).css('box-shadow', 'none');
-                        }
-                    }
-
-                    if (numOfVotes[i + 1] < 10) {
-                        $('#progNum' + i).text(numOfVotes[i + 1]);
-                        $('#progNum' + i).css('margin-right', '10px');
-                    }
-
-                    else if (numOfVotes[i + 1] < 100) {
-                        $('#progNum' + i).text(numOfVotes[i + 1]);
-                        $('#progNum' + i).css('margin-right', '8px');
-                    }
-                }
+                updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
 
                 var candIndexes = candIndex.split('#');
                 //for (var i = 0; i < numOfCandidates; i++) {
@@ -431,50 +334,8 @@
                     }
                 }
 
-                for (var i = 0; i < numOfCandidates; i++) {
-                    var cVoted = whoVotedString[i + 1].split(',');
-                    var glow = 0;
-                    for (var j = 1; j < winners.length; j++) {
-                        if (winners[j] == i)
-                            glow = 1;
-                    }
+                updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes);
 
-                    for (var j = numOfPlayers - 1, k = 0; j >= (numOfPlayers - numOfVotes[i + 1]), k < cVoted.length; j--, k++) {
-                        if (cVoted[k] != "") {
-                            if (glow == 1) {
-                                $('#progBars' + i).css('border-color', '#FFCC00');
-                                $('#progBars' + i).css('border-width', '2px');
-                                $('#progBars' + i).css('box-shadow', '0 0 15px #FFCC00');
-                            }
-                            else {
-                                $('#progBars' + i).css('border-color', '#C0C0C0');
-                                $('#progBars' + i).css('border-width', '2px');
-                                $('#progBars' + i).css('box-shadow', 'none');
-                            }
-                            if (playerString == cVoted[k])
-                                $('#pcell' + i + j).css('background-image', "url('images/progressBar2green2.png')");
-                            else
-                                $('#pcell' + i + j).css('background-image', "url('images/progressBar2p2.png')");
-
-                            if (showWhoVoted == true)
-                                $('#plabel' + i + j).text(cVoted[k]);
-                        }
-                        else {
-                            $('#progBars' + i).css('border-color', '#C0C0C0');
-                            $('#progBars' + i).css('border-width', '2px');
-                            $('#progBars' + i).css('box-shadow', 'none');
-                        }
-                    }
-                    if (numOfVotes[i + 1] < 10) {
-                        $('#progNum' + i).text(numOfVotes[i + 1]);
-                        $('#progNum' + i).css('margin-right', '10px');
-                    }
-
-                    else if (numOfVotes[i + 1] < 100) {
-                        $('#progNum' + i).text(numOfVotes[i + 1]);
-                        $('#progNum' + i).css('margin-right', '8px');
-                    }
-                }
                 $('#turnsToWait').show();
                 $('#numToWait').text(turnswait);
                 //$('#playerVoted').text('player ' + (playerV+1) + ' voted');
@@ -504,8 +365,25 @@
                     }
                 }
 
+                updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
+
+                var pPoints = points.split('#');
+                $('#waitImg').hide();
+                $('#turnsToWait').hide();
+                //$('#playerVoted').text('');
+                $('#turnStatus').text('GAME OVER!!!');
+                if (winner.indexOf(',')>=0)
+                    $('#gameOverTxt').html('The winning candidates are: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
+                else
+                    $('#gameOverTxt').html('The winning candidate is: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
+                //main.server.connectMsg('connect', $.connection.hub.id);
+                $('#nextGameP').show();
+                $('#gameOverTxt').show();
+            };
+
+            function updateVoteBars(numOfCandidates, whoVoted, winners, numOfVotes, playerString) {
                 for (var i = 0; i < numOfCandidates; i++) {
-                    var cVoted = whoVotedString[i + 1].split(',');
+                    var cVoted = whoVoted[i + 1].split(',');
                     var glow = 0;
                     for (var j = 1; j < winners.length; j++) {
                         if (winners[j] == i)
@@ -548,22 +426,10 @@
                         $('#progNum' + i).text(numOfVotes[i + 1]);
                         $('#progNum' + i).css('margin-right', '8px');
                     }
-                }
 
-                var pPoints = points.split('#');
-                $('#waitImg').hide();
-                $('#turnsToWait').hide();
-                //$('#playerVoted').text('');
-                $('#turnStatus').text('GAME OVER!!!');
-                if (winner.indexOf(',')>=0)
-                    $('#gameOverTxt').html('The winning candidates are: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
-                else
-                    $('#gameOverTxt').html('The winning candidate is: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
-                //main.server.connectMsg('connect', $.connection.hub.id);
-                $('#nextGameP').show();
-                $('#gameOverTxt').show();
-            };
-            
+                }
+            }
+
             $.connection.hub.start().done(function () {
                 $('#StartGame').click(function () {
                     // Call the Send method on the hub.
