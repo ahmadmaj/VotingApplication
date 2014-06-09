@@ -16,6 +16,9 @@ namespace Server
     {
         public override Task OnDisconnected()
         {
+            if (Program.waitingRoom != null && Program.waitingRoom.Contains(Context.ConnectionId))
+                Program.waitingRoom.Remove(Context.ConnectionId);
+
             if (Program.AwaitingGame != null && Program.AwaitingGame.playersID != null)
                 foreach (string ids in Program.AwaitingGame.playersID)
                     if (Context.ConnectionId == ids){
@@ -165,10 +168,10 @@ namespace Server
 
             if (Program.waitingRoom == null) Program.waitingRoom = new List<string>();
             Program.waitingRoom.Add(id);
-            if (Program.waitingRoom.Count == 4)
+            if (Program.waitingRoom.Count == 10)
             {
                 var random = new Random();
-                var result = Program.waitingRoom.OrderBy(i => random.Next()).Take(4).OrderBy(i => i);
+                var result = Program.waitingRoom.OrderBy(i => random.Next()).Take(Program.waitingRoom.Count).OrderBy(i => i);
                 Program.gameDetails = Program.gameDetails.Next ?? Program.gameDetails.List.First;
                 foreach (string player in result)
                     ConnectMsg("connect",player);
