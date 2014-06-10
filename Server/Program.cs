@@ -62,9 +62,9 @@ namespace Server
                 string curpath = Directory.GetCurrentDirectory();
                 if (args.Length > 0)
                     foreach (string confile in args)
-                        gameDetailsList.AddFirst(readConfigFile(curpath + "\\" + confile));
+                        gameDetailsList.AddFirst(readConfigFile(curpath + "\\" + confile, confile));
                 else
-                    gameDetailsList.AddFirst(readConfigFile(curpath + "\\configFile2_check.txt"));
+                    gameDetailsList.AddFirst(readConfigFile(curpath + "\\configFile2_check.txt", "configFile2_check.txt"));
                 //gameDetails = readConfigFile("C://Users//lena//Documents//Visual Studio 2013//Projects//VotingApplication//Server//configFile2_check.txt");
                 init = 1;
                 gameDetails = gameDetailsList.First;
@@ -92,7 +92,7 @@ namespace Server
         //  <path>
         ////
 
-        public static GameDetails readConfigFile(string file)
+        public static GameDetails readConfigFile(string file, string fileName)
         {
             try
             {
@@ -301,7 +301,7 @@ namespace Server
 
 
 
-                return new GameDetails(numOfHumanPlayers, numOfPlayers, numberOfCandidates, numOfRounds, candnames, playersOrder, points, priorities, agents, isRounds, whoVoted, startSecondRnd);
+                return new GameDetails(numOfHumanPlayers, numOfPlayers, numberOfCandidates, numOfRounds, candnames, playersOrder, points, priorities, agents, isRounds, whoVoted, startSecondRnd, fileName);
 
             }
             catch (Exception e)

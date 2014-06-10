@@ -44,6 +44,7 @@ namespace Server
         private Boolean startSecondrnd;
         private Boolean firstRound;
         private Boolean fileCreated;
+        private Boolean logUpdated;
 
 
         public Game(GameDetails gamedets)
@@ -88,31 +89,12 @@ namespace Server
             this.file = new WriteData(gameID);
             this.fileCreated = false;
             this.writeToFile = new List<string>();
+            this.writeToFile.Add("config file: ," + gamedets.configFile);
             this.writeToFile.Add("number of players:," + gamedets.players.Count.ToString());
             this.writeToFile.Add("number of candidates:," + this.numOfCandidates.ToString());
             this.writeToFile.Add("game ended after:,");
             this.writeToFile.Add("player,priorities");
-            for (int i = 0; i < this.players.Count; i++)
-            {
-                string priorityString = i.ToString();
-                for (int j = 0; j < this.priorities[i].Count; j++)
-                    priorityString = priorityString + "," + this.candidatesNames.IndexOf(this.priorities[i][j]);
-                this.writeToFile.Add(priorityString);
-
-            }
-            string titles = "time,player,vote,current winner,";
-            for (int i = 0; i < this.numOfCandidates; i++)
-            {
-                titles = titles + "votes for candidate " + (i + 1) + ",";
-            }
-            for (int i = 0; i < this.players.Count; i++)
-            {
-                if (i == this.players.Count - 1)
-                    titles = titles + "points player" + (i + 1);
-                else
-                    titles = titles + "points player" + (i + 1) + ",";
-            }
-            this.writeToFile.Add(titles);
+            this.logUpdated = false;
             this.agents = new List<Agent>(gamedets.agents);
             this.isRounds = gamedets.isRounds;
             this.replacingAgents = new List<ReplacingAgent>();
@@ -123,8 +105,7 @@ namespace Server
             {
                 this.startSecondrnd = true;
                 this.firstRound = true;
-                startFromSecondRound(start);
-                
+                startFromSecondRound(start);     
             }
             else
                 startSecondrnd = false;
@@ -205,9 +186,9 @@ namespace Server
                 else
                 {
                     if (gameOver)
-                        this.writeToFile[2] = "game ended after:,the players voted for the same candidate for 2 turns";
+                        this.writeToFile[3] = "game ended after:,the players voted for the same candidate for 2 turns";
                     else
-                        this.writeToFile[2] = "game ended after:,the turns are over";
+                        this.writeToFile[3] = "game ended after:,the turns are over";
                     writeToCSVFile();
                     return -1; //game over
                 }
@@ -513,10 +494,48 @@ namespace Server
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
+        public void updateLog()
+        {
+            if (this.logUpdated == false)
+            {
+                //priorities
+                int j = 5;
+                for (int i = 0; i < this.players.Count; i++)
+                {
+                    string priorityString = Program.ConnIDtoUser[this.playersID[i]].userID.ToString();
+                    for (int k = 0; k < this.priorities[i].Count; k++)
+                        priorityString = priorityString + "," + this.candidatesNames.IndexOf(this.priorities[i][k]);
+                    this.writeToFile.Insert(j, priorityString);
+                }
+
+                //titles
+                string titles = "time,player,vote,current winner,";
+                for (int i = 0; i < this.numOfCandidates; i++)
+                {
+                    titles = titles + "votes for candidate " + (i) + ",";
+                }
+                
+                for (int i = 0; i < this.players.Count; i++)
+                {
+                    if (i == this.players.Count - 1)
+                        titles = titles + "points player" + Program.ConnIDtoUser[this.playersID[i]].userID.ToString();
+                    else
+                        titles = titles + "points player" + Program.ConnIDtoUser[this.playersID[i]].userID.ToString() + ",";
+                }
+
+                this.writeToFile.Add(titles);
+                this.logUpdated = true;
+            }
+
+
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void writeToCSVFile()
         {
             this.fileCreated = true;
-            int firstRows = 4 + this.players.Count;
+            //add disconnected players tp log
+            int firstRows = 5 + this.players.Count;
             this.writeToFile.Insert(firstRows, "disconnected player id, round");
             int j = firstRows+1;
             for (int i = 0; i < this.playersDisconnected.Count; i++)
@@ -639,7 +658,7 @@ namespace Server
             this.gameOver = true;
             if (!fileCreated)
             {
-                this.writeToFile[2] = "game ended after:,all players left";
+                this.writeToFile[3] = "game ended after:,all players left";
                 writeToCSVFile();
             }
         }

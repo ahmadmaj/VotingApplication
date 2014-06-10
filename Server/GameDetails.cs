@@ -21,8 +21,9 @@ namespace Server
         public Boolean isRounds { get; private set; }
         public Boolean whoVoted { get; private set; }
         public string startSecondRound { get; private set; }
+        public string configFile { get; private set; }
 
-        public GameDetails(int humanPlayers, int players, int candidates, int rounds, List<string> candNames, List<string> player, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round, Boolean voted, string start)
+        public GameDetails(int humanPlayers, int players, int candidates, int rounds, List<string> candNames, List<string> player, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round, Boolean voted, string start, string config)
         {
             this.numOfHumanPlayers = humanPlayers;
             this.numOfTotalPlayers = players;
@@ -36,6 +37,7 @@ namespace Server
             this.isRounds = round;
             this.whoVoted = voted;
             this.startSecondRound = start;
+            this.configFile = config;
         }
 
         public List<int> getVotesList()

@@ -100,6 +100,7 @@ namespace Server
                 Game startRunning = Program.AwaitingGame;
                 Program.AwaitingGame = null;
                 Program.PlayingGames.Add(startRunning);
+                startRunning.updateLog();
                 foreach (string player in startRunning.getPlayersIDList())
                     Clients.Client(player).StartGameMsg("start");
                 }
