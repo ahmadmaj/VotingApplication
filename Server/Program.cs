@@ -38,33 +38,15 @@ namespace Server
             using (WebApp.Start<Startup>("http://+:8010"))
             {
                 Console.WriteLine("Server running on {0}", url);
-                //Console.WriteLine("Please enter a configuration file");
-                //while (true)
-                //{C:\Users\maor\Dropbox\Msc\Thesis\VotingApplication\Server\Startup.cs
-                //    String file = Console.ReadLine();
-                //    if (file != "")
-                //    {
-                //        gameDetails = readFromFile(file);
-                //        if (gameDetails == null)
-                //        {
-                //            Console.WriteLine("Error! Please enter a configuration file again");
-                //        }
-                //        else
-                //        {
-                //            Console.WriteLine("Finished reading the file");
-                //            break;
-                //        }
-                //    }
-                //}
-
+               
                 logFolder = DateTime.Now.ToString("ddMMyy_hhmm");
 
                 string curpath = Directory.GetCurrentDirectory();
                 if (args.Length > 0)
                     foreach (string confile in args)
-                        gameDetailsList.AddFirst(readConfigFile(curpath + "\\" + confile, confile));
+                        gameDetailsList.AddFirst(readConfigFile(curpath + "/" + confile));
                 else
-                    gameDetailsList.AddFirst(readConfigFile(curpath + "\\configFile2_check.txt", "configFile2_check.txt"));
+                    gameDetailsList.AddFirst(readConfigFile(curpath + "/configFile2_check.txt"));
                 //gameDetails = readConfigFile("C://Users//lena//Documents//Visual Studio 2013//Projects//VotingApplication//Server//configFile2_check.txt");
                 init = 1;
                 gameDetails = gameDetailsList.First;
@@ -92,7 +74,7 @@ namespace Server
         //  <path>
         ////
 
-        public static GameDetails readConfigFile(string file, string fileName)
+        public static GameDetails readConfigFile(string file)
         {
             try
             {
@@ -301,7 +283,7 @@ namespace Server
 
 
 
-                return new GameDetails(numOfHumanPlayers, numOfPlayers, numberOfCandidates, numOfRounds, candnames, playersOrder, points, priorities, agents, isRounds, whoVoted, startSecondRnd, fileName);
+                return new GameDetails(numOfHumanPlayers, numOfPlayers, numberOfCandidates, numOfRounds, candnames, playersOrder, points, priorities, agents, isRounds, whoVoted, startSecondRnd, Path.GetFileName(file));
 
             }
             catch (Exception e)
