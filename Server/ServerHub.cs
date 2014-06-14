@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 
@@ -130,7 +131,12 @@ namespace Server
             Clients.Client(connectionId).GameDetails("start", thegame.getPlayerIndex(connectionId), thegame.getNumOfCandidates(), thegame.getNumOfPlayers(), thegame.getNumOfRounds(), thegame.getTurnsLeft(), Program.createPrioritiesString(connectionId), Program.createCandNamesString(connectionId), playerUser.currPriToString(),0,
               Program.createPointsString(connectionId), Program.createNumOfVotesString(connectionId), thegame.isVotedDisplay(), thegame.createWhoVotedString(thegame.getPlayerIndex(connectionId)), ("p" + (thegame.getPlayerIndex(connectionId)+1).ToString()), turn, thegame.getCurrentTurn(), thegame.getCurrentWinner(thegame.getPlayerIndex(connectionId)), thegame.turnsToWait(thegame.getPlayerIndex(connectionId)));
         }
-
+        public void hasNextGame(string id)
+        {
+            LinkedListNode<GameDetails> tmp = Program.gameDetails;
+            if (tmp.Next != null)
+                Clients.Client(id).showNextGame();
+        }
         //sent when the client voted
         public void VoteDetails(string id, int playerIndex, int candidate)
         {
@@ -180,7 +186,8 @@ namespace Server
                 Program.waitingRoom.Shuffle();
                 /*var random = new Random();
                 var result = Program.waitingRoom.OrderBy(i => random.Next()).Take(Program.waitingRoom.Count).OrderBy(i => i);*/
-                Program.gameDetails = Program.gameDetails.Next ?? Program.gameDetails.List.First;
+                //Program.gameDetails = Program.gameDetails.Next ?? Program.gameDetails.List.First;
+                Program.gameDetails = Program.gameDetails.Next;
                 foreach (string player in Program.waitingRoom)
                     ConnectMsg("connect",player);
                 Program.waitingRoom = null;
@@ -230,6 +237,8 @@ namespace Server
             }
             Program.PlayingGames.Remove(game);
         }
+
+        
         
         
     }

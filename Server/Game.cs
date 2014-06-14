@@ -536,16 +536,20 @@ namespace Server
             this.fileCreated = true;
             //add disconnected players tp log
             int firstRows = 5 + this.players.Count;
-            this.writeToFile.Insert(firstRows, "disconnected player id, round");
-            int j = firstRows+1;
-            for (int i = 0; i < this.playersDisconnected.Count; i++)
+            var toFile = this.writeToFile;
+            if (toFile != null)
             {
-                this.writeToFile.Insert(j, this.playersDisconnected[i]);
-                j++;
-            }
+                toFile.Insert(firstRows, "disconnected player id, round");
+                int j = firstRows+1;
+                for (int i = 0; i < this.playersDisconnected.Count; i++)
+                {
+                    toFile.Insert(j, this.playersDisconnected[i]);
+                    j++;
+                }
 
-            for (int i = 0; i < this.writeToFile.Count; i++)
-                file.write(this.writeToFile[i]);
+                for (int i = 0; i < toFile.Count; i++)
+                    file.write(toFile[i]);
+            }
             file.close();
             
         }

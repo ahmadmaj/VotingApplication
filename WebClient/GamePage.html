@@ -367,8 +367,11 @@
                 else
                     $('#gameOverTxt').html('The winning candidate is: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
                 //main.server.connectMsg('connect', $.connection.hub.id);
-                $('#nextGameP').show();
                 $('#gameOverTxt').show();
+                game.server.hasNextGame($.connection.hub.id);
+            };
+            game.client.showNextGame = function() {
+                $('#nextGameP').show();
             };
             function resetVoteBars(numOfCandidates) {
                 for (var i = 0; i < numOfCandidates; i++) {
@@ -467,5 +470,18 @@
             }
         });
     </script>
+    <script>
+        window.onbeforeunload = function (e) {
+            e = e || window.event;
+
+            // For IE and Firefox prior to version 4
+            if (e) {
+                e.returnValue = 'Leaving will lose all your progress?';
+            }
+
+            // For Safari
+            return 'Leaving will lose all your progress?';
+        };
+</script>
 </body>
 </html>

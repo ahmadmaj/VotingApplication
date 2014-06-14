@@ -104,14 +104,13 @@ namespace Server
         {
             dataGridView1.DataSource = (from d in Program.ConnIDtoUser
                                         orderby d.Value
-                let currGame = d.Value.CurrGame
-                where currGame != null
+                let currGame = d.Value.CurrGame != null ? d.Value.CurrGame.gameID : -1
                 select new
                                         {
                                             d.Key,
                                             d.Value.userID,
                                             d.Value.Score,
-                                            currGame.gameID
+                                            currGame
                                         }).ToList();
             dataGridView1.Update();
         }
