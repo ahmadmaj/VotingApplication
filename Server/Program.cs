@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Drawing;
+using System.Security.Cryptography;
+using System.Windows.Forms;
 using Microsoft.Owin.Hosting;
 
 
 namespace Server
 {
-    public class Program
+    public static class Program
     {
         public static int init = 0;
-        private static LinkedList<GameDetails> gameDetailsList = new LinkedList<GameDetails>();
+        public static LinkedList<GameDetails> gameDetailsList = new LinkedList<GameDetails>();
         public static LinkedListNode<GameDetails> gameDetails;
         public static Game AwaitingGame = null;
         public static Dictionary<string, int> Players = new Dictionary<string, int>();  //for each playID the gameID he is in
@@ -24,38 +26,20 @@ namespace Server
         public static int count = 0;
         public static string first = "";
 
-        protected internal static Game getplayersGame(string id)
+        public static Game getplayersGame(string id)
         {
             Game currGame = null;
             if (ConnIDtoUser.ContainsKey(id))
                 currGame = ConnIDtoUser[id].CurrGame;
             return currGame;
         }
-
-        static void Main(string[] args)
+        [STAThread]
+        static void Main()
         {
-            string url = "http://localhost:8010";
-            using (WebApp.Start<Startup>("http://+:8010"))
-            {
-                Console.WriteLine("Server running on {0}", url);
-               
-                logFolder = DateTime.Now.ToString("ddMMyy_hhmm");
 
-                string curpath = Directory.GetCurrentDirectory();
-                if (args.Length > 0)
-                    foreach (string confile in args)
-                        gameDetailsList.AddFirst(readConfigFile(curpath + "/" + confile));
-                else
-                    gameDetailsList.AddFirst(readConfigFile(curpath + "/configFile2_check.txt"));
-                //gameDetails = readConfigFile("C://Users//lena//Documents//Visual Studio 2013//Projects//VotingApplication//Server//configFile2_check.txt");
-                init = 1;
-                gameDetails = gameDetailsList.First;
+            Application.EnableVisualStyles();
 
-
-
-
-                Console.ReadLine();
-            }
+            Application.Run(new ServerManager());
         }
 
         //// **** file format ****
@@ -531,5 +515,23 @@ namespace Server
                 ans = ans + "#" + points[i];
             return ans;
         }
+        public static void Shuffle<T>(this IList<T> list)
+        {
+            RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
+            int n = list.Count;
+            while (n > 1)
+            {
+                byte[] box = new byte[1];
+                do provider.GetBytes(box);
+                while (!(box[0] < n * (Byte.MaxValue / n)));
+                int k = (box[0] % n);
+                n--;
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+        }
+
     }
+
 }

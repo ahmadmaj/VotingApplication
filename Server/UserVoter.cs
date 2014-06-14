@@ -14,14 +14,13 @@ namespace Server
         public Game CurrGame { get; set; }
         public List<int> CurrPriority { get; set; } 
         private List<Game> GamesHistory { get; set; }
-        public double Points { get; set; }
-        public int score { get; set; }
+        public int Score { get; set; }
 
         public UserVoter(string connectionId)
         {
             this.userID = Interlocked.Increment(ref nextId);
             this.connectionID = connectionId;
-            this.Points = 0;
+            this.Score = 0;
             this.CurrPriority = new List<int>();
             this.GamesHistory = new List<Game>();
         }

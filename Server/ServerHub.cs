@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 
@@ -101,11 +103,16 @@ namespace Server
                 Program.AwaitingGame = null;
                 Program.PlayingGames.Add(startRunning);
                 startRunning.updateLog();
-                foreach (string player in startRunning.getPlayersIDList())
-                    Clients.Client(player).StartGameMsg("start");
-                }
+                sendStartToPlayers(startRunning.gameID,new List<string>(startRunning.getPlayersIDList()));
+            }
             else
                 Clients.Client(id).StartGameMsg("wait");
+        }
+        public void sendStartToPlayers(int gameId, List<string> playersList)
+        {
+            MessageBox.Show("Game " + gameId + " Full Press OK to start");
+            foreach (string player in playersList)
+                    Clients.Client(player).StartGameMsg("start");
         }
 
         //sent when the client loads the game page
@@ -162,19 +169,19 @@ namespace Server
                     gameOver(thegame, id, playerIndex);
             }
         }
-
-
+       
         public void nextGame(string id)
         {
 
             if (Program.waitingRoom == null) Program.waitingRoom = new List<string>();
             Program.waitingRoom.Add(id);
-            if (Program.waitingRoom.Count == 10)
+            if (Program.waitingRoom.Count == 4)
             {
-                var random = new Random();
-                var result = Program.waitingRoom.OrderBy(i => random.Next()).Take(Program.waitingRoom.Count).OrderBy(i => i);
+                Program.waitingRoom.Shuffle();
+                /*var random = new Random();
+                var result = Program.waitingRoom.OrderBy(i => random.Next()).Take(Program.waitingRoom.Count).OrderBy(i => i);*/
                 Program.gameDetails = Program.gameDetails.Next ?? Program.gameDetails.List.First;
-                foreach (string player in result)
+                foreach (string player in Program.waitingRoom)
                     ConnectMsg("connect",player);
                 Program.waitingRoom = null;
             }
@@ -217,13 +224,13 @@ namespace Server
             {
                 int playeridx = game.getPlayerIndex(playerid);
                 UserVoter playerUser = Program.ConnIDtoUser[playerid];
-                playerUser.score += playersPoints[playeridx];
+                playerUser.Score += playersPoints[playeridx];
                 Clients.Client(playerid).GameOver(game.getNumOfCandidates(), Program.createNumOfVotesString(game, playeridx), game.getVotesLeft(playeridx), game.getTurnsLeft(), Program.createGameOverString(playersPoints), game.getWinner(), game.getCurrentWinner(playeridx), game.createWhoVotedString(playeridx), ("p" + (playeridx + 1).ToString()));
                 playerUser.StoreHistory();
             }
             Program.PlayingGames.Remove(game);
         }
-   
+        
         
     }
 }
