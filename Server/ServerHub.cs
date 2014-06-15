@@ -111,7 +111,7 @@ namespace Server
         }
         public void sendStartToPlayers(int gameId, List<string> playersList)
         {
-            MessageBox.Show("Game " + gameId + " Full Press OK to start");
+            MessageBox.Show("Game " + gameId + " Full Press OK to start", "Game " + gameId + " Ready", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
             foreach (string player in playersList)
                     Clients.Client(player).StartGameMsg("start");
         }
