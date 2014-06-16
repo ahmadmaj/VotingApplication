@@ -97,7 +97,7 @@
                     //first table
                     var table1 = $('<table id=topTable></table>');
                     row11 = $('<tr border="0" width="100%"></tr>');
-                    cell11 = $('<td width="25%" align="left" valign="top"></td>').html('<td id=infopanel>' +
+                    cell11 = $('<td width="25%" align="left" valign="middle"></td>').html('<td id=infopanel>' +
                         '<label style="font-family:Arial"> There are <label id=numP>' + numPlayers + '</label> players' +
                         '<label id=showPlayers>, you are <label id=currplayer>' + playerString + '</label></label></label> <br/>' +
                         ' <label id="turnsLeft" style="font-family:Arial"> Game ends in: <label id=turnsLeftnum>' + numTurns + '</label> turns' +
@@ -106,11 +106,12 @@
                     cell12 = $('<td width="50%" align="center" style="vertical-align:middle;"></td>').html(
                         '<p><label id="turnStatus"></label></p>' +
                         '<p><label id="voteStatus"></label></p>' +
-                        '<p id="waitImg"><img src="images/wait.gif" style="height:inherit;"></p>' +
+                        '<p id="waitImg"><img src="images/wait-trans.gif" style="height:inherit;"></p>' +
                         '<p><label id="turnsToWait">Your turn is in <label id="numToWait"></label> steps</label></p>' +
                         '<p><label id="playerVoted"></label></p>' +
                         '<p><label id="gameOverTxt" hidden></label></p>' +
                         '<p id="nextGameP" hidden><input id="nextGameB" type="button" value="Ready for another game" /><br>' +
+                        '<div id="noMoreGames" hidden>No more games.<p> your gamer id is <label id=gamerID>' + $.connection.hub.id + '</label></p><p> you recieved Total of: <label id=playerPoints></label> Coins</p></div>' +
                         '<label id="nextGamestatus"></label></p>' +
                         '<div id="secbar">' +
                         '<span id="secs">' +
@@ -128,8 +129,7 @@
                     row21 = $('<tr width="100%" style="height:10%"></tr>'); //priority
                     row22 = $('<tr width="100%" style="height:10%"></tr>'); //points
                     row23 = $('<tr width="100%" style="height:60%"></tr>'); //pic
-                    row24 = $('<tr width="100%" style="height:10%"></tr>'); //name
-                    row25 = $('<tr width="100%" style="height:10%"></tr>'); //voted by
+                    row24 = $('<tr width="100%" style="height:20%"></tr>');
                     var cellWidth = 100 / numOfCandidates;
                     var points = point.split('#');
                     var priorities = priority.split('#');
@@ -137,74 +137,45 @@
                     var names = candNames.split('#');
                     var candIndexes = candIndex.split('#');
                     var whoVoted = voted.split("#");
-  
-                    for (var j = 0; j < 5; j++) { //for each row
-                        if (j == 0) {
-                            for (var i = 0; i < numOfCandidates; i++) {
-                                cell21 = $('<td width=cellWidth + "%" align="center" style="height:10%"></td>').html('<label style="font-family:Arial">' + priorities[i] + '</label>');
-                                row21.append(cell21);
-                            }
-                        }
-                        else if (j == 1) {
-                            for (var i = 0; i < numOfCandidates; i++) {
-                                cell22 = $('<td width=cellWidth + "%" align="center" style="height:10%"></td>').html('<label style="font-family:Arial">' + points[i + 1] + ' coins</label> <br><br>');
-                                row22.append(cell22);
-                            }
-                        }
-                        else if (j == 2) {
-                            var pcellWidth = cellWidth * 0.5;
-                            var icellWidth = cellWidth * 0.5;
-                            for (var i = 0; i < numOfCandidates; i++) {
-                                //if (i == 0)
-                                //    var url = "images/user" + (candIndexes[i + 1]) + "_default.png";
-                                //else
-                                var url = "images/user" + (candIndexes[i + 1]) + ".png";
-                                var size = 80 - (8 * i);
-                                //cell23 = $('<td class="imgCells" width=cellWidth + "%" align="center" style="height:60%"></td>').
-                                //    html('<div class="progress"><label class="progNum" id="num' + i + '">' + numOfVotes[i + 1] + '</label><br /><div class="outer"> <div class="inner" id="inner'+i+'"></div></div></div> <img class="images" id="' + i + '" src="' + url + '" style="height:' + size + '%">');
-                                
-                                cell23 = $('<td class="imgCells" align="center" style="height:60%; width:cellWidth + %"></td>');
-                                imgTable = $('<table width="100%" align="center" style="height:100%;"></table>');
-                                imgrow = $('<tr width=100% style="height:100%"></tr>');
-                                imgCell1 = $('<td width="25%" style="height:100%" align="right"></td>');
-                                imgCell2 = $('<td width="75%" style="height:100%;" align="left" valign="middle"></td>').html('<img class="images" id="' + i + '" src="' + url + '" style=" margin-top:20px; height:' + size + '%">');
-                                pTable = $('<table class="progBars" id="progBars'+i+'" width="30%" style="height:93%"></table><label class="numVoteslabel" id="progNum' + i + '"></label>');
-                                var pheight = 100 / numPlayers;
-                                for (var k = 0; k < numPlayers; k++) {
-                                    prow = $('<tr width="100%" style="height:' + pheight + '%"></tr>');
-                                    pcell = ('<td id="pcell' + i + k + '" width="100%" align="center" style="border: none;"><label class="progLabel" id="plabel' + i + k + '" style="margin-right:0px"></label></td>');
-                                    prow.append(pcell);
-                                    pTable.append(prow);
-                                }
-                                imgCell1.append(pTable);
-                                imgrow.append(imgCell1);
-                                imgrow.append(imgCell2);
-                                imgTable.append(imgrow);
 
-                                cell23.append(imgTable);
-                                row23.append(cell23);
-                            }
-                        }
-                        else if (j == 3) {
-                            for (var i = 0; i < numOfCandidates; i++) {
-                                cell24 = $('<td width=cellWidth + "%" align="center" style="height:10%"></td>').html('<label style="font-family:Arial; font-style:italic; font-weight: bold">' + names[i + 1] + '</label>');
-                                row24.append(cell24);
-                            }
-                        }
-                        else if (showWhoVoted == true && j == 4) {
-                            //for (var i = 0; i < numOfCandidates; i++) {
-                            //    cell25 = $('<td width=cellWidth + "%" align="center" style="height:10%"></td>').html('<label id=voted' + i + ' style="font-family:Arial">Who voted: ' + whoVoted[i + 1] + '</label>');
-                            //    row25.append(cell25);
-                            //}
 
+
+                    for (var i = 0; i < numOfCandidates; i++) {
+                        cell21 = $('<td width=cellWidth + "%" align="center"></td>').html('<label style="font-family:Arial;font-weight:bold;">' + priorities[i] + '</label>');
+                        row21.append(cell21);
+                        cell22 = $('<td width=cellWidth + "%" align="center"></td>').html('<label style="font-family:Arial;font-weight:bold;">' + points[i + 1] + ' Coins</label>');
+                        row22.append(cell22);
+                        var url = "images/user" + (candIndexes[i + 1]) + ".png";
+                        var size = 80;// - (8 * i);                      
+                        cell23 = $('<td class="imgCells" align="center" style="height:60%; width:cellWidth + %"></td>');
+                        imgTable = $('<table width="100%" align="center" style="height:100%;"></table>');
+                        imgrow = $('<tr width=100% style="height:100%"></tr>');
+                        imgCell1 = $('<td width="25%" style="height:100%" align="right"></td>');
+                        imgCell2 = $('<td width="75%" style="height:100%;" align="left" valign="middle"></td>');
+                        imgCellpicCap = $('<tr></tr>').html('<img class="images" id="' + i + '" src="' + url + '" style=" margin-top:20px; height:' + size + '%"><div class="candsNames">' + names[i + 1] + '</div>');
+                        imgCell2.append(imgCellpicCap);
+                        pTable = $('<table class="progBars" id="progBars' + i + '" width="30%" style="height:93%"></table><label class="numVoteslabel" id="progNum' + i + '"></label>');
+                        var pheight = 100 / numPlayers;
+                        for (var k = 0; k < numPlayers; k++) {
+                            prow = $('<tr width="100%" style="height:' + pheight + '%"></tr>');
+                            pcell = ('<td id="pcell' + i + k + '" width="100%" align="center" style="border: none;"><label class="progLabel" id="plabel' + i + k + '" style="margin-right:0px"></label></td>');
+                            prow.append(pcell);
+                            pTable.append(prow);
                         }
+                        imgCell1.append(pTable);
+                        imgrow.append(imgCell1);
+                        imgrow.append(imgCell2);
+                        imgTable.append(imgrow);
+
+                        cell23.append(imgTable);
+                        row23.append(cell23);
                     }
+
+
                     table2.append(row21);
                     table2.append(row22);
                     table2.append(row23);
                     table2.append(row24);
-                    table2.append(row25);
-
                     $('#tableContainer').append(table2);
 
                     var winners = winner.split("#");
@@ -370,8 +341,14 @@
                 $('#gameOverTxt').show();
                 game.server.hasNextGame($.connection.hub.id);
             };
-            game.client.showNextGame = function() {
-                $('#nextGameP').show();
+            game.client.showNextGame = function (hasNext,userID,points) {
+                if (hasNext) {
+                    $('#nextGameP').show();
+                } else {
+                    $('#noMoreGames').show();
+                    $('#gamerID').text(userID + ' (' + $.connection.hub.id + ')').css('font-weight', 'bold');
+                    $('#playerPoints').text(points).css('font-weight', 'bold').css('font-size', 'larger').css('color', 'mediumvioletred');
+                }
             };
             function resetVoteBars(numOfCandidates) {
                 for (var i = 0; i < numOfCandidates; i++) {

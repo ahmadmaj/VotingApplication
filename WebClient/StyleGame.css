@@ -1,7 +1,13 @@
-﻿html,body,#tableContainer {
+﻿html,#tableContainer {
   height: 100%;
   min-height:  100%;
   margin: 0;
+}
+body {
+    background-image: url('images/background.jpg');
+    height: 100%;
+    min-height: 100%;
+    margin: 0;
 }
 #topTable {
     display: inline-table;
@@ -104,7 +110,7 @@ label {
 
 .numVoteslabel {
     font-family: Arial;
-    font-size:smaller;
+    font-size:medium;
 }
 
 .progLabel{
@@ -169,4 +175,11 @@ label {
 }
 #turnsToWait {
     font-size: large;
+}
+
+.candsNames {
+    text-align: center;
+    font-family:Arial;
+    font-style:italic;
+    font-weight: bold;
 }

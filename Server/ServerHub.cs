@@ -134,8 +134,8 @@ namespace Server
         public void hasNextGame(string id)
         {
             LinkedListNode<GameDetails> tmp = Program.gameDetails;
-            if (tmp.Next != null)
-                Clients.Client(id).showNextGame();
+            UserVoter tmpvoter = Program.ConnIDtoUser[id];
+            Clients.Client(id).showNextGame((tmp.Next != null),tmpvoter.userID,tmpvoter.Score);
         }
         //sent when the client voted
         public void VoteDetails(string id, int playerIndex, int candidate)
