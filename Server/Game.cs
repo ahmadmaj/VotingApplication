@@ -111,7 +111,7 @@ namespace Server
                 startSecondrnd = false;
         }
 
-        public int vote(int candidatePriority, int player)
+        public int vote(int candidatePriority, int player, int duration)
         {
             if (this.votesPerPlayer[player] > 0)
             {
@@ -170,8 +170,8 @@ namespace Server
                     playerID = "replace_" + this.replacingAgents[this.replaceTurn].getPlayerID().ToString() + "_" + this.replacingAgents[this.replaceTurn].getType();
                 else
                     playerID = Program.ConnIDtoUser[this.playersID[this.humanTurn]].userID.ToString();
-                     
-                this.writeToFile.Add(time + "," + playerID.ToString() + "," + candIndex + "," + winnersString + "," + candidatesString + "," + pointsString);
+
+                this.writeToFile.Add(time + "," + playerID.ToString() + "," + candIndex + "," + duration + "," + winnersString + "," + candidatesString + "," + pointsString);
 
 
                 //Boolean gameOver = false;
@@ -244,14 +244,14 @@ namespace Server
                     int votefor = this.agents[0].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
                     if (!firstRound)
                         Thread.Sleep(5000);
-                    gameStatus = vote(votefor, this.turn);
+                    gameStatus = vote(votefor, this.turn, 5);
                 }
                 else
                 {
                     int votefor = this.agents[this.computerTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
                     if (!firstRound)
                         Thread.Sleep(5000);
-                    gameStatus = vote(votefor, this.turn);
+                    gameStatus = vote(votefor, this.turn, 5);
                 }
 
                 this.turn++;
@@ -267,7 +267,7 @@ namespace Server
                 int votefor = this.replacingAgents[this.replaceTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
                 if (!firstRound)
                     Thread.Sleep(5000);
-                gameStatus = vote(votefor, this.turn);
+                gameStatus = vote(votefor, this.turn, 5);
                 this.replaceTurn++;
                 this.turn++;
                 if (this.replaceTurn >= this.replacingAgents.Count)
@@ -502,14 +502,18 @@ namespace Server
                 int j = 5;
                 for (int i = 0; i < this.players.Count; i++)
                 {
-                    string priorityString = Program.ConnIDtoUser[this.playersID[i]].userID.ToString();
+                    string priorityString;
+                    if(this.players[i] == "computer")
+                        priorityString = "comp_" + getAgentNumber(i).ToString();
+                    else
+                        priorityString = Program.ConnIDtoUser[this.playersID[gethumanNumber(i)]].userID.ToString();
                     for (int k = 0; k < this.priorities[i].Count; k++)
                         priorityString = priorityString + "," + this.candidatesNames.IndexOf(this.priorities[i][k]);
                     this.writeToFile.Insert(j, priorityString);
                 }
 
                 //titles
-                string titles = "time,player,vote,current winner,";
+                string titles = "time,player,vote,duration,current winner,";
                 for (int i = 0; i < this.numOfCandidates; i++)
                 {
                     titles = titles + "votes for candidate " + (i) + ",";
@@ -518,9 +522,21 @@ namespace Server
                 for (int i = 0; i < this.players.Count; i++)
                 {
                     if (i == this.players.Count - 1)
-                        titles = titles + "points player" + Program.ConnIDtoUser[this.playersID[i]].userID.ToString();
+                    {
+                        if(this.players[i] == "human")
+                            titles = titles + "points player" + Program.ConnIDtoUser[this.playersID[gethumanNumber(i)]].userID.ToString();
+                        else
+                            titles = titles + "points player comp_" + getAgentNumber(i).ToString();
+
+                    }
                     else
-                        titles = titles + "points player" + Program.ConnIDtoUser[this.playersID[i]].userID.ToString() + ",";
+                    {
+                        if (this.players[i] == "human")
+                            titles = titles + "points player" + Program.ConnIDtoUser[this.playersID[gethumanNumber(i)]].userID.ToString() + ",";
+                        else
+                            titles = titles + "points player comp_" + getAgentNumber(i).ToString() + ",";
+                    }
+
                 }
 
                 this.writeToFile.Add(titles);
@@ -709,6 +725,28 @@ namespace Server
                 return this.gameID - otherGame.gameID;
             else
                 throw new ArgumentException("Object is not a Game");
+        }
+
+        public int getAgentNumber(int index)
+        {
+            int ans = 0;
+            for (int i = 0; i < index; i++)
+            {
+                if (this.players[i] == "computer")
+                    ans++;
+            }
+            return ans;
+        }
+
+        public int gethumanNumber(int index)
+        {
+            int ans = 0;
+            for (int i = 0; i < index; i++)
+            {
+                if (this.players[i] == "human")
+                    ans++;
+            }
+            return ans;
         }
 
     }

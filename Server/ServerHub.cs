@@ -125,12 +125,12 @@ namespace Server
         }
 
         //sent when the client voted
-        public void VoteDetails(string id, int playerIndex, int candidate)
+        public void VoteDetails(string id, int playerIndex, int candidate, int time)
         {
             Game thegame = Program.getplayersGame(id);
             if (thegame != null)
             {
-                int status = thegame.vote(candidate, playerIndex);
+                int status = thegame.vote(candidate, playerIndex,time);
                 if (status == 1) //the game cont.
                 {
                     int next = thegame.getNextTurn();
