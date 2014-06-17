@@ -22,7 +22,7 @@
         function progressBarFunc() {
             $('#secbar').progressbar({ value: '101.667' });
             $('#secbar').show();
-            var sec = 61;
+            sec = 61;
             var val = 101.667;
             barInterval = setInterval(function () {
                 val = val - 1.667;
@@ -44,6 +44,7 @@
     </script>
     <script>
         $.connection.hub.url = "http://localhost:8010/signalr";
+        var sec; //counting the time left to vote
         var barInterval;
         var numOfImages;
         var numOfPlayers = 0;
@@ -442,8 +443,10 @@
                 imageClick = false;
                 backFromDown = false;
                 $(".images").css('cursor', 'auto');
-
-                game.server.voteDetails($.connection.hub.id, playerIndex, event.target.id);
+                var duration = (60-sec);
+                if(duration < 0)
+                    duration = 0;
+                game.server.voteDetails($.connection.hub.id, playerIndex, event.target.id, duration);
             }
         });
     </script>
