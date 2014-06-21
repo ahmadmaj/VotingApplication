@@ -181,7 +181,7 @@ namespace Server
 
             if (Program.waitingRoom == null) Program.waitingRoom = new List<string>();
             Program.waitingRoom.Add(id);
-            if (Program.waitingRoom.Count == 4)
+            if (Program.waitingRoom.Count == (Program.gameDetails.Value.numOfHumanPlayers*2))
             {
                 Program.waitingRoom.Shuffle();
                 /*var random = new Random();

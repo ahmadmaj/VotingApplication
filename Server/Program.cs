@@ -63,7 +63,7 @@ namespace Server
             try
             {
                 StreamReader sr = new StreamReader(file);
-              
+                
                 //number_of_players
                 int numOfPlayers = -1;
                 string nextLine = sr.ReadLine();
@@ -251,7 +251,7 @@ namespace Server
 
                 if (line[0] == "priorities:")
                 {
-                    string path = sr.ReadLine();
+                    string path = Path.GetDirectoryName(file) + '/' + sr.ReadLine();
                     priorities = readPriorityFile(path, numOfPlayers, numberOfCandidates);
                     if (priorities == null)
                     {
@@ -358,7 +358,7 @@ namespace Server
 
             try
             {
-                StreamReader sr = new StreamReader(Directory.GetCurrentDirectory() + "\\" + file);
+                StreamReader sr = new StreamReader(file);
                 string nextLine;
                 for (int i = 0; i < numLines; i++) //go over the priority lines
                 {

@@ -137,9 +137,9 @@ namespace Server
                 string winnersString = "";
                 for(int i=0;i<this.winners.Count;i++){
                     if (i == 0)
-                        winnersString = this.winners[i].ToString();
+                        winnersString = (this.winners[i] + 1).ToString();
                     else
-                        winnersString = winnersString + " " + this.winners[i].ToString();
+                        winnersString = winnersString + " " + (this.winners[i]+1).ToString();
                 }
                 string candidatesString = "";
                 for (int i = 0; i < numOfCandidates; i++)
@@ -171,7 +171,7 @@ namespace Server
                 else
                     playerID = Program.ConnIDtoUser[this.playersID[this.humanTurn]].userID.ToString();
 
-                this.writeToFile.Add(time + "," + playerID.ToString() + "," + candIndex + "," + duration + "," + winnersString + "," + candidatesString + "," + pointsString);
+                this.writeToFile.Add(time + "," + playerID.ToString() + "," + (candIndex+1) + "," + duration + "," + winnersString + "," + candidatesString + "," + pointsString);
 
 
                 //Boolean gameOver = false;
@@ -508,7 +508,7 @@ namespace Server
                     else
                         priorityString = Program.ConnIDtoUser[this.playersID[gethumanNumber(i)]].userID.ToString();
                     for (int k = 0; k < this.priorities[i].Count; k++)
-                        priorityString = priorityString + "," + this.candidatesNames.IndexOf(this.priorities[i][k]);
+                        priorityString = priorityString + "," + (this.candidatesNames.IndexOf(this.priorities[i][k]) +1);
                     this.writeToFile.Insert(j, priorityString);
                 }
 
@@ -516,7 +516,7 @@ namespace Server
                 string titles = "time,player,vote,duration,current winner,";
                 for (int i = 0; i < this.numOfCandidates; i++)
                 {
-                    titles = titles + "votes for candidate " + (i) + ",";
+                    titles = titles + "votes for candidate " + (i+1) + ",";
                 }
                 
                 for (int i = 0; i < this.players.Count; i++)

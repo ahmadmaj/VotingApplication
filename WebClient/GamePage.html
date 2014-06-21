@@ -79,7 +79,7 @@
                 }
             };
             
-            game.client.gameDetails = function (msg, playerI, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, defaultCand, point, votes, isVoted, voted, playerString, turn, voting, winner, turnsWait) {
+            game.client.gameDetails = function(msg, playerI, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, defaultCand, point, votes, isVoted, voted, playerString, turn, voting, winner, turnsWait) {
                 //$('playerTurn').val(turn);
                 $("#tableContainer").empty();
                 votesProgressInterval = 190 / numPlayers;
@@ -92,7 +92,7 @@
 
                 defaultVote = 0;
                 //create table
-                $(function () {
+                $(function() {
                     //first table
                     var table1 = $('<table id=topTable></table>');
                     row11 = $('<tr border="0" width="100%"></tr>');
@@ -111,6 +111,7 @@
                         '<p><label id="gameOverTxt" hidden></label></p>' +
                         '<p id="nextGameP" hidden><input id="nextGameB" type="button" value="Ready for another game" /><br>' +
                         '<div id="noMoreGames" hidden>No more games.<p> your gamer id is <label id=gamerID>' + $.connection.hub.id + '</label></p><p> you recieved Total of: <label id=playerPoints></label> Coins</p></div>' +
+                        '<p id="survy" hidden><a href="#" class="survyB" target="_blank">Fill our Survy</a>' +
                         '<label id="nextGamestatus"></label></p>' +
                         '<div id="secbar">' +
                         '<span id="secs">' +
@@ -122,7 +123,7 @@
                     row11.append(cell12);
                     row11.append(cell13);
                     $('#tableContainer').append(table1);
-                    
+
                     //second table
                     var table2 = $('<table id=bottomTable></table>');
                     row21 = $('<tr width="100%" style="height:10%"></tr>'); //priority
@@ -138,14 +139,13 @@
                     var whoVoted = voted.split("#");
 
 
-
                     for (var i = 0; i < numOfCandidates; i++) {
                         cell21 = $('<td width=cellWidth + "%" align="center"></td>').html('<label style="font-family:Arial;font-weight:bold;">' + priorities[i] + '</label>');
                         row21.append(cell21);
                         cell22 = $('<td width=cellWidth + "%" align="center"></td>').html('<label style="font-family:Arial;font-weight:bold;">' + points[i + 1] + ' Coins</label>');
                         row22.append(cell22);
                         var url = "images/user" + (candIndexes[i + 1]) + ".png";
-                        var size = 80;// - (8 * i);                      
+                        var size = 80; // - (8 * i);                      
                         cell23 = $('<td class="imgCells" align="center" style="height:60%; width:cellWidth + %"></td>');
                         imgTable = $('<table width="100%" align="center" style="height:100%;"></table>');
                         imgrow = $('<tr width=100% style="height:100%"></tr>');
@@ -179,7 +179,7 @@
 
                     var winners = winner.split("#");
                     updateVoteBars(numOfCandidates, whoVoted, winners, numOfVotes, playerString);
-                    
+
                     if (turn == 1) {
                         imageClick = true;
                         $('#waitImg').hide();
@@ -189,20 +189,19 @@
                         $('#voteStatus').text('VOTE NOW!');
                         $(".images").css('cursor', 'pointer');
                         $('.images').hover(
-                            function (event) {
+                            function(event) {
                                 var originalSrc = $(this).attr("src");
-                                var srcon = "images/user" + parseInt(originalSrc.substring(11,12)) + "_hover.png";
+                                var srcon = "images/user" + parseInt(originalSrc.substring(11, 12)) + "_hover.png";
                                 $("#" + event.target.id).attr("src", srcon);
                             },
-                            function (event) {
+                            function(event) {
                                 var originalSrc = $(this).attr("src");
-                                var imgsrc = "images/user" + parseInt(originalSrc.substring(11,12)) + ".png";
+                                var imgsrc = "images/user" + parseInt(originalSrc.substring(11, 12)) + ".png";
                                 $("#" + event.target.id).attr("src", imgsrc);
                             }
                         );
                         progressBarFunc();
-                    }
-                    else {
+                    } else {
                         imageClick = false;
                         $('#turnsToWait').show();
                         $('#turnStatus').text('Please wait for player ' + (voting + 1) + ' to vote');
@@ -215,7 +214,7 @@
                 if (showWhoVoted == false) {
                     $('#showPlayers').hide();
                 }
-                $('#nextGameB').click(function () {
+                $('#nextGameB').click(function() {
                     $('#nextGameB').prop('disabled', true);
                     game.server.nextGame($.connection.hub.id);
                 });
@@ -341,13 +340,15 @@
                 $('#gameOverTxt').show();
                 game.server.hasNextGame($.connection.hub.id);
             };
-            game.client.showNextGame = function (hasNext,userID,points) {
+            game.client.showNextGame = function(hasNext, userID, points) {
                 if (hasNext) {
                     $('#nextGameP').show();
                 } else {
                     $('#noMoreGames').show();
+                    $('#survy').show();
                     $('#gamerID').text(userID + ' (' + $.connection.hub.id + ')').css('font-weight', 'bold');
                     $('#playerPoints').text(points).css('font-weight', 'bold').css('font-size', 'larger').css('color', 'mediumvioletred');
+                    $('.survyB').attr('href', 'https://docs.google.com/forms/d/1RFKflpeYkfWApm1tYqouKvv75cz_pS2S0ZusBfTCPsI/viewform?entry.683314448=' + userID + '&entry.641831269=' + $.connection.hub.id);
                 }
             };
             function resetVoteBars(numOfCandidates) {

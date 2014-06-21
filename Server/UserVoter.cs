@@ -49,6 +49,7 @@ namespace Server
         {
             GamesHistory.Add(CurrGame);
             CurrGame = null;
+            CurrPriority = new List<int>();
         }
     }
 
