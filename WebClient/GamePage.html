@@ -54,7 +54,7 @@
         var backFromDown;
         var game;
         var votesProgressInterval = 0;
-        var showWhoVoted = false;
+        var showWhoVoted = 0;
         $(function () {
             //Set the hubs URL for the connection
             
@@ -118,32 +118,33 @@
                         '</span>' +
                         '</div>');
                     cell13 = $('<td width="25%" align="middle" valign="middle"></td>');
-
-                    var priolist = allpriorities.split('#');
-                    var prefTable = '<div class=prefTable style="width: 50%;"><b>Global Preference Table</b><table><tr><td style="width: 30%;">Voter</td>';
-                    var s = ["th", "st", "nd", "rd"];
-                    for (var i = 1; i <= numOfCandidates; i++) {
-                        v = i % 100;
-                        prefTable+='<td>' + i + (s[(v - 20) % 10] || s[v] || s[0]) + '</td>';
-                    }
-                    prefTable += '</tr>';
-                    var prionames = priolist[playerI].split(',');
-                    prefTable += '<tr><td>p' + (playerI+1) + '<b> (Me)</b></td>';
-                    for (var j = 0; j < prionames.length; j++)
-                        prefTable += '<td style="color:' + prionames[j] + ';">' + prionames[j] + '</td>';
-                    prefTable += '</tr>';
-                    for (var i = 0; i < priolist.length; i++) {
-                        prionames = priolist[i].split(',');
-                        if (i == playerI)
-                            continue;
-                        else
-                            prefTable += '<tr><td>p' + (i+1) + '</td>';
+                    if (showWhoVoted == 2) {
+                        var priolist = allpriorities.split('#');
+                        var prefTable = '<div class=prefTable style="width: 50%;"><b>Global Preference Table</b><table><tr><td style="width: 30%;">Voter</td>';
+                        var s = ["th", "st", "nd", "rd"];
+                        for (var i = 1; i <= numOfCandidates; i++) {
+                            v = i % 100;
+                            prefTable += '<td>' + i + (s[(v - 20) % 10] || s[v] || s[0]) + '</td>';
+                        }
+                        prefTable += '</tr>';
+                        var prionames = priolist[playerI].split(',');
+                        prefTable += '<tr><td>p' + (playerI + 1) + '<b> (Me)</b></td>';
                         for (var j = 0; j < prionames.length; j++)
                             prefTable += '<td style="color:' + prionames[j] + ';">' + prionames[j] + '</td>';
                         prefTable += '</tr>';
+                        for (var i = 0; i < priolist.length; i++) {
+                            prionames = priolist[i].split(',');
+                            if (i == playerI)
+                                continue;
+                            else
+                                prefTable += '<tr><td>p' + (i + 1) + '</td>';
+                            for (var j = 0; j < prionames.length; j++)
+                                prefTable += '<td style="color:' + prionames[j] + ';">' + prionames[j] + '</td>';
+                            prefTable += '</tr>';
+                        }
+                        prefTable += '</tbody></table></div>';
+                        cell13.append(prefTable);
                     }
-                    prefTable += '</tbody></table></div>';
-                    cell13.append(prefTable);
                     table1.append(row11);
                     row11.append(cell11);
                     row11.append(cell12);
@@ -237,9 +238,6 @@
                         $(".images").css('cursor', 'auto');
                     }
                 });
-                if (showWhoVoted == false) {
-                    $('#showPlayers').hide();
-                }
                 $('#nextGameB').click(function() {
                     $('#nextGameB').prop('disabled', true);
                     game.server.nextGame($.connection.hub.id);
@@ -286,25 +284,12 @@
                 var numOfVotes = votes.split("#");
                 var winners = winner.split("#");
                 var whoVotedString = whoVoted.split("#");
-                //if (showWhoVoted == true) {
-                    
-                //    for (var i = 0; i < numOfCandidates; i++) {
-                //        $('#voted' + i).text('Who voted: ' + whoVotedString[i + 1]);
-                //    }
-                //}
+                
                 resetVoteBars(numOfCandidates);
                 updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
 
                 var candIndexes = candIndex.split('#');
-                //for (var i = 0; i < numOfCandidates; i++) {
-                //    if (i == defaultCand) {
-                //        var url = "images/user" + (candIndexes[i + 1]) + "_default.png";
-                //        $('#' + i).attr('src', url);
-                //    } else {
-                //        var url = "images/user" + (candIndexes[i + 1]) + ".png";
-                //        $('#' + i).attr('src', url);
-                //    }
-                //}
+
             };
 
             game.client.otherVotedUpdate = function (numOfCandidates, votes, votesL, turnsL, playerV, voting, winner, whoVoted, playerString, turnswait) {
@@ -314,15 +299,7 @@
                 var numOfVotes = votes.split("#");
                 var winners = winner.split("#");
                 var whoVotedString = whoVoted.split("#");
-
-
-                //if (showWhoVoted == true) {
-                    
-                //    for (var i = 0; i < numOfCandidates; i++) {
-                //        $('#voted' + i).text('Who voted: ' + whoVotedString[i + 1]);
-                //    }
-                //}
-
+                
                 resetVoteBars(numOfCandidates);
 
                 updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
@@ -342,12 +319,7 @@
                 var numOfVotes = votes.split("#");
                 var winners = currentWinner.split("#");
                 var whoVotedString = whoVoted.split("#");
-                //if (showWhoVoted == true) {
-                   
-                //    for (var i = 0; i < numOfCandidates; i++) {
-                //        $('#voted' + i).text('Who voted: ' + whoVotedString[i + 1]);
-                //    }
-                //}
+                
 
                 resetVoteBars(numOfCandidates);
 
@@ -413,7 +385,7 @@
                                 $('#plabel' + i + j).css('font-weight', 'normal').css('font-size', 'smaller');
                             }
 
-                            if (showWhoVoted == true)
+                            if (showWhoVoted > 0)
                                 $('#plabel' + i + j).text(cVoted[k]);
                         }
                         else {

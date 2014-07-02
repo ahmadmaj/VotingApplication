@@ -19,11 +19,11 @@ namespace Server
         public List<List<string>> priorities { get; private set; }
         public List<Agent> agents { get; private set; }
         public Boolean isRounds { get; private set; }
-        public Boolean whoVoted { get; private set; }
+        public int whoVoted { get; private set; }
         public string startSecondRound { get; private set; }
         public string configFile { get; private set; }
 
-        public GameDetails(int humanPlayers, int players, int candidates, int rounds, List<string> candNames, List<string> player, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round, Boolean voted, string start, string config)
+        public GameDetails(int humanPlayers, int players, int candidates, int rounds, List<string> candNames, List<string> player, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round, int voted, string start, string config)
         {
             this.numOfHumanPlayers = humanPlayers;
             this.numOfTotalPlayers = players;

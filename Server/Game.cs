@@ -21,7 +21,7 @@ namespace Server
        // private int numOfTurns;
         public List<string> candidatesNames { get; private set; }
         private List<int> votesPerPlayer; //votes left for each player
-        private Boolean whoVoted; //to show in the game who voted for the player
+        private int whoVoted; //to show in the game who voted for the player
         private List<List<int>> votedBy; //candidates, players who voted
         private List<int> votes; //number of votes each candidate got
         public List<int> points { get; private set; }
@@ -605,7 +605,7 @@ namespace Server
             return this.gameOver;
         }
 
-        public Boolean isVotedDisplay()
+        public int isVotedDisplay()
         {
             return this.whoVoted;
         }

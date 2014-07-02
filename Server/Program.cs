@@ -125,24 +125,19 @@ namespace Server
                 }
 
                 //show_who_voted
-                Boolean whoVoted = false;
+                int whoVoted = 0;
                 nextLine = sr.ReadLine();
                 line = nextLine.Split(' ');
                 if (line[0] == "show_who_voted:")
                 {
-                    if (line[1] == "yes")
-                        whoVoted = true;
-                    else if (line[1] == "no")
-                        whoVoted = false;
-                    else
-                    {
-                        Console.WriteLine("error while reading the file - show_who_voted, wrond argument");
-                        return null;
-                    }
+                    if (line[1] == "full")
+                        whoVoted = 2;
+                    else if (line[1] == "yes")
+                        whoVoted = 1;
                 }
                 else
                 {
-                    Console.WriteLine("error while reading the file - show_who_voted");
+                    Console.WriteLine("error while reading the file - show_who_voted: [full\\yes\\no]");
                     return null;
                 }
 
