@@ -129,7 +129,7 @@ namespace Server
 
             int turn = thegame.getTurn(connectionId);
             Clients.Client(connectionId).GameDetails("start", thegame.getPlayerIndex(connectionId), thegame.getNumOfCandidates(), thegame.getNumOfPlayers(), thegame.getNumOfRounds(), thegame.getTurnsLeft(), Program.createPrioritiesString(connectionId), Program.createCandNamesString(connectionId), playerUser.currPriToString(),0,
-              Program.createPointsString(connectionId), Program.createNumOfVotesString(connectionId), thegame.isVotedDisplay(), thegame.createWhoVotedString(thegame.getPlayerIndex(connectionId)), ("p" + (thegame.getPlayerIndex(connectionId)+1).ToString()), turn, thegame.getCurrentTurn(), thegame.getCurrentWinner(thegame.getPlayerIndex(connectionId)), thegame.turnsToWait(thegame.getPlayerIndex(connectionId)));
+              Program.createPointsString(connectionId), Program.createNumOfVotesString(connectionId), thegame.isVotedDisplay(), thegame.createWhoVotedString(thegame.getPlayerIndex(connectionId)), ("p" + (thegame.getPlayerIndex(connectionId)+1).ToString()), turn, thegame.getCurrentTurn(), thegame.getCurrentWinner(thegame.getPlayerIndex(connectionId)), thegame.turnsToWait(thegame.getPlayerIndex(connectionId)),thegame.prioritiesJSON);
         }
         public void hasNextGame(string id)
         {

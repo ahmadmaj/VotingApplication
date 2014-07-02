@@ -79,7 +79,7 @@
                 }
             };
             
-            game.client.gameDetails = function(msg, playerI, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, defaultCand, point, votes, isVoted, voted, playerString, turn, voting, winner, turnsWait) {
+            game.client.gameDetails = function(msg, playerI, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, defaultCand, point, votes, isVoted, voted, playerString, turn, voting, winner, turnsWait,allpriorities) {
                 //$('playerTurn').val(turn);
                 $("#tableContainer").empty();
                 votesProgressInterval = 190 / numPlayers;
@@ -99,7 +99,7 @@
                     cell11 = $('<td width="25%" align="left" valign="middle"></td>').html('<td id=infopanel>' +
                         '<label style="font-family:Arial"> There are <label id=numP>' + numPlayers + '</label> players' +
                         '<label id=showPlayers>, you are <label id=currplayer>' + playerString + '</label></label></label> <br/>' +
-                        ' <label id="turnsLeft" style="font-family:Arial"> Game ends in: <label id=turnsLeftnum>' + numTurns + '</label> turns' +
+                        ' <label id="turnsLeft" style="font-family:Arial" hidden> Game ends in: <label id=turnsLeftnum>' + numTurns + '</label> turns' +
                         '</label></td>');
 
                     cell12 = $('<td width="50%" align="center" style="vertical-align:middle;"></td>').html(
@@ -117,7 +117,33 @@
                         '<span id="secs">' +
                         '</span>' +
                         '</div>');
-                    cell13 = $('<td width="25%" align="left" valign="top"></td>').html('<label></label>');
+                    cell13 = $('<td width="25%" align="middle" valign="middle"></td>');
+
+                    var priolist = allpriorities.split('#');
+                    var prefTable = '<div class=prefTable style="width: 50%;"><b>Global Preference Table</b><table><tr><td style="width: 30%;">Voter</td>';
+                    var s = ["th", "st", "nd", "rd"];
+                    for (var i = 1; i <= numOfCandidates; i++) {
+                        v = i % 100;
+                        prefTable+='<td>' + i + (s[(v - 20) % 10] || s[v] || s[0]) + '</td>';
+                    }
+                    prefTable += '</tr>';
+                    var prionames = priolist[playerI].split(',');
+                    prefTable += '<tr><td>p' + (playerI+1) + '<b> (Me)</b></td>';
+                    for (var j = 0; j < prionames.length; j++)
+                        prefTable += '<td style="color:' + prionames[j] + ';">' + prionames[j] + '</td>';
+                    prefTable += '</tr>';
+                    for (var i = 0; i < priolist.length; i++) {
+                        prionames = priolist[i].split(',');
+                        if (i == playerI)
+                            continue;
+                        else
+                            prefTable += '<tr><td>p' + (i+1) + '</td>';
+                        for (var j = 0; j < prionames.length; j++)
+                            prefTable += '<td style="color:' + prionames[j] + ';">' + prionames[j] + '</td>';
+                        prefTable += '</tr>';
+                    }
+                    prefTable += '</tbody></table></div>';
+                    cell13.append(prefTable);
                     table1.append(row11);
                     row11.append(cell11);
                     row11.append(cell12);

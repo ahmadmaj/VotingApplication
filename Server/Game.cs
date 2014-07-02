@@ -26,6 +26,7 @@ namespace Server
         private List<int> votes; //number of votes each candidate got
         public List<int> points { get; private set; }
         public List<List<string>> priorities { get; private set; }
+        public string prioritiesJSON { get; private set; }
         private int turn; //index of the player who's turn it is
         private int humanTurn; //index of the human player who's turn it is
         private int computerTurn; //index of the agent who's turn it is
@@ -60,6 +61,10 @@ namespace Server
             this.candidatesNames = new List<string>(gamedets.candidatesNames);
             this.points = new List<int>(gamedets.points);
             this.priorities = new List<List<string>>(gamedets.priorities);
+            this.prioritiesJSON = "";
+            foreach (List<string> prio in this.priorities)
+                prioritiesJSON += string.Join(",", prio) + "#";
+            this.prioritiesJSON=this.prioritiesJSON.Remove(this.prioritiesJSON.Length - 1);
             this.votesPerPlayer = new List<int>(gamedets.getVotesList());
             this.rounds = gamedets.numOfRounds;
             this.whoVoted = gamedets.whoVoted;
