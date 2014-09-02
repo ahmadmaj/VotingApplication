@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ConsoleRedirection;
 using Microsoft.Owin.Hosting;
@@ -15,6 +9,7 @@ namespace Server
 {
     public partial class ServerManager : Form
     {
+        delegate void SetTextCallback(string text);
         private TextWriter _writer = null;
         private OpenFileDialog OpenFileDialog1;
 
@@ -28,7 +23,7 @@ namespace Server
             this.OpenFileDialog1 = new OpenFileDialog();
             InitializeOpenFileDialog();
             // Instantiate the writer
-            _writer = new TextBoxStreamWriter(txtConsole);
+            _writer = new TextBoxStreamWriter(this);
             // Redirect the out Console stream
             Console.SetOut(_writer);
             dataGridView1.AllowUserToAddRows = false;
@@ -109,10 +104,29 @@ namespace Server
                                         {
                                             d.Key,
                                             d.Value.userID,
-                                            d.Value.Score,
+                                            d.Value.TotalScore,
                                             currGame
                                         }).ToList();
             dataGridView1.Update();
+        }
+
+        public void SetText(string text)
+        {
+            // InvokeRequired required compares the thread ID of the 
+            // calling thread to the thread ID of the creating thread. 
+            // If these threads are different, it returns true. 
+            if (txtConsole.InvokeRequired)
+            {
+                SetTextCallback d = new SetTextCallback(SetText);
+                Invoke(d, new object[] {text});
+            }
+            else
+                txtConsole.AppendText(text);
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            Program.mTurkMode = !Program.mTurkMode;
         }
     }
 }

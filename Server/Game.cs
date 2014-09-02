@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
-using System.Diagnostics;
 
 namespace Server
 {
@@ -14,21 +13,20 @@ namespace Server
         static int nextId;
         public int gameID {get; private set;}
         public int numOfHumanPlayers { get; private set; }
-        private List<string> players; // players type (human, compter, replaced)
-        public List<string> playersID;
-        private int numOfCandidates;
-        private int rounds; //number of rounds in the game
-       // private int numOfTurns;
+        public List<string> players { get; private set; }// players type (human, compter, replaced)
+        public List<string> playersID { get; private set; }
+        public int numOfCandidates { get; private set; }
+        public int rounds { get; private set; } //number of rounds in the game
         public List<string> candidatesNames { get; private set; }
-        private List<int> votesPerPlayer; //votes left for each player
-        private int whoVoted; //to show in the game who voted for the player
+        public List<int> votesPerPlayer { get; private set; } //votes left for each player
+        public int whoVoted { get; private set; } //to show in the game who voted for the player
         private List<List<int>> votedBy; //candidates, players who voted
-        private List<int> votes; //number of votes each candidate got
+        public List<int> votes { get; private set; } //number of votes each candidate got
         public List<int> points { get; private set; }
         public List<List<string>> priorities { get; private set; }
         public string prioritiesJSON { get; private set; }
-        private int turn; //index of the player who's turn it is
-        private int humanTurn; //index of the human player who's turn it is
+        public int turn { get; private set; } //index of the player who's turn it is
+        public int humanTurn { get; set; } //index of the human player who's turn it is
         private int computerTurn; //index of the agent who's turn it is
         private int replaceTurn; //index of the replacing agent who's turn it is
         private Boolean firstTurn;
@@ -41,7 +39,7 @@ namespace Server
         private Boolean isRounds;
         private List<List<int>> playersVotes;
         private int roundNumber; //current round
-        private Boolean gameOver;
+        public Boolean gameOver { get; private set; }
         private Boolean startSecondrnd;
         private Boolean firstRound;
         private Boolean fileCreated;
@@ -180,7 +178,7 @@ namespace Server
 
 
                 //Boolean gameOver = false;
-                if (player == this.players.Count - 1)
+                if (player == getNumOfPlayers() - 1)
                 {
                     this.roundNumber++;
                     gameOver = checkGameOver();
@@ -188,26 +186,33 @@ namespace Server
 
                 if (this.rounds >= this.roundNumber && !gameOver)
                     return 1; //the game is not over
+                if (gameOver)
+                    this.writeToFile[3] = "game ended after:,the players voted for the same candidate for 2 turns";
                 else
-                {
-                    if (gameOver)
-                        this.writeToFile[3] = "game ended after:,the players voted for the same candidate for 2 turns";
-                    else
-                        this.writeToFile[3] = "game ended after:,the turns are over";
-                    writeToCSVFile();
-                    return -1; //game over
-                }
-                    
-            }
-            else if (this.rounds < this.roundNumber)
-            {
+                    this.writeToFile[3] = "game ended after:,the turns are over";
+                playersDump();
                 writeToCSVFile();
                 return -1; //game over
             }
-                
-            else
-                return -2;
+            if (this.rounds >= this.roundNumber) return -2;
+            playersDump();
+            writeToCSVFile();
+            return -1; //game over
         }
+
+        void playersDump()
+        {
+            updatePlayersScores();
+            string[] lines = new string[5];
+            for (int x=0;x < players.Count; x++)
+            {
+                UserVoter playObjer = Program.ConnIDtoUser[playersID[x]];
+                lines[x] = playObjer.ToString();
+            }
+            Directory.CreateDirectory(Directory.GetCurrentDirectory() + "/playersDump/");
+            File.WriteAllLines(Directory.GetCurrentDirectory() + "/playersDump/" + gameID + ".txt", lines);
+        }
+
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public int getTurn(string playerID)
@@ -240,7 +245,7 @@ namespace Server
         {
             //if (!this.firstTurn)
             //    this.turn++;
-            if (this.turn >= this.players.Count)
+            if (this.turn >= getNumOfPlayers())
                 this.turn = 0;
             int gameStatus = 1;
             if (this.players[this.turn] == "computer"){
@@ -261,7 +266,7 @@ namespace Server
 
                 this.turn++;
                 this.computerTurn++;
-                if (this.turn >= this.players.Count)
+                if (this.turn >= getNumOfPlayers())
                     this.turn = 0;
                 if (this.computerTurn >= this.agents.Count)
                     this.computerTurn = 0;
@@ -277,7 +282,7 @@ namespace Server
                 this.turn++;
                 if (this.replaceTurn >= this.replacingAgents.Count)
                     this.replaceTurn = 0;
-                if (this.turn >= this.players.Count)
+                if (this.turn >= getNumOfPlayers())
                     this.turn = 0;
             }
             else
@@ -287,7 +292,7 @@ namespace Server
                     this.humanTurn++;
                 if (this.humanTurn >= this.playersID.Count)
                     this.humanTurn = 0;
-                if (this.turn >= this.players.Count)
+                if (this.turn >= getNumOfPlayers())
                     this.turn = 0;
                 //if (this.replaceTurn >= this.replacingAgents.Count)
                 //    this.replaceTurn = 0;
@@ -302,54 +307,42 @@ namespace Server
 
         public string getPlayerID(int player)
         {
-            return this.playersID.ElementAt(player);
-        }
-        public void deletePlayerID(string id)
-        {
-            this.playersID.Remove(id);
+            var playersId = this.playersID;
+            if (playersId != null) return playersId.ElementAt(player);
+            return null;
         }
 
-        public List<string> getPlayersIDList()
+        public void deletePlayerID(string id)
         {
-            return this.playersID;
+            var playersId = this.playersID;
+            if (playersId != null) playersId.Remove(id);
         }
 
         public int getPlayerIndex(string player)
         {
             int humanCounter = this.playersID.IndexOf(player)+1;
             int ans = 0;
-            for (int i = 0; i < this.players.Count; i++)
+            for (int i = 0; i < getNumOfPlayers(); i++)
             {
-                if (this.players[i] == "human")
+                if (players[i] != "human") continue;
+                humanCounter--;
+                if (humanCounter == 0)
                 {
-                    humanCounter--;
-                    if (humanCounter == 0)
-                    {
-                        ans = i;
-                        break;
-                    }
+                    ans = i;
+                    break;
                 }
             }
                 return ans;
         }
 
-        public List<string> getPlayers()
-        {
-            return this.players;
-        }
 
-        public void replacePlayer(int index, string id)
+        public void replacePlayer(int index, UserVoter user)
         {
             this.players[index] = "replaced";
-            this.replacingAgents.Add(new ReplacingAgent("FIRST", Program.ConnIDtoUser[id].userID));
+            this.replacingAgents.Add(new ReplacingAgent("FIRST", user.userID));
             this.replaceTurn++;
-            string disconnect = Program.ConnIDtoUser[id].userID.ToString() + "," + this.roundNumber.ToString();
+            string disconnect = user.userID.ToString() + "," + this.roundNumber.ToString();
             this.playersDisconnected.Add(disconnect);
-        }
-
-        public int getNumOfCandidates()
-        {
-            return this.numOfCandidates;
         }
 
         public int getNumOfPlayers()
@@ -371,16 +364,6 @@ namespace Server
             return ans;
         }
 
-        public string getStatus()
-        {
-            return this.status;
-        }
-
-        public List<int> getNumOfVotes()
-        {
-            return this.votes;
-        }
-
         public void addPlayerID(UserVoter playerID)
         {
             this.playersID.Add(playerID.connectionID);
@@ -388,21 +371,6 @@ namespace Server
                 Program.ConnIDtoUser.Add(playerID.connectionID,playerID);
             if (playersID.Count == this.numOfHumanPlayers)
                 this.status = "playing";
-        }
-
-        public int getVotesLeft(int player)
-        {
-            return this.votesPerPlayer[player];
-        }
-
-        public List<int> getVotesPerPlayer()
-        {
-            return this.votesPerPlayer;
-        }
-
-        public int getNumOfRounds()
-        {
-            return this.rounds;
         }
 
         public int getTurnsLeft()
@@ -419,38 +387,37 @@ namespace Server
             
             //find the candidates that won
             List<int> winningCandidates = new List<int>();
-            int tmp = this.votes[0];
+            int maxVotes = this.votes[0];
             for (int i = 0; i < this.numOfCandidates; i++)
-            {
-                if (this.votes[i] == tmp)
-                {
+                if (this.votes[i] == maxVotes)
                     winningCandidates.Add(i);
-                }
-                else if (this.votes[i] > tmp)
+                else if (this.votes[i] > maxVotes)
                 {
                     winningCandidates.Clear();
                     winningCandidates.Add(i);
-                    tmp = votes[i];
+                    maxVotes = votes[i];
                 }
-            }
 
             this.winners = winningCandidates;
 
             //calc the points each player gets
-            for (int i = 0; i < this.players.Count; i++)
+            for (int i = 0; i < getNumOfPlayers(); i++)
             {
                 int pointsSum = 0;
                 for (int j = 0; j < winningCandidates.Count; j++)
                 {
                     int priority = this.priorities[i].IndexOf(this.candidatesNames.ElementAt(winningCandidates[j]));
-                    pointsSum = pointsSum + this.points[priority];
-
+                    pointsSum += this.points[priority];
                 }
-
                 currentPoints.Add(pointsSum / winningCandidates.Count);
             }
-
-                return currentPoints;
+            foreach (string playerid in playersID)
+                if (Program.ConnIDtoUser.ContainsKey(playerid))
+                {
+                    UserVoter playerUser = Program.ConnIDtoUser[playerid];
+                    playerUser.CurrScore = currentPoints[getPlayerIndex(playerid)];
+                }
+            return currentPoints;
         }
 
         // check if all players voted for the same candidate for the last 2 turns
@@ -463,16 +430,27 @@ namespace Server
                         return false;
                 return true;
             }
-            else if (!startSecondrnd)
+            if (!startSecondrnd)
             {
                 for (int i = 0; i < this.playersVotes.Count; i++)
                     if (this.playersVotes[i][0] != this.playersVotes[i][1])
                         return false;
                 return true;
             }
-            else
-                return false;
+            return false;
+        }
 
+        public void updatePlayersScores()
+        {
+            foreach (string playerid in playersID)
+            {
+                if (Program.ConnIDtoUser.ContainsKey(playerid))
+                {
+                    UserVoter playerUser = Program.ConnIDtoUser[playerid];
+                    playerUser.TotalScore += playerUser.CurrScore;
+                    playerUser.StoreHistory();
+                }
+            }
         }
 
         public string getWinner()
@@ -505,7 +483,7 @@ namespace Server
             {
                 //priorities
                 int j = 5;
-                for (int i = 0; i < this.players.Count; i++)
+                for (int i = 0; i < getNumOfPlayers(); i++)
                 {
                     string priorityString;
                     if(this.players[i] == "computer")
@@ -523,10 +501,10 @@ namespace Server
                 {
                     titles = titles + "votes for candidate " + (i+1) + ",";
                 }
-                
-                for (int i = 0; i < this.players.Count; i++)
+
+                for (int i = 0; i < getNumOfPlayers(); i++)
                 {
-                    if (i == this.players.Count - 1)
+                    if (i == getNumOfPlayers() - 1)
                     {
                         if(this.players[i] == "human")
                             titles = titles + "points player" + Program.ConnIDtoUser[this.playersID[gethumanNumber(i)]].userID.ToString();
@@ -556,7 +534,7 @@ namespace Server
         {
             this.fileCreated = true;
             //add disconnected players tp log
-            int firstRows = 5 + this.players.Count;
+            int firstRows = 5 + getNumOfPlayers();
             var toFile = this.writeToFile;
             if (toFile != null)
             {
@@ -578,36 +556,6 @@ namespace Server
         public int getDefault(int player)
         {
             return this.priorities[player].IndexOf(this.candidatesNames[this.playersVotes[player][0]]);
-        }
-
-        public string getPlayersType(int player)
-        {
-            return this.players[player];
-        }
-
-        public int getHumanTurn()
-        {
-            return this.humanTurn;
-        }
-
-        public void setHumanTurn(int n)
-        {
-            this.humanTurn = n;
-        }
-
-        public int getCurrentTurn()
-        {
-            return this.turn;
-        }
-
-        public Boolean isGameOver()
-        {
-            return this.gameOver;
-        }
-
-        public int isVotedDisplay()
-        {
-            return this.whoVoted;
         }
 
         private void updateVotedBy(int candIndex, int player){
@@ -693,7 +641,7 @@ namespace Server
             if (firstRound == "first")
             { //voted by
                 // votes
-                for (int i = 0; i < this.players.Count; i++)
+                for (int i = 0; i < getNumOfPlayers(); i++)
                 {
                     int candIndex = this.candidatesNames.IndexOf(this.priorities[i][0]);
                     this.votedBy[candIndex].Add(i);
@@ -704,7 +652,7 @@ namespace Server
             }
             else if (firstRound == "random")
             {
-                for (int i = 0; i < this.players.Count; i++)
+                for (int i = 0; i < getNumOfPlayers(); i++)
                 {
                     Random rnd = new Random();
                     int randomCand = rnd.Next(0, this.priorities[i].Count - 1);
@@ -723,7 +671,7 @@ namespace Server
             else if (player == this.turn)
                 return 0;
             else
-                return (this.players.Count - this.turn + player);
+                return (getNumOfPlayers() - this.turn + player);
         }
         public int CompareTo(object obj)
         {
@@ -740,10 +688,8 @@ namespace Server
         {
             int ans = 0;
             for (int i = 0; i < index; i++)
-            {
                 if (this.players[i] == "computer")
                     ans++;
-            }
             return ans;
         }
 
@@ -751,10 +697,8 @@ namespace Server
         {
             int ans = 0;
             for (int i = 0; i < index; i++)
-            {
                 if (this.players[i] == "human")
                     ans++;
-            }
             return ans;
         }
 

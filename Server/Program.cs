@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Drawing;
 using System.Security.Cryptography;
 using System.Windows.Forms;
-using Microsoft.Owin.Hosting;
 
 
 namespace Server
@@ -22,10 +20,11 @@ namespace Server
         public static List<Game> PlayingGames = new List<Game>();
         public static List<string> waitingRoom { get; set; }
         public static String logFolder = "";
-
+        public static List<TimeSpan> usersWaitTimes = new List<TimeSpan>(); 
+        public static TimeSpan AvgTimeSpan = new TimeSpan(0,0,0,0);
         public static int count = 0;
         public static string first = "";
-
+        public static Boolean mTurkMode = false;
         public static Game getplayersGame(string id)
         {
             Game currGame = null;
@@ -384,7 +383,7 @@ namespace Server
             Game thegame = getplayersGame(playerID);
             string ans = "";
             List<int> points = thegame.points;
-            for (int i = 0; i < thegame.getNumOfCandidates(); i++)
+            for (int i = 0; i < thegame.numOfCandidates; i++)
             {
                 ans = ans + "#" + points[i];
             }
@@ -413,7 +412,7 @@ namespace Server
         {
             Game thegame = getplayersGame(playerID);
             string ans = "";
-            for (int i = 0; i < thegame.getNumOfCandidates(); i++)
+            for (int i = 0; i < thegame.numOfCandidates; i++)
             {
                 if (i == 0)
                 {
@@ -485,7 +484,7 @@ namespace Server
             int player = thegame.getPlayerIndex(playerID);
             List<string> priority = thegame.priorities.ElementAt(player);
             List<string> candNames = thegame.candidatesNames;
-            List<int> numOfVotes = thegame.getNumOfVotes();
+            List<int> numOfVotes = thegame.votes;
             for (int i = 0; i < numOfVotes.Count; i++)
                 ans = ans + "#" + numOfVotes[candNames.IndexOf(priority[i])];
             return ans;
@@ -496,7 +495,7 @@ namespace Server
             string ans = "";
             List<string> priority = game.priorities.ElementAt(playerID);
             List<string> candNames = game.candidatesNames;
-            List<int> numOfVotes = game.getNumOfVotes();
+            List<int> numOfVotes = game.votes;
             for (int i = 0; i < numOfVotes.Count; i++)
                 ans = ans + "#" + numOfVotes[candNames.IndexOf(priority[i])];
             return ans;

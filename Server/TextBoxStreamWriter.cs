@@ -1,15 +1,14 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.IO;
-using System.Windows.Forms;
+using Server;
 
 namespace ConsoleRedirection
 {
     public class TextBoxStreamWriter : TextWriter
     {
-        RichTextBox _output = null;
+        ServerManager _output = null;
 
-        public TextBoxStreamWriter(RichTextBox output)
+        public TextBoxStreamWriter(ServerManager output)
         {
             _output = output;
         }
@@ -17,7 +16,7 @@ namespace ConsoleRedirection
         public override void Write(char value)
         {
             base.Write(value);
-            _output.AppendText(value.ToString()); // When character data is written, append it to the text box.
+            _output.SetText(value.ToString()); // When character data is written, append it to the text box.
         }
 
         public override Encoding Encoding

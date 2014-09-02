@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace Server
@@ -9,25 +8,44 @@ namespace Server
     public class UserVoter : IComparable
     {
         static int nextId;
+        public TimeSpan? waitDuration = null;
+        public string mTurkToken { get; private set; }
+        public string mTurkID { get; private set; }
+        public DateTime ConnectTime { get; private set; }
         public int userID { get; private set; }
         public string connectionID { get; private set; }
         public Game CurrGame { get; set; }
         public List<int> CurrPriority { get; set; } 
         private List<Game> GamesHistory { get; set; }
-        public int Score { get; set; }
+        public int TotalScore { get; set; }
+        public int CurrScore { get; set; } 
 
-        public UserVoter(string connectionId)
+
+        public UserVoter(string connectionId, string workerID = "")
         {
-            this.userID = Interlocked.Increment(ref nextId);
+            this.userID = Interlocked.Increment(ref nextId);  
             this.connectionID = connectionId;
-            this.Score = 0;
+            this.mTurkID = workerID;
+            if (workerID != "")
+            {
+                Guid g = Guid.NewGuid();
+                string GuidString = Convert.ToBase64String(g.ToByteArray());
+                GuidString = GuidString.Replace("=", "");
+                GuidString = GuidString.Replace("+", "");
+                this.mTurkToken = GuidString;
+            }
+            this.CurrScore = 0;
+            this.TotalScore = 0;
             this.CurrPriority = new List<int>();
             this.GamesHistory = new List<Game>();
+            this.ConnectTime = DateTime.Now;
+            Console.WriteLine("Connected: Player {0} ({1})", this.userID, connectionId);
         }
 
         public void JoinGame(Game newgame)
         {
             CurrGame = newgame;
+            Console.WriteLine("Join: Player {0} joins game {1}", this.userID, newgame.gameID);
         }
         public int CompareTo(object obj)
         {
@@ -35,7 +53,7 @@ namespace Server
 
             UserVoter otherPlayer = obj as UserVoter;
             if (otherPlayer != null)
-                return System.String.Compare(this.connectionID, otherPlayer.connectionID, System.StringComparison.Ordinal);
+                return String.Compare(this.connectionID, otherPlayer.connectionID, StringComparison.Ordinal);
             else 
                throw new ArgumentException("Object is not a Player");
         }
@@ -50,6 +68,19 @@ namespace Server
             GamesHistory.Add(CurrGame);
             CurrGame = null;
             CurrPriority = new List<int>();
+        }
+
+        public string ToString()
+        {
+            string ans = "";
+            ans = "User ID:\t" + userID + "\n";
+            ans += "Game ID:\t" + GamesHistory[GamesHistory.Count - 1] + "\n";
+            ans += "Connected at:\t" + ConnectTime + "\n";
+            ans += "mTurk:\t" + mTurkID + "\n";
+            ans += "mTurk Token:\t" + mTurkToken + "\n";
+            ans += "Wait Time:\t" + waitDuration + "\n";
+            ans += "Total score:\t" + TotalScore + "\n\n";
+            return ans;
         }
     }
 
