@@ -11,20 +11,20 @@ namespace Server
 {
     public static class Program
     {
-        public static int init = 0;
-        public static LinkedList<GameDetails> gameDetailsList = new LinkedList<GameDetails>();
-        public static LinkedListNode<GameDetails> gameDetails;
-        public static Game AwaitingGame = null;
-        public static Dictionary<string, int> Players = new Dictionary<string, int>();  //for each playID the gameID he is in
+        public static List<GameDetails> gameDetailsList = new List<GameDetails>();
+        public static GameDetails gameDetails;
         public static Dictionary<string, UserVoter> ConnIDtoUser = new Dictionary<string, UserVoter>(); //for each playID the User class he is
         public static List<Game> PlayingGames = new List<Game>();
-        public static List<string> waitingRoom { get; set; }
         public static String logFolder = "";
-        public static List<TimeSpan> usersWaitTimes = new List<TimeSpan>(); 
-        public static TimeSpan AvgTimeSpan = new TimeSpan(0,0,0,0);
-        public static int count = 0;
-        public static string first = "";
         public static Boolean mTurkMode = false;
+
+        public static UserVoter getplayerUser(string id)
+        {
+            UserVoter player = null;
+            ConnIDtoUser.TryGetValue(id, out player);
+            return player;
+        }
+        
         public static Game getplayersGame(string id)
         {
             Game currGame = null;
@@ -504,28 +504,8 @@ namespace Server
         //seperated by #
         public static string createGameOverString(List<int> points)
         {
-            string ans = "";
-            for (int i = 0; i < points.Count; i++)
-                ans = ans + "#" + points[i];
-            return ans;
+            return points.Aggregate("", (current, t) => current + "#" + t);
         }
-        public static void Shuffle<T>(this IList<T> list)
-        {
-            RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
-            int n = list.Count;
-            while (n > 1)
-            {
-                byte[] box = new byte[1];
-                do provider.GetBytes(box);
-                while (!(box[0] < n * (Byte.MaxValue / n)));
-                int k = (box[0] % n);
-                n--;
-                T value = list[k];
-                list[k] = list[n];
-                list[n] = value;
-            }
-        }
-
     }
 
 }

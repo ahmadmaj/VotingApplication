@@ -18,25 +18,19 @@ namespace Server
             Game theGame = Program.getplayersGame(Context.ConnectionId);
             UserVoter removedVoter = null;
             var sb = new StringBuilder();
-            if (Program.ConnIDtoUser.ContainsKey(Context.ConnectionId))
+            if (Program.ConnIDtoUser.TryGetValue(Context.ConnectionId, out removedVoter))
             {
-                removedVoter = Program.ConnIDtoUser[Context.ConnectionId];
                 sb.AppendFormat("Disconnected: Player {0} ({1}). ", removedVoter.userID,
                     Context.ConnectionId);
                 if (removedVoter.CurrGame != null)
                     sb.AppendFormat("Left game {0}.", removedVoter.CurrGame.gameID);
                 Console.WriteLine(sb);
+                Program.ConnIDtoUser.Remove(Context.ConnectionId);
             }
-            Program.ConnIDtoUser.Remove(Context.ConnectionId);
-            if (Program.waitingRoom != null && Program.waitingRoom.Contains(Context.ConnectionId))
-                Program.waitingRoom.Remove(Context.ConnectionId);
+            
+            WaitingRoom.RemoveFromWaitingR(Context.ConnectionId);
+            waitingRoomStats();
 
-            if (Program.AwaitingGame != null && Program.AwaitingGame.playersID != null)
-            {
-                if (Program.AwaitingGame.playersID.Contains(Context.ConnectionId))
-                    Program.AwaitingGame.playersID.Remove(Context.ConnectionId);
-                updateWaitingRoom();
-            }
 
             if (Program.PlayingGames.Count > 0)
                 if (theGame != null && !theGame.gameOver)
@@ -89,31 +83,21 @@ namespace Server
         public void ConnectMsg(string msg, string id, Newtonsoft.Json.Linq.JContainer data)
         {
             //Program.awaitingPlayersID.Add(id);
-            if (Program.AwaitingGame == null)
-            {
-                Game newGame = new Game(Program.gameDetails.Value);
-                Program.AwaitingGame = newGame;
-            }
             UserVoter newplayer;
             if (!Program.ConnIDtoUser.TryGetValue(id, out newplayer))
-                newplayer = data.Count != 0 ? new UserVoter(id, data["workerId"].ToString()) : new UserVoter(id);
-
-            Program.AwaitingGame.addPlayerID(newplayer);
-            newplayer.JoinGame(Program.AwaitingGame);
-
-
-            if (Program.AwaitingGame.playersID.Count == Program.AwaitingGame.numOfHumanPlayers)
             {
-                Game startRunning = Program.AwaitingGame;
-                Program.AwaitingGame = null;
-                Program.PlayingGames.Add(startRunning);
-                startRunning.updateLog();
-                sendStartToPlayers(startRunning.gameID, new List<string>(startRunning.playersID));
+                newplayer = data.Count != 0 ? new UserVoter(id, data["workerId"].ToString()) : new UserVoter(id);
+                Program.ConnIDtoUser.Add(id, newplayer);
             }
+
+
+            if (WaitingRoom.joinWaitingRnStart(newplayer) && Program.PlayingGames.Any())
+                foreach (Game newGame in Program.PlayingGames)
+                    sendStartToPlayers(newGame);
             else
             {
                 Clients.Client(id).StartGameMsg("wait");
-                updateWaitingRoom();
+                waitingRoomStats();
             }
         }
         private string ToPrettyFormat(TimeSpan span)
@@ -130,24 +114,26 @@ namespace Server
                 sb.AppendFormat("{0} second{1} ", span.Seconds, span.Seconds > 1 ? "s" : String.Empty);
             return sb.ToString();
         }
-        private void updateWaitingRoom()
+        private void waitingRoomStats()
         {
-            long averageTicks = Program.usersWaitTimes.Count > 0
-                ? Convert.ToInt64(Program.usersWaitTimes.Average(timeSpan => timeSpan.Ticks))
+            long averageTicks = WaitingRoom.usersWaitTimes.Count > 0
+                ? Convert.ToInt64(WaitingRoom.usersWaitTimes.Average(timeSpan => timeSpan.Ticks))
                 : 0;
-            int waitingFor = Program.AwaitingGame.numOfHumanPlayers - Program.AwaitingGame.playersID.Count;
+            int waitingFor = 0;
+            if (!Program.PlayingGames.Any())
+                waitingFor = Program.gameDetails.numOfHumanPlayers - WaitingRoom.waitingPlayers.Count;
             Clients.All.updateWaitingRoom(waitingFor, Program.ConnIDtoUser.Count, ToPrettyFormat(new TimeSpan(averageTicks)));
         }
-        public void sendStartToPlayers(int gameId, List<string> playersList)
+        public void sendStartToPlayers(Game gamestart)
         {
             if (!Program.mTurkMode)
-                MessageBox.Show("Game " + gameId + " Full Press OK to start", "Game " + gameId + " Ready", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-            foreach (string player in playersList)
+                MessageBox.Show("Game " + gamestart.gameID + " Full Press OK to start", "Game " + gamestart.gameID + " Ready", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+            foreach (string player in gamestart.playersID)
             {
                 if (Program.ConnIDtoUser[player].waitDuration == null)
                 {
                     TimeSpan waitTemp = DateTime.Now - Program.ConnIDtoUser[player].ConnectTime;
-                    Program.usersWaitTimes.Add(waitTemp);
+                    WaitingRoom.usersWaitTimes.Add(waitTemp);
                     Program.ConnIDtoUser[player].waitDuration = waitTemp;
                 }
                 Clients.Client(player).StartGameMsg("start");
@@ -169,12 +155,19 @@ namespace Server
             Clients.Client(connectionId).GameDetails("start", thegame.getPlayerIndex(connectionId), thegame.numOfCandidates, thegame.getNumOfPlayers(), thegame.rounds, thegame.getTurnsLeft(), Program.createPrioritiesString(connectionId), Program.createCandNamesString(connectionId), playerUser.currPriToString(), 0,
               Program.createPointsString(connectionId), Program.createNumOfVotesString(connectionId), thegame.whoVoted, thegame.createWhoVotedString(thegame.getPlayerIndex(connectionId)), ("p" + (thegame.getPlayerIndex(connectionId) + 1).ToString()), turn, thegame.turn, thegame.getCurrentWinner(thegame.getPlayerIndex(connectionId)), thegame.turnsToWait(thegame.getPlayerIndex(connectionId)), thegame.prioritiesJSON);
         }
+
         public void hasNextGame(string id)
         {
-            LinkedListNode<GameDetails> tmp = Program.gameDetails;
-            UserVoter tmpvoter = Program.ConnIDtoUser[id];
-            Clients.Client(id).showNextGame((tmp.Next != null),tmpvoter.userID,tmpvoter.CurrScore, tmpvoter.mTurkToken);
+            UserVoter tmpvoter;
+            if (Program.ConnIDtoUser.TryGetValue(id, out tmpvoter))
+            {
+                Boolean chk = tmpvoter.GamesHistory.Count != Program.gameDetailsList.Count;
+                Clients.Client(id).showNextGame(chk, tmpvoter.userID,tmpvoter.CurrScore, tmpvoter.mTurkToken);
+                if (!chk) Program.ConnIDtoUser.Remove(id);
+            }
         }
+
+
         //sent when the client voted
         public void VoteDetails(string id, int playerIndex, int candidate, int time)
         {
@@ -213,23 +206,6 @@ namespace Server
                     gameOver(thegame, id, playerIndex);
             }
         }
-       
-        public void nextGame(string id)
-        {
-
-            if (Program.waitingRoom == null) Program.waitingRoom = new List<string>();
-            Program.waitingRoom.Add(id);
-            if (Program.waitingRoom.Count == (Program.gameDetails.Value.numOfHumanPlayers*2))
-            {
-                Program.waitingRoom.Shuffle();
-                Program.gameDetails = Program.gameDetails.Next;
-                foreach (string player in Program.waitingRoom)
-                    ConnectMsg("connect",player, null);
-                Program.waitingRoom = null;
-            }
-            else
-                Clients.Client(id).StartGameMsg("wait");
-        }
         
         
         private void updateOtherPlayers(Game game, string id, int playerIndex, int next)
@@ -248,9 +224,9 @@ namespace Server
 
         private void updatePlayer(Game game, string id, int playerIndex, int next)
         {
-            if (Program.ConnIDtoUser.ContainsKey(id))
+            UserVoter playerUser;
+            if (Program.ConnIDtoUser.TryGetValue(id, out playerUser))
             {
-                UserVoter playerUser = Program.ConnIDtoUser[id];
                 //numOfCandidates, voted, turnsLeft, candIndex, defaultCand, voted, votingNow, currentWinnersIndex, whoVoted, playerString, turnsToWait
                 Clients.Client(id).VotedUpdate(game.numOfCandidates, Program.createNumOfVotesString(game, playerIndex), game.votesPerPlayer[playerIndex], game.getTurnsLeft(), playerUser.currPriToString(), game.getDefault(playerIndex), (next - 1), next, game.getCurrentWinner(playerIndex), game.createWhoVotedString(playerIndex), ("p" + (playerIndex + 1).ToString()), game.turnsToWait(playerIndex));
             }

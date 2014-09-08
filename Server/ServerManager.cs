@@ -57,8 +57,8 @@ namespace Server
             {
                 // Read the files 
                 foreach (String confile in OpenFileDialog1.FileNames)
-                    Program.gameDetailsList.AddFirst(Program.readConfigFile(confile));
-                Program.gameDetails = Program.gameDetailsList.First;
+                    Program.gameDetailsList.Add(Program.readConfigFile(confile));
+                Program.gameDetails = Program.gameDetailsList.First();
 
                 //loaded Config enable components
                 StartServ.Enabled = true;
@@ -80,9 +80,9 @@ namespace Server
             if ((Program.gameDetails != null) && (this.tabControl1.SelectedTab == this.tabPage2))
             {
                 tabControl1.SelectedTab = tabPage2;
-                textBox1.Text = Program.gameDetails.Value.numOfTotalPlayers.ToString();
-                textBox2.Text = Program.gameDetails.Value.numOfCandidates.ToString();
-                textBox3.Text = Program.gameDetails.Value.numOfRounds.ToString();
+                textBox1.Text = Program.gameDetails.numOfTotalPlayers.ToString();
+                textBox2.Text = Program.gameDetails.numOfCandidates.ToString();
+                textBox3.Text = Program.gameDetails.numOfRounds.ToString();
             }
             else if ((Program.gameDetails == null) && (tabControl1.SelectedTab == tabPage2))
             {

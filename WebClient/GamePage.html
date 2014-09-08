@@ -97,7 +97,7 @@
             <div id="StatusInfo" hidden>            
                 <div class="ribbon">
                     <p align="left" style="margin-bottom: 5px;"><span align="left" style="margin-bottom: 0px;color:white; border-bottom: 1px solid deepskyblue;"><b>Server Status:</b></span></p>
-                    <p align="left" style="margin-bottom: 0px;margin-top: 0px;">Please Wait for <span id="numPtoWait" style="font-weight: bolder;color: rgb(132, 171, 241);font-size: x-large;"></span> more players.</p>
+                    <p align="left" id="waitStatus"  style="margin-bottom: 0px;margin-top: 0px;"></p>
                     <hr/>
                     <p align="left" style="font-family: monospace">
                         Current players online: <span id="playersOnline" style="color: chartreuse"></span><br/>
@@ -426,7 +426,7 @@
                     });
                     $('#nextGameB').click(function() {
                         $('#nextGameB').prop('disabled', true);
-                        game.server.nextGame($.connection.hub.id);
+                        game.server.connectMsg('connect', $.connection.hub.id, QueryString);
                     });
                 }; //details function
 
@@ -540,7 +540,10 @@
                     }
                 };
                 game.client.updateWaitingRoom = function(waitingFor, totalOnline, avgTime) {
-                    $('#numPtoWait').text(waitingFor);
+                    if (waitingFor == 0)
+                        $('#waitStatus').html("Game will commence shortly!");
+                    else
+                        $('#waitStatus').html("Please Wait for <span style='font-weight: bolder;color: rgb(132, 171, 241);font-size: x-large;'>" + waitingFor + "</span> more players");
                     $('#playersOnline').text(totalOnline);
                     $('#avgWaitTime').text(avgTime);
                 };

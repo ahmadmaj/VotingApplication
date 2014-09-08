@@ -16,7 +16,7 @@ namespace Server
         public string connectionID { get; private set; }
         public Game CurrGame { get; set; }
         public List<int> CurrPriority { get; set; } 
-        private List<Game> GamesHistory { get; set; }
+        public List<Game> GamesHistory { get; private set; }
         public int TotalScore { get; set; }
         public int CurrScore { get; set; } 
 
@@ -45,7 +45,7 @@ namespace Server
         public void JoinGame(Game newgame)
         {
             CurrGame = newgame;
-            Console.WriteLine("Join: Player {0} joins game {1}", this.userID, newgame.gameID);
+            Console.WriteLine("Join: Player {0} joins game {1} ({2})", this.userID, newgame.gameID, newgame.configFile);
         }
         public int CompareTo(object obj)
         {
@@ -74,13 +74,23 @@ namespace Server
         {
             string ans = "";
             ans = "User ID:\t" + userID + "\n";
-            ans += "Game ID:\t" + GamesHistory[GamesHistory.Count - 1] + "\n";
+            ans += "Game ID:\t" + GamesHistory[GamesHistory.Count - 1].gameID + "\n";
             ans += "Connected at:\t" + ConnectTime + "\n";
             ans += "mTurk:\t" + mTurkID + "\n";
             ans += "mTurk Token:\t" + mTurkToken + "\n";
             ans += "Wait Time:\t" + waitDuration + "\n";
             ans += "Total score:\t" + TotalScore + "\n\n";
             return ans;
+        }
+
+        public int NumGamesPlayed()
+        {
+            return GamesHistory.Count;
+        }
+
+        public Boolean HasPlayed(string configFile)
+        {
+            return GamesHistory.Any(playedGame => playedGame.configFile.Equals(configFile));
         }
     }
 

@@ -11,6 +11,7 @@ namespace Server
     {
         private string status;
         static int nextId;
+        public string configFile { get; private set; }
         public int gameID {get; private set;}
         public int numOfHumanPlayers { get; private set; }
         public List<string> players { get; private set; }// players type (human, compter, replaced)
@@ -52,6 +53,7 @@ namespace Server
             gameID = Interlocked.Increment(ref nextId);
             this.status = "init";
             this.numOfHumanPlayers = gamedets.numOfHumanPlayers;
+            this.configFile = gamedets.configFile;
             this.players = new List<string>(gamedets.players);
             this.playersID = new List<string>();
             this.numOfCandidates = gamedets.numOfCandidates;
@@ -203,11 +205,12 @@ namespace Server
         void playersDump()
         {
             updatePlayersScores();
-            string[] lines = new string[5];
-            for (int x=0;x < players.Count; x++)
-            {
-                UserVoter playObjer = Program.ConnIDtoUser[playersID[x]];
-                lines[x] = playObjer.ToString();
+            string[] lines = new string[playersID.Count];
+            int x = 0;
+            foreach(string playID in playersID){
+                UserVoter playObjer;
+                if (Program.ConnIDtoUser.TryGetValue(playID, out playObjer))
+                    lines[x++] = playObjer.ToString();
             }
             Directory.CreateDirectory(Directory.GetCurrentDirectory() + "/playersDump/");
             File.WriteAllLines(Directory.GetCurrentDirectory() + "/playersDump/" + gameID + ".txt", lines);
@@ -364,13 +367,18 @@ namespace Server
             return ans;
         }
 
-        public void addPlayerID(UserVoter playerID)
+        public Boolean addPlayerID(UserVoter playerID)
         {
-            this.playersID.Add(playerID.connectionID);
-            if (!Program.ConnIDtoUser.ContainsKey(playerID.connectionID)) 
-                Program.ConnIDtoUser.Add(playerID.connectionID,playerID);
-            if (playersID.Count == this.numOfHumanPlayers)
-                this.status = "playing";
+            if (status == "playing") return false;
+            playersID.Add(playerID.connectionID);
+            playerID.JoinGame(this);
+
+            if (playersID.Count == numOfHumanPlayers)
+            {
+                status = "playing";
+                updateLog();
+            }
+            return true;
         }
 
         public int getTurnsLeft()
@@ -412,11 +420,11 @@ namespace Server
                 currentPoints.Add(pointsSum / winningCandidates.Count);
             }
             foreach (string playerid in playersID)
-                if (Program.ConnIDtoUser.ContainsKey(playerid))
-                {
-                    UserVoter playerUser = Program.ConnIDtoUser[playerid];
+            {
+                UserVoter playerUser;
+                if (Program.ConnIDtoUser.TryGetValue(playerid, out playerUser))
                     playerUser.CurrScore = currentPoints[getPlayerIndex(playerid)];
-                }
+            }
             return currentPoints;
         }
 
@@ -444,12 +452,10 @@ namespace Server
         {
             foreach (string playerid in playersID)
             {
-                if (Program.ConnIDtoUser.ContainsKey(playerid))
-                {
-                    UserVoter playerUser = Program.ConnIDtoUser[playerid];
-                    playerUser.TotalScore += playerUser.CurrScore;
-                    playerUser.StoreHistory();
-                }
+                UserVoter playerUser;
+                if (!Program.ConnIDtoUser.TryGetValue(playerid, out playerUser)) continue;
+                playerUser.TotalScore += playerUser.CurrScore;
+                playerUser.StoreHistory();
             }
         }
 
@@ -489,9 +495,9 @@ namespace Server
                     if(this.players[i] == "computer")
                         priorityString = "comp_" + getAgentNumber(i).ToString();
                     else
-                        priorityString = Program.ConnIDtoUser[this.playersID[gethumanNumber(i)]].userID.ToString();
+                        priorityString = Program.ConnIDtoUser[playersID[gethumanNumber(i)]].userID.ToString();
                     for (int k = 0; k < this.priorities[i].Count; k++)
-                        priorityString = priorityString + "," + (this.candidatesNames.IndexOf(this.priorities[i][k]) +1);
+                        priorityString = priorityString + "," + (candidatesNames.IndexOf(priorities[i][k]) +1);
                     this.writeToFile.Insert(j, priorityString);
                 }
 
