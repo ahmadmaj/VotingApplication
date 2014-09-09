@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
 namespace Server
@@ -15,6 +16,7 @@ namespace Server
         public static TimeSpan AvgTimeSpan = new TimeSpan(0,0,0,0);
 
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static Boolean joinWaitingRnStart(UserVoter Player)
         {
             if (!waitingPlayers.Contains(Player))
@@ -66,8 +68,8 @@ namespace Server
 
             //look for players under starvation
             //TODO: fix this not a good idea...
-            int minGames = int.MaxValue;
             /*
+            int minGames = int.MaxValue;
             List<UserVoter> minPlayersList =  new List<UserVoter>(); 
             foreach (UserVoter wP in waitingPlayers)
             {
@@ -130,7 +132,6 @@ namespace Server
                     {
                         UserVoter newP = playersList.First();
                         BatchofPlayers.Add(newP);
-                        //if (!currGame.addPlayerID(newP)) continue;
                         playersList.Remove(newP);
                         RemoveFromWaitingR(newP.connectionID);
                     }

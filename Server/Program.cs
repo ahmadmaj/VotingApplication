@@ -27,10 +27,8 @@ namespace Server
         
         public static Game getplayersGame(string id)
         {
-            Game currGame = null;
-            if (ConnIDtoUser.ContainsKey(id))
-                currGame = ConnIDtoUser[id].CurrGame;
-            return currGame;
+            UserVoter tmpvoter;
+            return ConnIDtoUser.TryGetValue(id,out tmpvoter) ? tmpvoter.CurrGame : null;
         }
         [STAThread]
         static void Main()
@@ -406,38 +404,6 @@ namespace Server
             return ans;
         }*/
 
-
-        //per player: cand.1#cand.2# ... (seperated by #)
-        public static string createPrioritiesString(string playerID)
-        {
-            Game thegame = getplayersGame(playerID);
-            string ans = "";
-            for (int i = 0; i < thegame.numOfCandidates; i++)
-            {
-                if (i == 0)
-                {
-                    ans = ans + "1st priority";
-
-                }
-                else if (i == 1)
-                {
-                    ans = ans + "#" + "2nd priority";
-
-                }
-                else if (i == 2)
-                {
-                    ans = ans + "#" + "3rd priority";
-
-                }
-                else
-                {
-                    ans = ans + "#" + (i + 1) + "th priority";
-
-                }
-            }
-
-            return ans;
-        }
 
         //c1 c2 c3 ... (seperated by #)
         public static string createCandNamesString(string playerID)

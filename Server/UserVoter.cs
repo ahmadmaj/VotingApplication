@@ -47,6 +47,13 @@ namespace Server
             CurrGame = newgame;
             Console.WriteLine("Join: Player {0} joins game {1} ({2})", this.userID, newgame.gameID, newgame.configFile);
         }
+
+        public void LeaveGame()
+        {
+            if (CurrGame != null)
+                Console.WriteLine("[Error] Left: Player {0} left game {1} ({2}) insufficiant players - returned to waiting room", userID, CurrGame.gameID, CurrGame.configFile);
+            CurrGame = null;
+        }
         public int CompareTo(object obj)
         {
             if (obj == null) return 1;
@@ -70,7 +77,7 @@ namespace Server
             CurrPriority = new List<int>();
         }
 
-        public string ToString()
+        public override string ToString()
         {
             string ans = "";
             ans = "User ID:\t" + userID + "\n";

@@ -66,13 +66,8 @@ namespace Server
                     }
                     else
                     {
-                        if (theGame.playersID.Count == 0)
-                            theGame.endGame();
-
                         if (theGame.playersID.Count <= theGame.humanTurn)
-                        {
                             theGame.humanTurn = 0;
-                        }
                     }
                 }
             return null;
@@ -92,8 +87,24 @@ namespace Server
 
 
             if (WaitingRoom.joinWaitingRnStart(newplayer) && Program.PlayingGames.Any())
+            {
                 foreach (Game newGame in Program.PlayingGames)
-                    sendStartToPlayers(newGame);
+                    if (newGame.status == "playing")
+                        sendStartToPlayers(newGame);
+                    else //for sanity check
+                    {
+                        foreach (string playerID in newGame.playersID)
+                        {
+                            UserVoter tmp;
+                            if (Program.ConnIDtoUser.TryGetValue(playerID, out tmp))
+                            {
+                                WaitingRoom.joinWaitingRnStart(tmp);
+                                tmp.LeaveGame();
+                            }
+                        }
+                    }
+                Program.PlayingGames.RemoveAll(newGame => newGame.status != "playing");
+            }
             else
             {
                 Clients.Client(id).StartGameMsg("wait");
@@ -152,7 +163,7 @@ namespace Server
                 playerUser.CurrPriority.Add(candNames.IndexOf(t) + 1);
 
             int turn = thegame.getTurn(connectionId);
-            Clients.Client(connectionId).GameDetails("start", thegame.getPlayerIndex(connectionId), thegame.numOfCandidates, thegame.getNumOfPlayers(), thegame.rounds, thegame.getTurnsLeft(), Program.createPrioritiesString(connectionId), Program.createCandNamesString(connectionId), playerUser.currPriToString(), 0,
+            Clients.Client(connectionId).GameDetails("start", thegame.getPlayerIndex(connectionId), thegame.numOfCandidates, thegame.getNumOfPlayers(), thegame.rounds, thegame.getTurnsLeft(), Program.createCandNamesString(connectionId), playerUser.currPriToString(), 0,
               Program.createPointsString(connectionId), Program.createNumOfVotesString(connectionId), thegame.whoVoted, thegame.createWhoVotedString(thegame.getPlayerIndex(connectionId)), ("p" + (thegame.getPlayerIndex(connectionId) + 1).ToString()), turn, thegame.turn, thegame.getCurrentWinner(thegame.getPlayerIndex(connectionId)), thegame.turnsToWait(thegame.getPlayerIndex(connectionId)), thegame.prioritiesJSON);
         }
 
@@ -183,7 +194,7 @@ namespace Server
                         gameOver(thegame, id, playerIndex);
                     else // game cont.
                     {
-                        while (next != -1 && (thegame.players[next] == "computer" || thegame.players[next] == "replaced"))
+                        while (next != -1 && (thegame.playersTypeOrder[next] == "computer" || thegame.playersTypeOrder[next] == "replaced"))
                         {
                             foreach (string t in thegame.playersID)
                             {

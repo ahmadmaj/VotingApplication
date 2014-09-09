@@ -9,12 +9,12 @@ namespace Server
 {
     public class Game : IComparable
     {
-        private string status;
+        public string status { get; private set; }
         static int nextId;
         public string configFile { get; private set; }
         public int gameID {get; private set;}
         public int numOfHumanPlayers { get; private set; }
-        public List<string> players { get; private set; }// players type (human, compter, replaced)
+        public List<string> playersTypeOrder { get; private set; }// players type (human, compter, replaced)
         public List<string> playersID { get; private set; }
         public int numOfCandidates { get; private set; }
         public int rounds { get; private set; } //number of rounds in the game
@@ -54,7 +54,7 @@ namespace Server
             this.status = "init";
             this.numOfHumanPlayers = gamedets.numOfHumanPlayers;
             this.configFile = gamedets.configFile;
-            this.players = new List<string>(gamedets.players);
+            this.playersTypeOrder = new List<string>(gamedets.players);
             this.playersID = new List<string>();
             this.numOfCandidates = gamedets.numOfCandidates;
            // this.numOfTurns = turns;
@@ -78,7 +78,7 @@ namespace Server
                 this.votes.Add(0);
 
             this.playersVotes = new List<List<int>>();
-            for (int i = 0; i < this.players.Count; i++)
+            for (int i = 0; i < this.playersTypeOrder.Count; i++)
             {
                 this.playersVotes.Add(new List<int>());
                 this.playersVotes[i].Add(-1);
@@ -164,14 +164,14 @@ namespace Server
                 }
 
                 String playerID = "";
-                if (this.players[player] == "computer")
+                if (this.playersTypeOrder[player] == "computer")
                 {
                     if (this.isRounds)
                         playerID = "comp_" + this.computerTurn + "_" + this.agents[0].getType();
                     else
                         playerID = "comp_" + this.computerTurn + "_" + this.agents[this.computerTurn].getType();
                 }
-                else if (this.players[player] == "replaced")
+                else if (this.playersTypeOrder[player] == "replaced")
                     playerID = "replace_" + this.replacingAgents[this.replaceTurn].getPlayerID().ToString() + "_" + this.replacingAgents[this.replaceTurn].getType();
                 else
                     playerID = Program.ConnIDtoUser[this.playersID[this.humanTurn]].userID.ToString();
@@ -220,7 +220,7 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public int getTurn(string playerID)
         {
-            if (this.players[this.turn] == "human")
+            if (this.playersTypeOrder[this.turn] == "human")
             {
                 this.firstTurn = false;
                 this.firstRound = false;
@@ -233,7 +233,7 @@ namespace Server
             {
                 getNextTurn();
                 this.firstTurn = false;
-                while (this.players[this.turn] == "computer")
+                while (this.playersTypeOrder[this.turn] == "computer")
                     getNextTurn();
                 this.firstRound = false;
                 if (this.playersID[this.humanTurn] == playerID)
@@ -251,7 +251,7 @@ namespace Server
             if (this.turn >= getNumOfPlayers())
                 this.turn = 0;
             int gameStatus = 1;
-            if (this.players[this.turn] == "computer"){
+            if (this.playersTypeOrder[this.turn] == "computer"){
                 if (this.isRounds)
                 {
                     int votefor = this.agents[0].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
@@ -275,7 +275,7 @@ namespace Server
                     this.computerTurn = 0;
 
             }
-            else if (this.players[this.turn] == "replaced")
+            else if (this.playersTypeOrder[this.turn] == "replaced")
             {
                 int votefor = this.replacingAgents[this.replaceTurn].vote(this.priorities[this.turn], this.candidatesNames, this.roundNumber);
                 if (!firstRound)
@@ -327,7 +327,7 @@ namespace Server
             int ans = 0;
             for (int i = 0; i < getNumOfPlayers(); i++)
             {
-                if (players[i] != "human") continue;
+                if (playersTypeOrder[i] != "human") continue;
                 humanCounter--;
                 if (humanCounter == 0)
                 {
@@ -341,7 +341,7 @@ namespace Server
 
         public void replacePlayer(int index, UserVoter user)
         {
-            this.players[index] = "replaced";
+            this.playersTypeOrder[index] = "replaced";
             this.replacingAgents.Add(new ReplacingAgent("FIRST", user.userID));
             this.replaceTurn++;
             string disconnect = user.userID.ToString() + "," + this.roundNumber.ToString();
@@ -350,7 +350,7 @@ namespace Server
 
         public int getNumOfPlayers()
         {
-            return this.players.Count;
+            return this.playersTypeOrder.Count;
         }
 
         public int findPlayer(string playerID)
@@ -492,7 +492,7 @@ namespace Server
                 for (int i = 0; i < getNumOfPlayers(); i++)
                 {
                     string priorityString;
-                    if(this.players[i] == "computer")
+                    if(this.playersTypeOrder[i] == "computer")
                         priorityString = "comp_" + getAgentNumber(i).ToString();
                     else
                         priorityString = Program.ConnIDtoUser[playersID[gethumanNumber(i)]].userID.ToString();
@@ -512,7 +512,7 @@ namespace Server
                 {
                     if (i == getNumOfPlayers() - 1)
                     {
-                        if(this.players[i] == "human")
+                        if(this.playersTypeOrder[i] == "human")
                             titles = titles + "points player" + Program.ConnIDtoUser[this.playersID[gethumanNumber(i)]].userID.ToString();
                         else
                             titles = titles + "points player comp_" + getAgentNumber(i).ToString();
@@ -520,7 +520,7 @@ namespace Server
                     }
                     else
                     {
-                        if (this.players[i] == "human")
+                        if (this.playersTypeOrder[i] == "human")
                             titles = titles + "points player" + Program.ConnIDtoUser[this.playersID[gethumanNumber(i)]].userID.ToString() + ",";
                         else
                             titles = titles + "points player comp_" + getAgentNumber(i).ToString() + ",";
@@ -640,6 +640,7 @@ namespace Server
                 this.writeToFile[3] = "game ended after:,all players left";
                 writeToCSVFile();
             }
+            Program.PlayingGames.Remove(this);
         }
 
         private void startFromSecondRound(string firstRound)
@@ -694,7 +695,7 @@ namespace Server
         {
             int ans = 0;
             for (int i = 0; i < index; i++)
-                if (this.players[i] == "computer")
+                if (this.playersTypeOrder[i] == "computer")
                     ans++;
             return ans;
         }
@@ -703,7 +704,7 @@ namespace Server
         {
             int ans = 0;
             for (int i = 0; i < index; i++)
-                if (this.players[i] == "human")
+                if (this.playersTypeOrder[i] == "human")
                     ans++;
             return ans;
         }
