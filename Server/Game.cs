@@ -57,7 +57,6 @@ namespace Server
             this.playersTypeOrder = new List<string>(gamedets.players);
             this.playersID = new List<string>();
             this.numOfCandidates = gamedets.numOfCandidates;
-           // this.numOfTurns = turns;
             this.candidatesNames = new List<string>(gamedets.candidatesNames);
             this.points = new List<int>(gamedets.points);
             this.priorities = new List<List<string>>(gamedets.priorities);
@@ -134,7 +133,6 @@ namespace Server
                 this.playersVotes[player][0] = candIndex;
 
                 this.votesPerPlayer[player]--;
-               // this.numOfTurns--;
 
                 //update log
                 string time = DateTime.Now.ToString();
@@ -224,23 +222,14 @@ namespace Server
             {
                 this.firstTurn = false;
                 this.firstRound = false;
-                if (this.playersID[this.humanTurn] == playerID)
-                    return 1;
-                else
-                    return 0;
+                return this.playersID[this.humanTurn] == playerID ? 1 : 0;
             }
-            else
-            {
+            getNextTurn();
+            this.firstTurn = false;
+            while (this.playersTypeOrder[this.turn] == "computer")
                 getNextTurn();
-                this.firstTurn = false;
-                while (this.playersTypeOrder[this.turn] == "computer")
-                    getNextTurn();
-                this.firstRound = false;
-                if (this.playersID[this.humanTurn] == playerID)
-                    return 1;
-                else
-                    return 0;                  
-            }
+            this.firstRound = false;
+            return this.playersID[this.humanTurn] == playerID ? 1 : 0;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]

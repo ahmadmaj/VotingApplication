@@ -86,7 +86,8 @@ namespace Server
             ans += "mTurk:\t" + mTurkID + "\n";
             ans += "mTurk Token:\t" + mTurkToken + "\n";
             ans += "Wait Time:\t" + waitDuration + "\n";
-            ans += "Total score:\t" + TotalScore + "\n\n";
+            ans += "Current Score:\t" + CurrScore + "\n";
+            ans += "Total Score:\t" + TotalScore + "\n\n";
             return ans;
         }
 
