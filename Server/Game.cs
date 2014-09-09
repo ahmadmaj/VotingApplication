@@ -361,7 +361,6 @@ namespace Server
             if (status == "playing") return false;
             playersID.Add(playerID.connectionID);
             playerID.JoinGame(this);
-
             if (playersID.Count == numOfHumanPlayers)
             {
                 status = "playing";
@@ -420,21 +419,7 @@ namespace Server
         // check if all players voted for the same candidate for the last 2 turns
         public Boolean checkGameOver()
         {
-            if (startSecondrnd && this.roundNumber > 2)
-            {
-                for (int i = 0; i < this.playersVotes.Count; i++)
-                    if (this.playersVotes[i][0] != this.playersVotes[i][1])
-                        return false;
-                return true;
-            }
-            if (!startSecondrnd)
-            {
-                for (int i = 0; i < this.playersVotes.Count; i++)
-                    if (this.playersVotes[i][0] != this.playersVotes[i][1])
-                        return false;
-                return true;
-            }
-            return false;
+            return ((startSecondrnd && this.roundNumber > 2) || !startSecondrnd) && playersVotes.All(t => t[0] == t[1]);
         }
 
         public void updatePlayersScores()

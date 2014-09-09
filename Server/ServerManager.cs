@@ -100,9 +100,10 @@ namespace Server
             dataGridView1.DataSource = (from d in Program.ConnIDtoUser
                                         orderby d.Value
                 let currGame = d.Value.CurrGame != null ? d.Value.CurrGame.gameID : -1
+                let id = d.Value.mTurkID != "" ? d.Value.mTurkID : d.Key
                 select new
                                         {
-                                            d.Key,
+                                            id,
                                             d.Value.userID,
                                             d.Value.TotalScore,
                                             currGame
