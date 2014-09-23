@@ -21,14 +21,13 @@ namespace Server
             if (Program.ConnIDtoUser.TryGetValue(Context.ConnectionId, out removedVoter))
             {
                 sb.AppendFormat("Disconnected: Player {0} ({1}). ", removedVoter.userID,
-                    Context.ConnectionId);
+                    removedVoter.mTurkID != "" ? removedVoter.mTurkID : Context.ConnectionId);
                 if (removedVoter.CurrGame != null)
                     sb.AppendFormat("Left game {0}.", removedVoter.CurrGame.gameID);
                 Console.WriteLine(sb);
+                WaitingRoom.RemoveFromWaitingR(Context.ConnectionId);
                 Program.ConnIDtoUser.Remove(Context.ConnectionId);
             }
-            
-            WaitingRoom.RemoveFromWaitingR(Context.ConnectionId);
             waitingRoomStats();
 
 
@@ -70,6 +69,7 @@ namespace Server
                             theGame.humanTurn = 0;
                     }
                 }
+            WaitingRoom.checkToStartGame();
             return null;
         }
 
@@ -81,31 +81,14 @@ namespace Server
             UserVoter newplayer;
             if (!Program.ConnIDtoUser.TryGetValue(id, out newplayer))
             {
-                newplayer = data.Count != 0 ? new UserVoter(id, data["workerId"].ToString()) : new UserVoter(id);
+                newplayer = data.Count != 0 ? new UserVoter(id, data["workerId"].ToString(), data["assignmentId"].ToString()) : new UserVoter(id);
                 Program.ConnIDtoUser.Add(id, newplayer);
             }
 
-
-            if (WaitingRoom.joinWaitingRnStart(newplayer) && Program.PlayingGames.Any())
-            {
-                foreach (Game newGame in Program.PlayingGames)
-                    if (newGame.status == "playing")
-                        sendStartToPlayers(newGame);
-                    else //for sanity check
-                    {
-                        foreach (string playerID in newGame.playersID)
-                        {
-                            UserVoter tmp;
-                            if (Program.ConnIDtoUser.TryGetValue(playerID, out tmp))
-                            {
-                                WaitingRoom.joinWaitingRnStart(tmp);
-                                tmp.LeaveGame();
-                            }
-                        }
-                    }
-                Program.PlayingGames.RemoveAll(newGame => newGame.status != "playing");
-            }
-            else
+            if (WaitingRoom.joinWaitingRnStart(newplayer))
+                foreach (Game playingGame in Program.PlayingGames)
+                    sendStartToPlayers(playingGame);
+            if (newplayer.CurrGame == null)
             {
                 Clients.Client(id).StartGameMsg("wait");
                 waitingRoomStats();
@@ -150,7 +133,7 @@ namespace Server
                 Clients.Client(player).StartGameMsg("start");
             }
         }
-
+        
         //sent when the client loads the game page
         public void GameDetailsMsg(string connectionId)
         {
@@ -178,7 +161,19 @@ namespace Server
             }
         }
 
-
+        public void playerQuits(string id)
+        {
+            UserVoter tmpvoter;
+            if (Program.ConnIDtoUser.TryGetValue(id, out tmpvoter))
+            {
+                WaitingRoom.RemoveFromWaitingR(id);
+                Clients.Client(id).showNextGame(false, tmpvoter.userID, tmpvoter.CurrScore, tmpvoter.mTurkToken);
+                Program.ConnIDtoUser.Remove(Context.ConnectionId);
+                Console.WriteLine("Quitter: {0} ({1}) decided to quit.. his score: {2}", tmpvoter.userID, tmpvoter.mTurkID != "" ? tmpvoter.mTurkID : tmpvoter.connectionID, tmpvoter.TotalScore);
+                waitingRoomStats();
+                WaitingRoom.checkToStartGame();
+            }
+        }
         //sent when the client voted
         public void VoteDetails(string id, int playerIndex, int candidate, int time)
         {

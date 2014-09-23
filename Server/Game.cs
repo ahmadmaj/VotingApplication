@@ -202,6 +202,7 @@ namespace Server
 
         void playersDump()
         {
+            Console.WriteLine("DONE!: Game {0} finished...", gameID);
             updatePlayersScores();
             string[] lines = new string[playersID.Count];
             int x = 0;

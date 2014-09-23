@@ -11,6 +11,7 @@ namespace Server
         public TimeSpan? waitDuration = null;
         public string mTurkToken { get; private set; }
         public string mTurkID { get; private set; }
+        public string assID { get; private set; }
         public DateTime ConnectTime { get; private set; }
         public int userID { get; private set; }
         public string connectionID { get; private set; }
@@ -21,11 +22,12 @@ namespace Server
         public int CurrScore { get; set; } 
 
 
-        public UserVoter(string connectionId, string workerID = "")
+        public UserVoter(string connectionId, string workerID = "", string assID= "")
         {
             this.userID = Interlocked.Increment(ref nextId);  
             this.connectionID = connectionId;
             this.mTurkID = workerID;
+            this.assID = assID;
             if (workerID != "")
             {
                 Guid g = Guid.NewGuid();
@@ -39,13 +41,13 @@ namespace Server
             this.CurrPriority = new List<int>();
             this.GamesHistory = new List<Game>();
             this.ConnectTime = DateTime.Now;
-            Console.WriteLine("Connected: Player {0} ({1})", this.userID, connectionId);
+            Console.WriteLine("Connected: Player {0} ({1})", userID, mTurkID != "" ? mTurkID : connectionId);
         }
 
         public void JoinGame(Game newgame)
         {
             CurrGame = newgame;
-            Console.WriteLine("Join: Player {0} joins game {1} ({2})", this.userID, newgame.gameID, newgame.configFile);
+            Console.WriteLine("Join: Player {0} ({1}) joins game {2} ({3})", userID, mTurkID != "" ? mTurkID : connectionID, newgame.gameID, newgame.configFile);
         }
 
         public void LeaveGame()
@@ -84,6 +86,7 @@ namespace Server
             ans += "Game ID:\t" + GamesHistory[GamesHistory.Count - 1].gameID + "\n";
             ans += "Connected at:\t" + ConnectTime + "\n";
             ans += "mTurk:\t" + mTurkID + "\n";
+            ans += "Assignment ID:\t" + assID + "\n";
             ans += "mTurk Token:\t" + mTurkToken + "\n";
             ans += "Wait Time:\t" + waitDuration + "\n";
             ans += "Current Score:\t" + CurrScore + "\n";

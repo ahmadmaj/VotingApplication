@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using ConsoleRedirection;
+using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Hosting;
 
 namespace Server
@@ -93,6 +94,8 @@ namespace Server
             {
                 refresh(sender, e);
             }
+            if (tabControl1.SelectedTab == tabPage4)
+                refreshGames(sender, e);
         }
 
         private void refresh(object sender, EventArgs e)
@@ -110,6 +113,20 @@ namespace Server
                                         }).ToList();
             dataGridView1.Update();
         }
+        private void refreshGames(object sender, EventArgs e)
+        {
+            dataGridView2.DataSource = (from d in Program.PlayingGames
+                                        orderby d.gameID
+                                        let Gameid = d.gameID
+                                        let PlayersInside = d.playersID.Count
+                                        select new
+                                        {
+                                            Gameid,
+                                            PlayersInside
+                                        }).ToList();
+            dataGridView2.Update();
+        }
+
 
         public void SetText(string text)
         {
@@ -128,6 +145,14 @@ namespace Server
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             Program.mTurkMode = !Program.mTurkMode;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            WaitingRoom.AssignPlayersToGames();
+            var context = GlobalHost.ConnectionManager.GetHubContext<ServerHub>();
+            foreach (string connID in Program.PlayingGames.SelectMany(playingGame => playingGame.playersID))
+                context.Clients.Client(connID).StartGameMsg("start");
         }
     }
 }

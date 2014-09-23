@@ -55,12 +55,12 @@ function getScore(form) {
 }
 var defaultVote;
     function progressBarFunc() {
-        $('#secbar').progressbar({ value: '101.667' });
+        $('#secbar').progressbar({ value: '105' });
         $('#secbar').show();
-        sec = 61;
-        var val = 101.667;
+        sec = 30;
+        var val = 105;
         barInterval = setInterval(function() {
-            val = val - 1.667;
+            val = val - 3.5;
             sec--;
             $('#secbar').progressbar({
                 value: val,
@@ -174,7 +174,8 @@ $(function() {
                 '<p><label id="turnsToWait">Your turn is in <label id="numToWait"></label> steps</label></p>' +
                 '<p><label id="playerVoted"></label></p>' +
                 '<p><label id="gameOverTxt" hidden></label></p>' +
-                '<p id="nextGameP" hidden><input id="nextGameB" type="button" value="Ready for another game" /><br>' +
+                '<p id="nextGameP" hidden><input id="nextGameB" type="button" value="Ready for another game" />' +
+                '<input id="QuitNow" type="button" value="Enough waiting! Let me out!" /><br/>' +
                 '<div id="noMoreGames" hidden>No more games.<p id=gamerID></p><p> you recieved Total of: <label id=playerPoints></label> Coins</p></div>' +
                 '<p id="survy" hidden><a href="#" class="survyB" target="_blank">Fill our Survy</a></p>' +
                 '<label id="nextGamestatus"></label>' +
@@ -303,6 +304,13 @@ $(function() {
             $('#nextGameB').prop('disabled', true);
             game.server.connectMsg('connect', $.connection.hub.id, QueryString);
         });
+
+        $('#QuitNow').click(function () {
+            var r = confirm("Are you sure? There can still earn some money..");
+            if (r) {
+                game.server.playerQuits($.connection.hub.id);
+            } 
+        });
     }; //details function
 
     game.client.yourTurn = function() {
@@ -404,6 +412,9 @@ $(function() {
         if (hasNext) {
             $('#nextGameP').show();
         } else {
+            $('#nextGameP').hide();
+            $('#QuitNow').hide();
+            $('#nextGamestatus').hide();
             $('#noMoreGames').show();
             $('#survy').show();
             if (mturkToken)
@@ -413,6 +424,7 @@ $(function() {
             }
             $('#playerPoints').text(points).css('font-weight', 'bold').css('font-size', 'larger').css('color', 'mediumvioletred');
             $('.survyB').attr('href', 'https://docs.google.com/forms/d/1RFKflpeYkfWApm1tYqouKvv75cz_pS2S0ZusBfTCPsI/viewform?entry.683314448=' + userID + '&entry.641831269=' + $.connection.hub.id);
+            $.connection.hub.stop();
         }
     };
 
@@ -455,10 +467,10 @@ $(function() {
                         $('#progBars' + i).css('box-shadow', 'none');
                     }
                     if (playerString == cVoted[k]) {
-                        $('#pcell' + i + j).css('background-image', "url('../images/progressBar2green2.png')");
+                        $('#pcell' + i + j).css('background-image', "url('images/progressBar2green2.png')");
                         $('#plabel' + i + j).css('font-weight', 'bold').css('font-size', 'large');
                     } else {
-                        $('#pcell' + i + j).css('background-image', "url('../images/progressBar2p2.png')");
+                        $('#pcell' + i + j).css('background-image', "url('images/progressBar2p2.png')");
                         $('#plabel' + i + j).css('font-weight', 'normal').css('font-size', 'smaller');
                     }
 
@@ -515,7 +527,7 @@ $(document).on('mouseup', '.images', function(event) {
         imageClick = false;
         backFromDown = false;
         $(".images").css('cursor', 'auto');
-        var duration = (60 - sec);
+        var duration = (30 - sec);
         if (duration < 0)
             duration = 0;
         game.server.voteDetails($.connection.hub.id, playerIndex, event.target.id, duration);

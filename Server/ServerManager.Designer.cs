@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Config = new System.Windows.Forms.Button();
             this.txtConsole = new System.Windows.Forms.RichTextBox();
             this.StartServ = new System.Windows.Forms.Button();
@@ -45,11 +46,17 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.button1 = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.button2 = new System.Windows.Forms.Button();
+            this.dataGridView2 = new System.Windows.Forms.DataGridView();
+            this.button3 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.tabPage4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.SuspendLayout();
             // 
             // Config
@@ -70,10 +77,10 @@
             this.txtConsole.BackColor = System.Drawing.SystemColors.InfoText;
             this.txtConsole.ForeColor = System.Drawing.SystemColors.Window;
             this.txtConsole.HideSelection = false;
-            this.txtConsole.Location = new System.Drawing.Point(5, 253);
+            this.txtConsole.Location = new System.Drawing.Point(5, 295);
             this.txtConsole.Name = "txtConsole";
             this.txtConsole.ReadOnly = true;
-            this.txtConsole.Size = new System.Drawing.Size(354, 105);
+            this.txtConsole.Size = new System.Drawing.Size(468, 174);
             this.txtConsole.TabIndex = 2;
             this.txtConsole.Text = "";
             // 
@@ -95,10 +102,11 @@
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Location = new System.Drawing.Point(5, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(350, 235);
+            this.tabControl1.Size = new System.Drawing.Size(464, 277);
             this.tabControl1.TabIndex = 4;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
@@ -111,7 +119,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(342, 206);
+            this.tabPage1.Size = new System.Drawing.Size(387, 206);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Initialization";
             // 
@@ -139,7 +147,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(342, 206);
+            this.tabPage2.Size = new System.Drawing.Size(387, 206);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Current Config";
             this.tabPage2.Visible = false;
@@ -203,13 +211,13 @@
             this.tabPage3.Controls.Add(this.dataGridView1);
             this.tabPage3.Location = new System.Drawing.Point(4, 25);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(342, 206);
+            this.tabPage3.Size = new System.Drawing.Size(456, 248);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Online Players";
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(253, 169);
+            this.button1.Location = new System.Drawing.Point(352, 211);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(81, 34);
             this.button1.TabIndex = 1;
@@ -231,14 +239,64 @@
             dataGridViewCellStyle1.NullValue = "0";
             this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(333, 162);
+            this.dataGridView1.Size = new System.Drawing.Size(447, 204);
             this.dataGridView1.TabIndex = 0;
+            // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.button3);
+            this.tabPage4.Controls.Add(this.button2);
+            this.tabPage4.Controls.Add(this.dataGridView2);
+            this.tabPage4.Location = new System.Drawing.Point(4, 25);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(456, 248);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "Current Games";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(369, 211);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(81, 34);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "Refresh";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.refreshGames);
+            // 
+            // dataGridView2
+            // 
+            this.dataGridView2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridView2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView2.Location = new System.Drawing.Point(4, 5);
+            this.dataGridView2.Name = "dataGridView2";
+            this.dataGridView2.RowHeadersVisible = false;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.NullValue = "0";
+            this.dataGridView2.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            this.dataGridView2.RowTemplate.Height = 24;
+            this.dataGridView2.Size = new System.Drawing.Size(447, 204);
+            this.dataGridView2.TabIndex = 1;
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(11, 214);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(156, 28);
+            this.button3.TabIndex = 3;
+            this.button3.Text = "Force Assign Games";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // ServerManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(357, 357);
+            this.ClientSize = new System.Drawing.Size(471, 471);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.txtConsole);
             this.MinimumSize = new System.Drawing.Size(375, 402);
@@ -253,6 +311,8 @@
             this.tabPage2.PerformLayout();
             this.tabPage3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.tabPage4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -275,5 +335,9 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.DataGridView dataGridView2;
+        private System.Windows.Forms.Button button3;
     }
 }

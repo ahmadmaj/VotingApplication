@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using Microsoft.Owin.Security.Provider;
 
 namespace Server
 {
@@ -17,21 +18,28 @@ namespace Server
 
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static Boolean joinWaitingRnStart(UserVoter Player)
+        public static Boolean checkToStartGame()
         {
-            if (!waitingPlayers.Contains(Player))
-                waitingPlayers.Add(Player);
             //if there are no games AND all current players are in waitinglist AND number of players in waitingroom is sufficent for new game
             //OR number of waiting players equal twice as players needed to start game
-            if ((waitingPlayers.Count == Program.gameDetails.numOfHumanPlayers && !Program.PlayingGames.Any() &&
+            if ((waitingPlayers.Count >= Program.gameDetails.numOfHumanPlayers && !Program.PlayingGames.Any() &&
                  waitingPlayers.Count == Program.ConnIDtoUser.Count) ||
-                waitingPlayers.Count == (Program.gameDetails.numOfHumanPlayers*2))
+                waitingPlayers.Count == (Program.gameDetails.numOfHumanPlayers * 2))
             {
                 AssignPlayersToGames();
                 return true;
             }
             return false;
         }
+
+        public static Boolean joinWaitingRnStart(UserVoter Player)
+        {
+            if (!waitingPlayers.Contains(Player))
+                waitingPlayers.Add(Player);
+            return (checkToStartGame() && Program.PlayingGames.Any());
+        }
+
+
 
         public static void RemoveFromWaitingR(string connID)
         {
@@ -58,8 +66,8 @@ namespace Server
                 list[n] = value;
             }
         }
-     
-        private static void AssignPlayersToGames()
+
+        public static void AssignPlayersToGames()
         {
             //Create number of games needed
             for (int x=0; x < waitingPlayers.Count/Program.gameDetails.numOfHumanPlayers; x++)
@@ -85,14 +93,18 @@ namespace Server
             //shuffle the list of players under starvation and assign them to games
             splitPlayersToGames(minPlayersList);*/
             //shuffle the remaining players and assign them to games
-            splitPlayersToGames(new List<UserVoter>(waitingPlayers));
-
-            foreach (List<UserVoter> batchofplayers in sortedPlayers)
+            if (sortedPlayers.Any())
             {
-                DecideOnGame(batchofplayers);
-                batchofplayers.Clear();
+                List<UserVoter> garanteedToPlay = waitingPlayers.GetRange(0,
+                    sortedPlayers.Count*Program.gameDetails.numOfHumanPlayers);
+                splitPlayersToGames(garanteedToPlay);
+                foreach (List<UserVoter> batchofplayers in sortedPlayers)
+                {
+                    DecideOnGame(batchofplayers);
+                    batchofplayers.Clear();
+                }
+                sortedPlayers.Clear();
             }
-            sortedPlayers.Clear();
         }
 
         private static void DecideOnGame(List<UserVoter> batchofplayers)
@@ -114,16 +126,22 @@ namespace Server
                 x++;
             }
             Game newGame = new Game(selecteDetails);
-            foreach (UserVoter player in batchofplayers)
-                newGame.addPlayerID(player);
-            Program.PlayingGames.Add(newGame);
-
+            if (batchofplayers.Count() == newGame.numOfHumanPlayers)
+            {
+                foreach (UserVoter player in batchofplayers)
+                    newGame.addPlayerID(player);
+                Program.PlayingGames.Add(newGame);
+            }
+            else
+                foreach (UserVoter voter in batchofplayers)
+                    joinWaitingRnStart(voter);
         }
 
         private static void splitPlayersToGames(List<UserVoter> playersList)
         {
+
             playersList.Shuffle();
-            int numPlayersinGame = (playersList.Count / sortedPlayers.Count);
+            int numPlayersinGame = Program.gameDetails.numOfHumanPlayers;
             //while (playersList.Count > 0)
             //foreach (Game currGame in Program.PlayingGames)
             foreach (List<UserVoter> BatchofPlayers in sortedPlayers)
