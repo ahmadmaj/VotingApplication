@@ -16,6 +16,7 @@ namespace Server
         public int userID { get; private set; }
         public string connectionID { get; private set; }
         public Game CurrGame { get; set; }
+        public int inGameIndex { get; private set; } 
         public List<int> CurrPriority { get; set; } 
         public List<Game> GamesHistory { get; private set; }
         public int TotalScore { get; set; }
@@ -44,9 +45,13 @@ namespace Server
             Console.WriteLine("Connected: Player {0} ({1})", userID, mTurkID != "" ? mTurkID : connectionId);
         }
 
-        public void JoinGame(Game newgame)
+        public void JoinGame(Game newgame, int igIndex, List<string> priority)
         {
             CurrGame = newgame;
+            inGameIndex = igIndex;
+            //TODO: fix that
+            foreach (string t in priority)
+                CurrPriority.Add(newgame.candidatesNames.IndexOf(t) + 1);
             Console.WriteLine("Join: Player {0} ({1}) joins game {2} ({3})", userID, mTurkID != "" ? mTurkID : connectionID, newgame.gameID, newgame.configFile);
         }
 
@@ -72,11 +77,16 @@ namespace Server
             return CurrPriority.Aggregate("", (current, t) => current + "#" + (t));
         }
 
+        //reset game settings and store history
         public void StoreHistory()
         {
             GamesHistory.Add(CurrGame);
+        }
+        public void resetGame()
+        {
             CurrGame = null;
             CurrPriority = new List<int>();
+            inGameIndex = -1;
         }
 
         public override string ToString()

@@ -146,7 +146,7 @@ $(function() {
         }
     };
 
-    game.client.gameDetails = function(msg, playerI, numOfCandidates, numPlayers, numVotes, numTurns, candNames, candIndex, defaultCand, point, votes, isVoted, voted, playerString, turn, voting, winner, turnsWait, allpriorities) {
+    game.client.gameDetails = function(playerI, numOfCandidates, numPlayers, numTurns, candNames, candIndex, point, votes, isVoted, voted, playerString, turn, voting, winner, turnsWait, allpriorities) {
         //$('playerTurn').val(turn);
         $("#tableContainer").empty();
         numOfPlayers = numPlayers;
@@ -342,7 +342,7 @@ $(function() {
         progressBarFunc();
     };
 
-    game.client.votedUpdate = function(numOfCandidates, votes, votesL, turnsL, candIndex, defaultCand, playerV, voting, winner, whoVoted, playerString, turnsWait) {
+    game.client.votedUpdate = function(numOfCandidates, votes, votesL, turnsL, defaultCand, voting, winner, whoVoted, playerString, turnsWait) {
         defaultVote = defaultCand;
         $('#turnsToWait').show();
         $('#numToWait').text(turnsWait);
@@ -357,11 +357,10 @@ $(function() {
         resetVoteBars(numOfCandidates);
         updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
 
-        var candIndexes = candIndex.split('#');
 
     };
 
-    game.client.otherVotedUpdate = function(numOfCandidates, votes, votesL, turnsL, playerV, voting, winner, whoVoted, playerString, turnswait) {
+    game.client.otherVotedUpdate = function(numOfCandidates, votes, votesL, turnsL, voting, winner, whoVoted, playerString, turnswait) {
         $('#turnStatus').text('Please wait for player ' + (voting + 1) + ' to vote');
         //$('#votesLeft').text('Remaining votes: ' + votesL);
         $('#turnsLeftnum').text(turnsL);

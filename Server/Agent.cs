@@ -116,10 +116,7 @@ namespace Server
 
         public Boolean isRounds()
         {
-            if (this.id == 5)
-                return true;
-            else
-                return false;
+            return id == 5;
         }
 
         public string getType(){
