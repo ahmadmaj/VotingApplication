@@ -211,8 +211,9 @@ namespace Server
                 if (Program.ConnIDtoUser.TryGetValue(playID, out playObjer))
                     lines[x++] = playObjer.ToString();
             }
-            Directory.CreateDirectory(Directory.GetCurrentDirectory() + "/playersDump/");
-            File.WriteAllLines(Directory.GetCurrentDirectory() + "/playersDump/" + gameID + ".txt", lines);
+            string dumppath = string.Format("{0}/playersDump/{1}/", Directory.GetCurrentDirectory(), Program.logFolder);
+            Directory.CreateDirectory(dumppath);
+            File.WriteAllLines(dumppath + gameID + ".txt", lines);
         }
 
 

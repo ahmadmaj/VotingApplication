@@ -72,7 +72,7 @@ namespace Server
             string url = "http://localhost:8010";
             WebApp.Start<Startup>("http://+:8010");
             Console.WriteLine("Server running on {0}", url);
-            Program.logFolder = DateTime.Now.ToString("ddMMyy_hhmm");
+            Program.logFolder = DateTime.Now.ToString("ddMMyy_HHmm");
 
 
         }

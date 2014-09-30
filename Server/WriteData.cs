@@ -6,24 +6,23 @@ namespace Server
 {
     public class WriteData
     {
-        private string path;
-        private StreamWriter file;
+        private readonly StreamWriter file;
 
         public WriteData(int gameID)
         {
-            string filename = gameID.ToString() + "_" + DateTime.Now.ToString("hhmm_ddMMyy") + ".csv";
-            Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\logs\\" + Program.logFolder + "\\");
-            this.path = string.Format(Directory.GetCurrentDirectory() + "{0}" + filename, "\\logs\\" + Program.logFolder + "\\");
-            this.file = new StreamWriter(path, true);
+            string filename = gameID + "_" + DateTime.Now.ToString("HHmm_ddMMyy") + ".csv";
+            string path = string.Format("{0}/logs/{1}/", Directory.GetCurrentDirectory(), Program.logFolder);
+            Directory.CreateDirectory(path);
+            file = new StreamWriter(path + filename, true);
         }
 
         public void write(string line)
         {
-            if(file.BaseStream != null)
+            if(file != null)
                 file.WriteLine(line);
         }
 
-        public void close()
+        public void Close()
         {
             file.Close();
         }
