@@ -122,6 +122,10 @@ $(function() {
     // Declare a proxy to reference the hub.
 
     game = $.connection.serverHub;
+    if (game == null) {
+        $('body').replaceWith("<div><h1 style=\"text-align: center;\">We are sorry!<br/> There seems to be a problem with the server.</h1></div>");
+        return;
+    }
     game.client.startGameMsg = function(msg) {
 
         if (msg == "wait") {

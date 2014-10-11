@@ -170,7 +170,7 @@ namespace Server
 
         void playersDump()
         {
-            Console.WriteLine("DONE!: Game {0} finished...", gameID);
+            Console.WriteLine("[{0}] DONE!: Game {1} finished...", DateTime.Now.ToString("HH:mm:ss"), gameID);
             updatePlayersScores();
             string[] lines = new string[playersID.Count];
             int x = 0;
@@ -335,9 +335,7 @@ namespace Server
         }
 
         public void updateCurWinner()
-        {
-            List<int> currentPoints = new List<int>();
-            
+        {            
             //find current winning candidates
             List<int> winningCandidates = new List<int>();
             int maxVotes = this.votedBy[0].Count;
@@ -498,7 +496,7 @@ namespace Server
 
         public int getDefault(int player)
         {
-            return this.priorities[player].IndexOf(this.candidatesNames[this.playersVotes[player][0]]);
+            return playersVotes[player][0] == -1 ? 0 : priorities[player].IndexOf(candidatesNames[playersVotes[player][0]]);
         }
 
         private void updateVotedBy(int candIndex, int player)
@@ -528,7 +526,7 @@ namespace Server
                 {
                     int candIndex = this.candidatesNames.IndexOf(this.priorities[i][0]);
                     this.votedBy[candIndex].Add(i);
-                    this.playersVotes[i][0] = candIndex;
+                    //this.playersVotes[i][0] = candIndex;
                 }
                 updateCurWinner();
             }
@@ -539,7 +537,7 @@ namespace Server
                     Random rnd = new Random();
                     int randomCand = rnd.Next(0, this.priorities[i].Count - 1);
                     this.votedBy[randomCand].Add(i);
-                    this.playersVotes[i][0] = randomCand;
+                    //this.playersVotes[i][0] = randomCand;
                 }
                 updateCurWinner();
             }

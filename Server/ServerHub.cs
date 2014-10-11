@@ -22,7 +22,7 @@ namespace Server
             if (Program.ConnIDtoUser.TryGetValue(Context.ConnectionId, out removedVoter))
             {
                 playerIndex = removedVoter.inGameIndex;
-                sb.AppendFormat("Disconnected: Player {0} ({1}). ", removedVoter.userID,
+                sb.AppendFormat("[{0}] Disconnected: Player {1} ({2}). ", DateTime.Now.ToString("HH:mm:ss"), removedVoter.userID,
                     removedVoter.mTurkID != "" ? removedVoter.mTurkID : Context.ConnectionId);
                 if (removedVoter.CurrGame != null)
                     sb.AppendFormat("Left game {0}.", removedVoter.CurrGame.gameID);
@@ -164,7 +164,7 @@ namespace Server
                 WaitingRoom.RemoveFromWaitingR(id);
                 Clients.Client(id).showNextGame(false, tmpvoter.userID, tmpvoter.CurrScore, tmpvoter.mTurkToken);
                 Program.ConnIDtoUser.Remove(Context.ConnectionId);
-                Console.WriteLine("Quitter: {0} ({1}) decided to quit.. his score: {2}", tmpvoter.userID, tmpvoter.mTurkID != "" ? tmpvoter.mTurkID : tmpvoter.connectionID, tmpvoter.TotalScore);
+                Console.WriteLine("[{0}] Quitter: {1} ({2}) decided to quit.. his score: {3}",DateTime.Now.ToString("HH:mm:ss"), tmpvoter.userID, tmpvoter.mTurkID != "" ? tmpvoter.mTurkID : tmpvoter.connectionID, tmpvoter.TotalScore);
                 waitingRoomStats();
                 WaitingRoom.checkToStartGame();
             }

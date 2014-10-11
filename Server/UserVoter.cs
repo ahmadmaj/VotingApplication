@@ -42,7 +42,7 @@ namespace Server
             this.CurrPriority = new List<int>();
             this.GamesHistory = new List<Game>();
             this.ConnectTime = DateTime.Now;
-            Console.WriteLine("Connected: Player {0} ({1})", userID, mTurkID != "" ? mTurkID : connectionId);
+            Console.WriteLine("[{0}] Connected: Player {1} ({2})", DateTime.Now.ToString("HH:mm:ss"),userID, mTurkID != "" ? mTurkID : connectionId);
         }
 
         public void JoinGame(Game newgame, int igIndex, List<string> priority)
@@ -52,13 +52,13 @@ namespace Server
             //TODO: fix that
             foreach (string t in priority)
                 CurrPriority.Add(newgame.candidatesNames.IndexOf(t) + 1);
-            Console.WriteLine("Join: Player {0} ({1}) joins game {2} ({3})", userID, mTurkID != "" ? mTurkID : connectionID, newgame.gameID, newgame.configFile);
+            Console.WriteLine("[{0}] Join: Player {1} ({2}) joins game {3} ({4})", DateTime.Now.ToString("HH:mm:ss"), userID, mTurkID != "" ? mTurkID : connectionID, newgame.gameID, newgame.configFile);
         }
 
         public void LeaveGame()
         {
             if (CurrGame != null)
-                Console.WriteLine("[Error] Left: Player {0} left game {1} ({2}) insufficiant players - returned to waiting room", userID, CurrGame.gameID, CurrGame.configFile);
+                Console.WriteLine("[{0} Error] Left: Player {1} left game {2} ({3}) insufficiant players - returned to waiting room", DateTime.Now.ToString("HH:mm:ss"), userID, CurrGame.gameID, CurrGame.configFile);
             CurrGame = null;
         }
         public int CompareTo(object obj)
