@@ -42,7 +42,7 @@ namespace Server
         {
             // Set the file dialog to filter for graphics files. 
             this.OpenFileDialog1.Filter =
-                "Config Files (*.txt)|*.txt|" +
+                "Config Files (*.xml)|*.xml|" +
                 "All files (*.*)|*.*";
 
             // Allow the user to select multiple images. 
