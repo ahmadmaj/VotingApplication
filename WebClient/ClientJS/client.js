@@ -392,7 +392,9 @@ $(function() {
         var winners = currentWinner.split("#");
         var whoVotedString = whoVoted.split("#");
 
-
+        clearInterval(barInterval);
+        $('#secbar').hide();
+        $('#voteStatus').text('');
         resetVoteBars(numOfCandidates);
 
         updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);

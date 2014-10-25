@@ -20,7 +20,7 @@ namespace Server
         public readonly string startSecondRound;// { get; private set; }
         public readonly string configFile;// { get; private set; }
 
-        public GameDetails(int humanPlayers, int players, int candidates, int rounds, List<string> candNames, List<string> player, List<int> points, List<List<string>> priority, List<Agent> agent, Boolean round, int voted, string start, string config)
+        public GameDetails(int humanPlayers, int players, int candidates, int rounds, List<string> candNames, List<string> player, List<int> points, List<List<string>> priority, int voted, string start, string config)
         {
             this.numOfHumanPlayers = humanPlayers;
             this.numOfTotalPlayers = players;
@@ -30,8 +30,6 @@ namespace Server
             this.players = player;
             this.points = points;
             this.priorities = priority;
-            this.agents = agent;
-            this.isRounds = round;
             this.whoVoted = voted;
             this.startSecondRound = start;
             this.configFile = config;

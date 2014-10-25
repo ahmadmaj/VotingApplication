@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -153,6 +154,36 @@ namespace Server
             var context = GlobalHost.ConnectionManager.GetHubContext<ServerHub>();
             foreach (string connID in Program.PlayingGames.SelectMany(playingGame => playingGame.playersID))
                 context.Clients.Client(connID).StartGameMsg("start");
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (dataGridView2.SelectedCells.Count == 0) return;
+            string gameid = dataGridView2.SelectedCells[0].Value.ToString();
+            Game game = Program.PlayingGames.Find(gamei => gamei.gameID.ToString() == gameid);
+            if (game!=null)
+            {
+                game.endGame();
+                var context = GlobalHost.ConnectionManager.GetHubContext<ServerHub>();
+
+                List<int> playersPoints = game.currentPoints;
+                string points = playersPoints.Aggregate("", (current, point) => current + ("#" + point));
+                foreach (string playerid in game.playersID)
+                {
+                    UserVoter playUser;
+                    if (Program.ConnIDtoUser.TryGetValue(playerid, out playUser))
+                    {
+                        int playeridx = playUser.inGameIndex;
+                        context.Clients.Client(playerid)
+                            .GameOver(game.numOfCandidates, game.createNumOfVotesString(playUser),
+                                game.votesPerPlayer[playeridx], game.getTurnsLeft(), points, game.getWinner(),
+                                game.getCurrentWinner(playeridx), game.createWhoVotedString(playeridx),
+                                ("p" + (playeridx + 1)));
+                        playUser.resetGame();
+                    }
+                }
+                Program.PlayingGames.Remove(game);
+            }
         }
     }
 }

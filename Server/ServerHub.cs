@@ -37,36 +37,45 @@ namespace Server
                 {
                     theGame.replacePlayer(playerIndex, removedVoter);
                     theGame.deletePlayerID(Context.ConnectionId);
-                    if (theGame.playersID.Count == 0)
-                        theGame.endGame();
-                    else if (theGame.playersID.Count > 0 && theGame.turn == playerIndex)
+                    if (theGame.turn == playerIndex)
                     {
-                        int next = theGame.getNextTurn();
-                        if (next != -1 && theGame.playersID.Count > 0)
+                        theGame.GameOver();
+                        sendGameOver(theGame);
+                    }
+                    else theGame.endNextVote = true;
+                    if (false)
+                    {
+                        if (theGame.playersID.Count == 0)
+                            theGame.endGame();
+                        else if (theGame.playersID.Count > 0 && theGame.turn == playerIndex)
                         {
-                            if (theGame.playersID.Count > 0)
+                            int next = theGame.getNextTurn();
+                            if (next != -1 && theGame.playersID.Count > 0)
                             {
-                                if (theGame.playersID.Count - 1 == theGame.humanTurn ||
-                                    theGame.playersID.Count <= theGame.humanTurn)
+                                if (theGame.playersID.Count > 0)
                                 {
-                                    theGame.humanTurn = 0;
-                                    updateOtherPlayers(theGame, Context.ConnectionId, playerIndex, next);
-                                    updatePlayer(theGame, Context.ConnectionId, playerIndex, next);
-                                }
-                                else
-                                {
-                                    updateOtherPlayers(theGame, Context.ConnectionId, playerIndex, next);
-                                    updatePlayer(theGame, Context.ConnectionId, playerIndex, next);
+                                    if (theGame.playersID.Count - 1 == theGame.humanTurn ||
+                                        theGame.playersID.Count <= theGame.humanTurn)
+                                    {
+                                        theGame.humanTurn = 0;
+                                        updateOtherPlayers(theGame, Context.ConnectionId, playerIndex, next);
+                                        updatePlayer(theGame, Context.ConnectionId, playerIndex, next);
+                                    }
+                                    else
+                                    {
+                                        updateOtherPlayers(theGame, Context.ConnectionId, playerIndex, next);
+                                        updatePlayer(theGame, Context.ConnectionId, playerIndex, next);
+                                    }
                                 }
                             }
+                            else
+                                sendGameOver(theGame);
                         }
                         else
-                            gameOver(theGame, Context.ConnectionId, playerIndex);
-                    }
-                    else
-                    {
-                        if (theGame.playersID.Count <= theGame.humanTurn)
-                            theGame.humanTurn = 0;
+                        {
+                            if (theGame.playersID.Count <= theGame.humanTurn)
+                                theGame.humanTurn = 0;
+                        }
                     }
                 }
             WaitingRoom.checkToStartGame();
@@ -175,16 +184,16 @@ namespace Server
             Game thegame = Program.getplayersGame(id);
             if (thegame != null)
             {
-                int status = thegame.vote(candidate, playerIndex,time);
-                if (status == 1) //the game cont.
+                int status = thegame.vote(candidate, playerIndex,time, id);
+                if (status == 1 ) //the game cont.
                 {
                     int next = thegame.getNextTurn();
 
                     if (next == -1) //game over
-                        gameOver(thegame, id, playerIndex);
+                        sendGameOver(thegame);
                     else // game cont.
                     {
-                        while (next != -1 && (thegame.playersTypeOrder[next] == "computer" || thegame.playersTypeOrder[next] == "replaced"))
+                        while (next != -1 && (thegame.playersTypeOrder[next] != "human"))
                         {
                             foreach (string t in thegame.playersID)
                             {
@@ -208,12 +217,12 @@ namespace Server
                         }
                         
                         else
-                            gameOver(thegame, id, playerIndex);
+                            sendGameOver(thegame);
                     }
 
                 }
                 else if (status == -1) //game over
-                    gameOver(thegame, id, playerIndex);
+                    sendGameOver(thegame);
             }
         }
         
@@ -249,7 +258,7 @@ namespace Server
             Clients.Client(game.getPlayerID(game.humanTurn)).YourTurn();
         }
 
-        private void gameOver(Game game, string id, int playerIndex)
+        public void sendGameOver(Game game)
         {
             //to seperade playerIndex when msg sent in order to dend the right playerString
             List<int> playersPoints = game.currentPoints;

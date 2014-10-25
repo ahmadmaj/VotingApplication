@@ -85,7 +85,7 @@ namespace Server
         public void resetGame()
         {
             CurrGame = null;
-            CurrPriority = new List<int>();
+            CurrPriority.Clear();
             inGameIndex = -1;
         }
 

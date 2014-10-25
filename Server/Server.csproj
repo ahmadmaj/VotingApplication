@@ -92,9 +92,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agent.cs" />
+    <Compile Include="Agents\FirstModel.cs" />
+    <Compile Include="Agents\LastModel.cs" />
+    <Compile Include="Agents\NoiseModel.cs" />
+    <Compile Include="Agents\RandomModel.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameDetails.cs" />
-    <Compile Include="ReplacingAgent.cs" />
     <Compile Include="ServerManager.cs">
       <SubType>Form</SubType>
     </Compile>

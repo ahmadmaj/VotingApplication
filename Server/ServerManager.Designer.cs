@@ -47,9 +47,10 @@
             this.button1 = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.button3 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
-            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -119,7 +120,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(387, 206);
+            this.tabPage1.Size = new System.Drawing.Size(456, 248);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Initialization";
             // 
@@ -147,7 +148,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(387, 206);
+            this.tabPage2.Size = new System.Drawing.Size(456, 248);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Current Config";
             this.tabPage2.Visible = false;
@@ -244,6 +245,7 @@
             // 
             // tabPage4
             // 
+            this.tabPage4.Controls.Add(this.button4);
             this.tabPage4.Controls.Add(this.button3);
             this.tabPage4.Controls.Add(this.button2);
             this.tabPage4.Controls.Add(this.dataGridView2);
@@ -254,6 +256,16 @@
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Current Games";
             this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(11, 214);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(156, 28);
+            this.button3.TabIndex = 3;
+            this.button3.Text = "Force Assign Games";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // button2
             // 
@@ -282,15 +294,15 @@
             this.dataGridView2.Size = new System.Drawing.Size(447, 204);
             this.dataGridView2.TabIndex = 1;
             // 
-            // button3
+            // button4
             // 
-            this.button3.Location = new System.Drawing.Point(11, 214);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(156, 28);
-            this.button3.TabIndex = 3;
-            this.button3.Text = "Force Assign Games";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.button4.Location = new System.Drawing.Point(213, 214);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(105, 27);
+            this.button4.TabIndex = 4;
+            this.button4.Text = "KillGame";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // ServerManager
             // 
@@ -339,5 +351,6 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.DataGridView dataGridView2;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
     }
 }

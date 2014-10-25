@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -61,9 +62,7 @@ namespace Server
                 XDocument xDoc = XDocument.Load(file);
                 var res = xDoc.Element("Config");
                 var cands = res.Elements("CandidateNames").Descendants();
-                List<string> candnames = new List<string>();
-                foreach (var q in cands)
-                    candnames.Add(q.Value);
+                List<string> candnames = cands.Select(q => q.Value).ToList();
                 int numberOfCandidates = candnames.Count;
 
                 int numOfHumanPlayers = 0;
@@ -71,71 +70,81 @@ namespace Server
                 List<string> playersOrder = new List<string>();
                 foreach (var q in order)
                 {
-                    if (q.Value == "human")
-                        numOfHumanPlayers++;
-                    playersOrder.Add(q.Value);
+                    int rep = 1;
+                    if (q.HasAttributes)
+                        rep = Convert.ToInt32(q.Attribute("num").Value);
+                    while (rep > 0)
+                    {
+                        if (q.Value == "human")
+                            numOfHumanPlayers++;
+                        playersOrder.Add(q.Value);
+                        rep--;
+                    }
+
                 }
                 int numOfPlayers = playersOrder.Count;
                 int numOfRounds = Convert.ToInt32(res.Element("NumRounds").Value);
 
                 var xtmp = res.Element("ShowWhoVoted").Value;
-                int whoVoted = 0;
-                if (xtmp == "full")
-                    whoVoted = 2;
-                else if (xtmp == "True")
-                    whoVoted = 1;
+                int whoVoted;
+                switch (xtmp)
+                {
+                    case "full":
+                        whoVoted = 2;
+                        break;
+                    case "True":
+                        whoVoted = 1;
+                        break;
+                    default:
+                        whoVoted = 0;
+                        break;
+                }
 
                 string startSecondRnd = "no";
                 xtmp = res.Element("StartSecondRound").Value;
                 if (xtmp != "no" && xtmp != "first" && xtmp != "random")
-                    Console.WriteLine("Start From Second round parameter is invalid. using default (StartSecondRound: %s)", startSecondRnd);
+                    Console.WriteLine(
+                        "Start From Second round parameter is invalid. using default (StartSecondRound: %s)",
+                        startSecondRnd);
                 else
-                 startSecondRnd = xtmp;
+                    startSecondRnd = xtmp;
 
-                List<int> points = new List<int>();
                 var xpoints = res.Elements("Points").Descendants();
-                foreach (var q in xpoints)
-                   points.Add(Convert.ToInt32(q.Value));
-
+                List<int> points = xpoints.Select(q => Convert.ToInt32(q.Value)).ToList();
 
                 List<List<string>> priorities = new List<List<string>>();
                 var xprefs = res.Element("Preferences");
-                foreach (var q in xprefs.Elements("Pref"))
-                {
-                    int i = 0;
-                    int repeatedPref = Convert.ToInt32(q.Attribute("num").Value);
-                    while (i < repeatedPref)
+                if (xprefs != null)
+                    foreach (var q in xprefs.Elements("Pref"))
                     {
-                        List<string> candPriority = new List<string>();
-                        foreach (string cand in q.Elements())
-                            candPriority.Add(cand);
-                        if (candPriority.Count != numberOfCandidates)
+                        int rep = 1;
+                        if (q.HasAttributes)
+                            rep = Convert.ToInt32(q.Attribute("num").Value);
+                        while (rep > 0)
                         {
-                            Console.WriteLine("[Error:] some priorities dont have enough candidates");
-                            return null;
+                            List<string> candPriority = new List<string>();
+                            foreach (var elm in q.Elements())
+                                candPriority.Add(elm.Value);
+                            if (candPriority.Count != numberOfCandidates)
+                            {
+                                Console.WriteLine("[Error:] some preferences dont have enough candidates");
+                                return null;
+                            }
+                            priorities.Add(candPriority);
+                            rep--;
                         }
-                        priorities.Add(candPriority);
-                        i++;
                     }
-                }
                 if (priorities.Count != numOfPlayers)
                 {
-                    Console.WriteLine("[Error:] Not enough priorities!");
+                    Console.WriteLine("[Error:] preferences count mismatch!");
                     return null;
                 }
 
-                Boolean isRounds = false;
-                List<Agent> agents = new List<Agent>();
-                if (numOfPlayers > numOfHumanPlayers)
-                        {
-                            //TODO: Create Agents
-                        }
 
 
 
 
 
-               
                 /*agents
                 List<Agent> agents = new List<Agent>();
                 Boolean isRounds = false;
@@ -174,8 +183,8 @@ namespace Server
                     nextLine = sr.ReadLine(); // skip ont the "agents:" line
                 }*/
 
-                return new GameDetails(numOfHumanPlayers, numOfPlayers, numberOfCandidates, numOfRounds, candnames, playersOrder, points, priorities, agents, isRounds, whoVoted, startSecondRnd, Path.GetFileName(file));
-
+                return new GameDetails(numOfHumanPlayers, numOfPlayers, numberOfCandidates, numOfRounds, candnames,
+                    playersOrder, points, priorities, whoVoted, startSecondRnd, Path.GetFileName(file));
             }
             catch (Exception e)
             {
@@ -183,78 +192,6 @@ namespace Server
                 Debug.WriteLine(e.Message);
                 return null;
             }
-        }
-
-
-        public static Agent readAgent(string agentLine, int roundsNum, int numOfCandidates)
-        {
-            try
-            {
-                string[] line = agentLine.Split(' ');
-                if (line[0] == "random")
-                    return new Agent("RANDOM");
-
-                else if(line[0] == "first")
-                    return new Agent("FIRST");
-                else if(line[0] == "last")
-                    return new Agent("LAST");
-                else if (line[0] == "priority")
-                {
-                    StreamReader sr = new StreamReader(Directory.GetCurrentDirectory() + "\\" + line[1]);
-                    string nextLine = sr.ReadLine();
-                    line = nextLine.Split(' ');
-                    return new Agent("PRIORITY", Convert.ToInt32(line[1]));
-                }
-                else if (line[0] == "turns")
-                {
-                    StreamReader sr = new StreamReader(Directory.GetCurrentDirectory() + "\\" + line[1]);
-                    string nextLine;
-
-                    List<string> votesPerTurn = new List<string>();
-                    for (int i = 0; i < roundsNum; i++)
-                    {
-                        nextLine = sr.ReadLine();
-                        if (nextLine != "")
-                            votesPerTurn.Add(nextLine.Substring(2));
-                    }
-                    return new Agent("TURNS", votesPerTurn);
-                }
-                else if (line[0] == "rounds")
-                {
-                    StreamReader sr = new StreamReader(Directory.GetCurrentDirectory() + "\\" + line[1]);
-                    string nextLine;
-                    List<List<int>> rounds = new List<List<int>>(); // for each round a list with number of votes per candidate
-                    for (int i = 0; i < roundsNum; i++)
-                    {
-                        nextLine = sr.ReadLine();
-                        line = nextLine.Split(' ');
-                        List<int> votesForCand = new List<int>();
-                        string[] votesInRound = line[1].Split(',');
-                        if (votesInRound.Length == numOfCandidates)
-                        {
-                            for (int j = 0; j < votesInRound.Length; j++)
-                                votesForCand.Add(Convert.ToInt32(votesInRound[j]));
-                            rounds.Add(votesForCand);
-                        }
-                        else
-                        {
-                            Console.WriteLine("error while reading the agents file - wrong number of candidates in round");
-                            return null;
-                        }
-
-                    }
-                    return new Agent("ROUNDS", rounds);
-                }
-                else
-                    return null;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("the file could not be read - agentsFile");
-                Debug.WriteLine(e.Message);
-                return null;
-            }
-
         }
     }
 
