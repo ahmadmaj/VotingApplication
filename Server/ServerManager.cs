@@ -28,15 +28,6 @@ namespace Server
             _writer = new TextBoxStreamWriter(this);
             // Redirect the out Console stream
             Console.SetOut(_writer);
-            dataGridView1.AllowUserToAddRows = false;
-            dataGridView1.AllowUserToDeleteRows = false;
-            dataGridView1.AllowUserToResizeRows = false;
-            dataGridView1.RowHeadersWidthSizeMode =
-                DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridView1.ColumnHeadersHeightSizeMode =
-                DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dataGridView1.AutoSizeColumnsMode =
-                DataGridViewAutoSizeColumnsMode.Fill;
         }
 
         private void InitializeOpenFileDialog()
@@ -117,13 +108,19 @@ namespace Server
         private void refreshGames(object sender, EventArgs e)
         {
             dataGridView2.DataSource = (from d in Program.PlayingGames
-                                        orderby d.gameID
-                                        let Gameid = d.gameID
-                                        let PlayersInside = d.playersID.Count
+                orderby d.gameID
+                let GameId = d.gameID
+                let PlayersInside = d.playersID.Count
+                let Conf = d.configFile
+                let Rounds = d.rounds
+                let Timeleft = d.timeStarted.AddSeconds(30*(d.rounds*d.numOfHumanPlayers)) - DateTime.Now
                                         select new
                                         {
-                                            Gameid,
-                                            PlayersInside
+                                            GameId,
+                                            Conf,
+                                            Rounds,
+                                            PlayersInside,
+                                            Timeleft
                                         }).ToList();
             dataGridView2.Update();
         }

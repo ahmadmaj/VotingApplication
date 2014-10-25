@@ -11,6 +11,7 @@ namespace Server
     public class Game : IComparable
     {
         public string status { get; private set; }
+        public DateTime timeStarted { get; private set; }
         static int nextId;
         public string configFile { get; private set; }
         public int gameID {get; private set;}
@@ -21,8 +22,7 @@ namespace Server
         public int rounds { get; private set; } //number of rounds in the game
         public List<string> candidatesNames { get; private set; }
         public List<int> votesPerPlayer { get; private set; } //votes left for each player
-        public int whoVoted { get; private set; } //to show in the game who voted for the player
-        
+        public int whoVoted { get; private set; } //to show in the game who voted for the player     
         public List<List<int>> votedBy {get; private set; }//candidates, players who voted
         public List<int> votes { get; private set; } //number of votes each candidate got
         public List<int> points { get; private set; }
@@ -425,7 +425,7 @@ namespace Server
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void updateLog()
         {
-            if (this.logUpdated == false)
+            if (logUpdated == false)
             {
                 //priorities
                 int j = 5;
@@ -433,7 +433,7 @@ namespace Server
                 {
                     string priorityString;
                     if(this.playersTypeOrder[i] != "human")
-                        priorityString = "comp_" + getAgentNumber(i).ToString();
+                        priorityString = "comp_" + getAgentNumber(i);
                     else
                         priorityString = Program.ConnIDtoUser[playersID[gethumanNumber(i)]].userID.ToString();
                     for (int k = 0; k < this.priorities[i].Count; k++)
@@ -455,7 +455,7 @@ namespace Server
                         if(this.playersTypeOrder[i] == "human")
                             titles = titles + "points player" + Program.ConnIDtoUser[this.playersID[gethumanNumber(i)]].userID.ToString();
                         else
-                            titles = titles + "points player comp_" + getAgentNumber(i).ToString();
+                            titles = titles + "points player comp_" + getAgentNumber(i);
 
                     }
                     else
@@ -468,8 +468,9 @@ namespace Server
 
                 }
 
-                this.writeToFile.Add(titles);
-                this.logUpdated = true;
+                writeToFile.Add(titles);
+                logUpdated = true;
+                timeStarted = DateTime.Now;
             }
 
 
@@ -673,7 +674,5 @@ namespace Server
         {
             return points.Aggregate("", (current, point) => current + ("#" + point));
         }
- 
-        
     }
 }
