@@ -250,8 +250,8 @@ namespace Server
             else if (playersTypeOrder[turn] != "human")
             {
                 int votefor = agents[computerTurn].vote();
-                if (!firstRound)
-                    Thread.Sleep(5000);
+               /* if (!firstRound)
+                    Thread.Sleep(5000);*/
                 gameStatus = vote(votefor, turn, 5);
                 computerTurn = ++computerTurn % agents.Count;
             }
@@ -530,8 +530,8 @@ namespace Server
                 // votes
                 for (int i = 0; i < getNumOfPlayers(); i++)
                 {
-                    int candIndex = this.candidatesNames.IndexOf(this.priorities[i][0]);
-                    this.votedBy[candIndex].Add(i);
+                    int candIndex = candidatesNames.IndexOf(priorities[i][0]);
+                    votedBy[candIndex].Add(i);
                     //this.playersVotes[i][0] = candIndex;
                 }
                 updateCurWinner();

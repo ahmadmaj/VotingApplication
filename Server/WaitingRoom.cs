@@ -22,9 +22,9 @@ namespace Server
         {
             //if there are no games AND all current players are in waitinglist AND number of players in waitingroom is sufficent for new game
             //OR number of waiting players equal twice as players needed to start game
-            if ((waitingPlayers.Count >= Program.gameDetails.numOfHumanPlayers && !Program.PlayingGames.Any() &&
+            if (Program.SinglePMode || ((waitingPlayers.Count >= Program.gameDetails.numOfHumanPlayers && !Program.PlayingGames.Any() &&
                  waitingPlayers.Count == Program.ConnIDtoUser.Count) ||
-                waitingPlayers.Count == (Program.gameDetails.numOfHumanPlayers * 2))
+                waitingPlayers.Count == (Program.gameDetails.numOfHumanPlayers * 2)))
             {
                 AssignPlayersToGames();
                 return true;

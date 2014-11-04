@@ -17,7 +17,7 @@ namespace Server
         public static List<Game> PlayingGames = new List<Game>();
         public static String logFolder = "";
         public static Boolean mTurkMode = false;
-
+        public static Boolean SinglePMode = false;
         public static UserVoter getplayerUser(string id)
         {
             UserVoter player = null;

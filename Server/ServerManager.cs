@@ -144,6 +144,10 @@ namespace Server
         {
             Program.mTurkMode = !Program.mTurkMode;
         }
+        private void SinglePMode_CheckedChanged(object sender, EventArgs e)
+        {
+            Program.SinglePMode = !Program.SinglePMode;
+        }
 
         private void button3_Click(object sender, EventArgs e)
         {
@@ -182,5 +186,7 @@ namespace Server
                 Program.PlayingGames.Remove(game);
             }
         }
+
+
     }
 }
