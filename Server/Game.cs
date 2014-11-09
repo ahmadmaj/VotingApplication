@@ -10,7 +10,7 @@ namespace Server
 {
     public class Game : IComparable
     {
-        public string status { get; private set; }
+        public string status { get; set; }
         public DateTime timeStarted { get; private set; }
         static int nextId;
         public string configFile { get; private set; }
@@ -319,13 +319,13 @@ namespace Server
 
         public Boolean addPlayerID(UserVoter playerID)
         {
-            if (status == "playing") return false;
+            if (status != "init") return false;
             playersID.Add(playerID.connectionID);
             int indexofP = getPlayerIndex(playerID.connectionID);
             playerID.JoinGame(this, indexofP, priorities[indexofP]);
             if (playersID.Count == numOfHumanPlayers)
             {
-                status = "playing";
+                status = "ready";
                 updateLog();
             }
             return true;

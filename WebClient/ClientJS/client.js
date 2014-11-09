@@ -55,7 +55,6 @@ function getScore(form) {
 }
 var defaultVote;
 
-$.connection.hub.url = "http://localhost:8010/signalr";
 var sec; //counting the time left to vote
 var MaxSec = 30;
 var barInterval;
@@ -65,7 +64,11 @@ var backFromDown;
 var uID;
 var game;
 var names;
-var moregames=true;
+var moregames = true;
+
+
+$.connection.hub.url = "http://localhost:8010/signalr";
+
 
 function progressBarFunc(x) {
     var x = x || function () { };
@@ -74,21 +77,23 @@ function progressBarFunc(x) {
     $(".progress_bar").animate({ width: "99%" }, 0, function () {
         $('#timeremaining').show();
         x();
-        animate();
-        barInterval = setInterval(animate, 1000);
+        animate2();
+        barInterval = window.setInterval(animate2, 1000);
     });
 }
-function animate() {
+
+function animate2() {
     $("#prog_status").html(sec);
     sec--;
     val = sec / MaxSec * 100;
     $(".progress_bar").animate({ width: val + "%" }, 1000, "linear");
     if (sec < 0) {
-        clearInterval(barInterval);
+        window.clearInterval(barInterval);
         backFromDown = true;
         $('#' + defaultVote).trigger('mouseup');
-    }
+    } 
 }
+
 var QueryString = function() {
     // This function is anonymous, is executed immediately and 
     // the return value is assigned to QueryString!

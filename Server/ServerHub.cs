@@ -95,7 +95,7 @@ namespace Server
             }
 
             if (WaitingRoom.joinWaitingRnStart(newplayer))
-                foreach (Game playingGame in Program.PlayingGames)
+                foreach (Game playingGame in Program.PlayingGames.Where(playingGame => playingGame.status != "playing"))
                     sendStartToPlayers(playingGame);
             if (newplayer.CurrGame == null)
             {
@@ -129,6 +129,7 @@ namespace Server
         }
         public void sendStartToPlayers(Game gamestart)
         {
+            gamestart.status = "playing";
             if (!Program.mTurkMode)
                 MessageBox.Show("Game " + gamestart.gameID + " Full Press OK to start", "Game " + gamestart.gameID + " Ready", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
             foreach (string player in gamestart.playersID)
