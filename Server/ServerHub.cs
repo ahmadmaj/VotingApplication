@@ -160,7 +160,7 @@ namespace Server
             if (Program.ConnIDtoUser.TryGetValue(id, out tmpvoter))
             {
                 Boolean chk = tmpvoter.GamesHistory.Count != Program.gameDetailsList.Count;
-                Clients.Client(id).showNextGame(chk, tmpvoter.userID,tmpvoter.CurrScore, tmpvoter.mTurkToken);
+                Clients.Client(id).showNextGame(chk, tmpvoter.userID, tmpvoter.TotalScore,tmpvoter.mTurkToken);
                 if (!chk) Program.ConnIDtoUser.Remove(id);
             }
         }
@@ -171,7 +171,7 @@ namespace Server
             if (Program.ConnIDtoUser.TryGetValue(id, out tmpvoter))
             {
                 WaitingRoom.RemoveFromWaitingR(id);
-                Clients.Client(id).showNextGame(false, tmpvoter.userID, tmpvoter.CurrScore, tmpvoter.mTurkToken);
+                Clients.Client(id).showNextGame(false, tmpvoter.userID, tmpvoter.TotalScore, tmpvoter.mTurkToken);
                 Program.ConnIDtoUser.Remove(Context.ConnectionId);
                 Console.WriteLine("[{0}] Quitter: {1} ({2}) decided to quit.. his score: {3}",DateTime.Now.ToString("HH:mm:ss"), tmpvoter.userID, tmpvoter.mTurkID != "" ? tmpvoter.mTurkID : tmpvoter.connectionID, tmpvoter.TotalScore);
                 waitingRoomStats();
@@ -194,22 +194,21 @@ namespace Server
                     else // game cont.
                     {
                         while (next != -1 && (thegame.playersTypeOrder[next] != "human"))
-                        {
-                            foreach (string t in thegame.playersID)
-                            {
-                                UserVoter tmpvoter;
-                                if (Program.ConnIDtoUser.TryGetValue(t, out tmpvoter))
-                                {
-                                    int playerIDX = tmpvoter.inGameIndex;
-                                    Clients.Client(t)
-                                        .OtherVotedUpdate(thegame.numOfCandidates,
-                                            thegame.createNumOfVotesString(tmpvoter),
-                                            thegame.votesPerPlayer[playerIDX], thegame.getTurnsLeft(), next,
-                                            thegame.getCurrentWinner(playerIDX), thegame.createWhoVotedString(playerIDX),
-                                            ("p" + (playerIDX + 1)), thegame.turnsToWait(playerIDX));
-                                }
-                            }
                             next = thegame.getNextTurn();
+                        //update players regarding bots moves!
+                        foreach (string t in thegame.playersID)
+                        {
+                            UserVoter tmpvoter;
+                            if (Program.ConnIDtoUser.TryGetValue(t, out tmpvoter))
+                            {
+                                int playerIDX = tmpvoter.inGameIndex;
+                                Clients.Client(t)
+                                    .OtherVotedUpdate(thegame.numOfCandidates,
+                                        thegame.createNumOfVotesString(tmpvoter),
+                                        thegame.votesPerPlayer[playerIDX], thegame.getTurnsLeft(), next,
+                                        thegame.getCurrentWinner(playerIDX), thegame.createWhoVotedString(playerIDX),
+                                        ("p" + (playerIDX + 1)), thegame.turnsToWait(playerIDX));
+                            }
                         }
                         if (next != -1){
                             updateOtherPlayers(thegame, id, playerIndex, next);

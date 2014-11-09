@@ -84,37 +84,36 @@
                 <br /><br /><br /><br /><br /><br /><br /><br />
             </form>
         </div>
-        <div id="MainPage" hidden>
+        <div id="MainPage" style="display: none;">
             <div class="ribbon">
                 <h3>Welcome to the Voting Game</h3>
                 <p>
-                    <br/>
-                    <!--p> You will play a game of <b style="color: chartreuse;">5</b> Players with <b style="color: darkturquoise;">3</b> Candidates</p--> 
-                    <input id="StartGame" type="button" value="Press To Start The Game" ><br>
-                    <br/>
+                    <br />
+                    <!--p> You will play a game of <b style="color: chartreuse;">5</b> Players with <b style="color: darkturquoise;">3</b> Candidates</p-->
+                    <button id="StartGame" class="button">Press To Start The Game</button><br/><br />
                 </p>
             </div>
-            <div id="StatusInfo" hidden>            
+            <div id="StatusInfo" style="display: none;">
                 <div class="ribbon">
                     <p align="left" style="margin-bottom: 5px;"><span align="left" style="border-bottom: 1px solid deepskyblue; color: white; margin-bottom: 0px;"><b>Server Status:</b></span></p>
-                    <p align="left" id="waitStatus"  style="margin-bottom: 0px; margin-top: 0px;"></p>
-                    <hr/>
+                    <p align="left" id="waitStatus" style="margin-bottom: 0px; margin-top: 0px;"></p>
+                    <hr />
                     <p align="left" style="font-family: monospace">
-                        Current players online: <span id="playersOnline" style="color: chartreuse"></span><br/>
-                        Average waiting time: <span id="avgWaitTime" style="color: darkorange"></span><br/>
+                        Current players online: <span id="playersOnline" style="color: chartreuse"></span><br />
+                        Average waiting time: <span id="avgWaitTime" style="color: darkorange"></span><br />
                     </p>
                 </div>
             </div>
-            <div id="TimePassed" hidden>            
+            <div id="TimePassed" style="display: none;">
                 <div class="ribbon">
                     <p>
-                        <div class="clock" style="margin: 2em;"></div>
+                        <div class="clock" style="margin-left: 4em;"></div>
                     </p>
-               
                 </div>
-            </div> 
+            </div>
         </div>
-        <div id="tableContainer" hidden></div>
+        <div id="tableContainer" style="display: none;"></div>
+
     </body>
 <script src="ClientJS/client.js"></script>
 </html>

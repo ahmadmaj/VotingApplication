@@ -62,19 +62,22 @@ var barInterval;
 var playerIndex;
 var imageClick;
 var backFromDown;
+var uID;
 var game;
-var name;
+var names;
+var moregames=true;
 
-function progressBarFunc() {
+function progressBarFunc(x) {
+    var x = x || function () { };
     $("#prog_status").html(MaxSec);
     sec = MaxSec;
     $(".progress_bar").animate({ width: "99%" }, 0, function () {
-            $('#timeremaining').show();
+        $('#timeremaining').show();
+        x();
+        animate();
+        barInterval = setInterval(animate, 1000);
     });
-    animate();
-    barInterval = setInterval(animate, 1000);
 }
-
 function animate() {
     $("#prog_status").html(sec);
     sec--;
@@ -86,7 +89,6 @@ function animate() {
         $('#' + defaultVote).trigger('mouseup');
     }
 }
-
 var QueryString = function() {
     // This function is anonymous, is executed immediately and 
     // the return value is assigned to QueryString!
@@ -114,6 +116,8 @@ var getGetOrdinal = function(n) {
         v = n % 100;
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
 };
+
+
 $(function () {
     //Set the hubs URL for the connection
     var numOfPlayers = 0;
@@ -122,7 +126,6 @@ $(function () {
 
 
     // Declare a proxy to reference the hub.
-
     game = $.connection.serverHub;
     if (game == null) {
         $('body').replaceWith("<div><h1 style=\"text-align: center;\">We are sorry!<br/> There seems to be a problem with the server.</h1></div>");
@@ -138,13 +141,13 @@ $(function () {
                 $('#TimePassed').addClass("pullDown");
                 clock = $('.clock').FlipClock({ clockFace: 'MinuteCounter' });
             } else
-                $('#nextGamestatus').text("Please wait for the other players, the game will start shortly...");
+                $('#nextGamestatus').show();
         } else if (msg == "start") {
             if (clock) {
                 clock.stop();
                 clock = null;
             }
-            $('#nextGamestatus').text('');
+            $('#nextGamestatus').hide();
             $("#MainPage").hide();
             $('#tableContainer').show();
             game.server.gameDetailsMsg($.connection.hub.id);
@@ -153,7 +156,6 @@ $(function () {
     };
 
     game.client.gameDetails = function(playerI, numOfCandidates, numPlayers, numTurns, candNames, candIndex, point, votes, isVoted, voted, playerString, turn, voting, winner, turnsWait, allpriorities) {
-        //$('playerTurn').val(turn);
         $("#tableContainer").empty();
         numOfPlayers = numPlayers;
         playerIndex = playerI;
@@ -168,27 +170,68 @@ $(function () {
             var table1 = $('<table id=topTable></table>');
             row11 = $('<tr border="0" width="100%"></tr>');
             cell11 = $('<td width="25%" align="center" valign="middle"></td>').html('<td id=infopanel>' +
-                '<label style="font-family:Arial"> There are <label id=numP>' + numPlayers + '</label> players' +
-                '<label id=showPlayers>, you are <label id=currplayer>' + playerString + '</label></label></label> <br/>' +
-                ' <label id="turnsLeft" style="font-family:Arial" hidden> Game ends in: <label id=turnsLeftnum>' + numTurns + '</label> turns' +
-                '</label></td>');
+                '<span> There are <span id=numP>' + numPlayers + '</span> players' +
+                '<span id=showPlayers>, you are <span id=currplayer>' + playerString + '</span></span></span> <br/>' +
+                '<span id="turnsLeft" style="display: none;"> Game ends in: <span id=turnsLeftnum>' + numTurns + '</span> turns' +
+                '</span></td>');
 
             cell12 = $('<td width="50%" align="center" style="vertical-align:middle;"></td>').html(
-                '<p><label id="turnStatus"></label></p>' +
-                '<p><label id="voteStatus"></label></p>' +
-                '<p id="waitImg"><img src="images/wait-trans.gif" style="height:inherit;"></p>' +
-                '<p><label id="turnsToWait">Your turn is in <label id="numToWait"></label> steps</label></p>' +
-                '<p><label id="playerVoted"></label></p>' +
-                '<p><label id="gameOverTxt" hidden></label></p>' +
-                '<p id="nextGameP" hidden><input id="nextGameB" type="button" value="Ready for another game" />' +
-                '<input id="QuitNow" type="button" value="Enough waiting! Let me out!" /><br/>' +
-                '<div id="noMoreGames" hidden>No more games.<p id=gamerID></p><p> you recieved Total of: <label id=playerPoints></label> Coins</p></div>' +
-                '<p id="survy" hidden><a href="#" class="survyB" target="_blank">Fill our Survy</a></p>' +
-                '<label id="nextGamestatus"></label>' +
-                '<div id="timeremaining" hidden><div class="progress"><div class="progress_bar"></div><div id="prog_status"></div></div></div>' +
-                //'<div id="secbar" hidden><div class="progress-label"></div></div>' +
-                '<div id="ToWhoYou" style="text-shadow: 2px 1px 2px rgba(150, 150, 150, 1);' +
-                'font-size: xx-large; margin-top: 20px" hidden>You voted for <label id="towhoyouVoted"><b></b></label></div>');
+
+               '<div id="InGameMessages">' + 
+                   '<div><span id="turnStatus"></span></div>' +
+
+                   '<div><span id="voteStatus" style="display: none;">VOTE NOW!</span></div>' +
+
+                   '<div id="waitImg"><img src="images/wait-trans.gif" style="height:inherit;"></div>' +
+
+                   '<div id="timeremaining" style="display: none;">' +
+                        '<div class="progress">' +
+                        '<div class="progress_bar"></div>' +
+                        '<div id="prog_status"></div>' +
+                   '</div></div>' +
+
+                   '<div><span id="turnsToWait">Your turn is in <span id="numToWait"></span> steps</span></div>' +
+                    
+                '</div>' +
+
+                '<div id="mypopupGameOver" class="popup-ui">' +
+                    '<div class="popup-ui-wrapper">' +
+                        '<div class="popup-ui-content">' +
+                    '<div class="ribbon">' +
+                        '<h3>GAME OVER!!</h3>' +
+                        '<p style="text-align:left;"><br/>' +
+                        '<span id="gameOverTxt"></span></p>' +
+                        '<div style="text-align: center;padding-bottom: 5px;"><button id="cont" class="small color green button">continue</button></div>' +
+                        '</div>' +
+                '</div></div></div>' +
+
+                '<div id="mypopupPlayMore" class="popup-ui">' +
+                    '<div class="popup-ui-wrapper">' +
+                        '<div class="popup-ui-content">' +
+                         '<div class="ribbon">' +
+                             '<h3>Would you like to play another game?</h3>' +
+                             '<p><ul id="nextGameP" class="button-group">' +
+                             '<li><button id="nextGameB" class="small color green button">Ready for another game</button></li>' +
+                             '<li><button id="QuitNow" class="small color red button">Enough waiting! let me out!</button></li>' +
+                             '</ul></p><span id="nextGamestatus" style="display: none;">' +
+                             'Please wait for the other players, the game will start shortly...</span>' +
+               '</div></div></div></div>' +
+                             
+                '<div id="mypopupNoMORE" class="popup-ui">' +
+                    '<div class="popup-ui-wrapper">' +
+                        '<div class="popup-ui-content">' +
+                        '<div class="ribbon">' +
+                         '<h3>Thank you for participating</h3>' +
+                          '<p style="text-align:left;"> You recieved total of: <span id=playerPoints style="color:rgb(247, 110, 246);font-size:larger;"></span> Coins<br/>' +
+                          'Your Token is: <span id=gamerID style="color:chartreuse;font-size:larger;"></span></p>' +
+                          '<div style="text-align:center;padding-bottom: 5px;"><button id="survy" class="large color red button">Fill our Survy</button></div>' +
+                '</div></div></div></div>' +
+                
+                '<p id="ToWhoYou" style="text-shadow: 2px 1px 2px rgba(150, 150, 150, 1);' +
+                'font-size: xx-large; margin-top: 20px;display: none;">You voted for <span id="towhoyouVoted"><b></b></span></p>');
+                
+
+
             cell13 = $('<td width="25%" align="middle" valign="middle"></td>');
             if (showWhoVoted == 2) {
                 var priolist = allpriorities.split('#');
@@ -241,15 +284,16 @@ $(function () {
                 cell22 = $('<td width=cellWidth + "%" align="center"></td>').html('<label style="font-family:Arial;font-weight:bold;">' + points[i + 1] + ' Coins</label>');
                 row22.append(cell22);
                 var url = "images/user" + (candIndexes[i + 1]) + ".png";
-                var size = 80; // - (8 * i);                      
+
                 cell23 = $('<td class="imgCells" align="center" style="height:60%; width:cellWidth + %"></td>');
                 imgTable = $('<table width="100%" align="center" style="height:100%;"></table>');
                 imgrow = $('<tr width=100% style="height:100%"></tr>');
                 imgCell1 = $('<td width="25%" style="height:100%" align="right"></td>');
                 imgCell2 = $('<td width="75%" style="height:100%;" align="left" valign="middle"></td>');
-                imgCellpicCap = $('<tr></tr>').html('<img class="images" id="' + i + '" src="' + url + '" style=" margin-top:20px; height:' + size + '%"><div class="candsNames">' + names[i + 1] + '</div>');
+                imgCellpicCap = $('<tr></tr>').html('<img class="images" id="' + i + '" src="' + url + '" style=" margin-top:20px; height:80%"><div class="candsNames">' + names[i + 1] + '</div>');
                 imgCell2.append(imgCellpicCap);
                 pTable = $('<table class="progBars" id="progBars' + i + '"height="100%" width="30%"></table><label class="numVoteslabel" id="progNum' + i + '"></label>');
+
                 var pheight = 100 / numPlayers;
                 if (pheight > 1) {
                     for (var k = 0; k < numPlayers; k++) {
@@ -292,10 +336,9 @@ $(function () {
             if (turn == 1) {
                 imageClick = true;
                 $('#waitImg').hide();
-                //$('#playerVoted').text('');
                 $('#turnsToWait').hide();
                 $('#turnStatus').text("It's your turn");
-                $('#voteStatus').text('VOTE NOW!');
+                $('#voteStatus').show();
                 $(".images").css('cursor', 'pointer');
                 $('.images').hover(
                     function(event) {
@@ -312,10 +355,10 @@ $(function () {
                 progressBarFunc();
             } else {
                 imageClick = false;
+                $('#voteStatus').hide();
                 $('#turnsToWait').show();
-                $('#turnStatus').text('Please wait for player ' + (voting + 1) + ' to vote');
+                //$('#turnStatus').text('Please wait for player ' + (voting + 1) + ' to vote');
                 $('#numToWait').text(turnsWait);
-                $('#voteStatus').text('');
                 $('#waitImg').show();
                 $(".images").css('cursor', 'auto');
             }
@@ -328,76 +371,89 @@ $(function () {
         $('#QuitNow').click(function () {
             var r = confirm("Are you sure? There can still earn some money..");
             if (r) {
+                document.getElementById('mypopupPlayMore').className = 'popup-ui';
+                document.getElementById('mypopupNoMORE').className = 'popup-ui show dark';
                 game.server.playerQuits($.connection.hub.id);
             } 
         });
+        $('#survy').click(function() {
+            if (QueryString['workerId'])
+                window.open('https://docs.google.com/forms/d/1RFKflpeYkfWApm1tYqouKvv75cz_pS2S0ZusBfTCPsI/viewform?entry.683314448=' + uID + '&entry.641831269=' + QueryString['workerId']);
+            else
+                window.open('https://docs.google.com/forms/d/1RFKflpeYkfWApm1tYqouKvv75cz_pS2S0ZusBfTCPsI/viewform?entry.683314448=' + uID);
+        });
+        $('#cont').click(function() {
+            document.getElementById('mypopupGameOver').className = 'popup-ui';
+            if (moregames)
+                document.getElementById("mypopupPlayMore").className = 'popup-ui show dark';
+            else {
+                document.getElementById('mypopupNoMORE').className = 'popup-ui show dark';
+            }
+        });
+        
     }; //details function
 
     game.client.yourTurn = function() {
-        imageClick = true;
-        $('#waitImg').hide();
-        $('#turnsToWait').hide();
-        $(".images").each(function() {
-            var originalSrc = $(this).attr("src");
-            var imgsrc = "images/user" + parseInt(originalSrc.substring(11, 12)) + ".png";
-            $(this).attr("src", imgsrc);
-        });
-        progressBarFunc();
-        $('#turnStatus').text("It's your turn");
-        $('#voteStatus').text('VOTE NOW!');
-        $(".images").css('cursor', 'pointer');
-        $('.images').hover(
-            function(event) {
-                var originalSrc = $(this).attr("src");
-                var srcon = "images/user" + parseInt(originalSrc.substring(11, 12)) + "_hover.png";
-                $("#" + event.target.id).attr("src", srcon);
-            },
-            function(event) {
+        progressBarFunc(function () {
+            $('#waitImg').hide();
+            $('#turnsToWait').hide();
+            $(".images").each(function () {
                 var originalSrc = $(this).attr("src");
                 var imgsrc = "images/user" + parseInt(originalSrc.substring(11, 12)) + ".png";
-                $("#" + event.target.id).attr("src", imgsrc);
-            }
-        );
+                $(this).attr("src", imgsrc);
+            });
+            imageClick = true;
+            $('#turnStatus').text("It's your turn");
+            $('#voteStatus').show();
+            $(".images").css('cursor', 'pointer');
+            $('.images').hover(
+                function (event) {
+                    var originalSrc = $(this).attr("src");
+                    var srcon = "images/user" + parseInt(originalSrc.substring(11, 12)) + "_hover.png";
+                    $("#" + event.target.id).attr("src", srcon);
+                },
+                function (event) {
+                    var originalSrc = $(this).attr("src");
+                    var imgsrc = "images/user" + parseInt(originalSrc.substring(11, 12)) + ".png";
+                    $("#" + event.target.id).attr("src", imgsrc);
+                }
+            );
+        });
+        
     };
 
     game.client.votedUpdate = function(numOfCandidates, votes, votesL, turnsL, defaultCand, voting, winner, whoVoted, playerString, turnsWait) {
         defaultVote = defaultCand;
         $('#turnsToWait').show();
         $('#numToWait').text(turnsWait);
-        //$('#playerVoted').text('player ' + (playerV + 1) + ' voted');
-        $('#turnStatus').text('Please wait for player ' + (voting + 1) + ' to vote');
+        //$('#turnStatus').text('Please wait for player ' + (voting + 1) + ' to vote');
         //$('#votesLeft').text('Remaining votes: ' + votesL);
         $('#turnsLeftnum').text(turnsL);
         var numOfVotes = votes.split("#");
         var winners = winner.split("#");
         var whoVotedString = whoVoted.split("#");
-
-        resetVoteBars(numOfCandidates);
         updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
 
 
     };
 
     game.client.otherVotedUpdate = function(numOfCandidates, votes, votesL, turnsL, voting, winner, whoVoted, playerString, turnswait) {
-        $('#turnStatus').text('Please wait for player ' + (voting + 1) + ' to vote');
+        //$('#turnStatus').text('Please wait for player ' + (voting + 1) + ' to vote');
         //$('#votesLeft').text('Remaining votes: ' + votesL);
         $('#turnsLeftnum').text(turnsL);
         var numOfVotes = votes.split("#");
         var winners = winner.split("#");
         var whoVotedString = whoVoted.split("#");
-
-        resetVoteBars(numOfCandidates);
-
         updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
 
         $('#turnsToWait').show();
         $('#numToWait').text(turnswait);
-        //$('#playerVoted').text('player ' + (playerV+1) + ' voted');
 
     };
 
     game.client.gameOver = function(numOfCandidates, votes, votesL, turnsL, points, winner, currentWinner, whoVoted, playerString) {
         imageClick = false;
+        $('#InGameMessages').hide();
         $(".images").css('cursor', 'auto');
         $(".images").hover().unbind();
         //$('#votesLeft').text('Remaining votes: ' + votesL);
@@ -405,47 +461,29 @@ $(function () {
         var numOfVotes = votes.split("#");
         var winners = currentWinner.split("#");
         var whoVotedString = whoVoted.split("#");
-
         clearInterval(barInterval);
         $('#timeremaining').hide();
-        $('#voteStatus').text('');
-        resetVoteBars(numOfCandidates);
-
+        $('#voteStatus').hide();
         updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
 
         var pPoints = points.split('#');
         $('#waitImg').hide();
         $('#turnsToWait').hide();
-        //$('#playerVoted').text('');
-        $('#turnStatus').text('GAME OVER!!!');
+        $('#turnStatus').hide();
         if (winner.indexOf(',') >= 0)
-            $('#gameOverTxt').html('The winning candidates are: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
+            $('#gameOverTxt').html('The winning candidates are: <b>' + winner + '</b><br/> Your score is: ' + pPoints[playerIndex + 1]);
         else
-            $('#gameOverTxt').html('The winning candidate is: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
-        //main.server.connectMsg('connect', $.connection.hub.id);
-        $('#gameOverTxt').show();
+            $('#gameOverTxt').html('The winning candidate is: <b>' + winner + '</b><br/> Your score is: ' + pPoints[playerIndex + 1]);
         game.server.hasNextGame($.connection.hub.id);
+        document.getElementById('mypopupGameOver').className = 'popup-ui' + ' show';
     };
 
-    game.client.showNextGame = function (hasNext, userID, points, mturkToken) {
-        if (hasNext) {
-            $('#nextGameP').show();
-        } else {
-            $('#nextGameP').hide();
-            $('#QuitNow').hide();
-            $('#nextGamestatus').hide();
-            $('#noMoreGames').show();
-            $('#survy').show();
-            if (mturkToken)
-                $('#gamerID').text('Your mTurk Token is: ' + mturkToken).css('font-weight', 'bold');
-            else {
-                $('#gamerID').text('Your gamer id is ' + userID + ' (' + $.connection.hub.id + ')').css('font-weight', 'bold');
-            }
-            $('#playerPoints').text(points).css('font-weight', 'bold').css('font-size', 'larger').css('color', 'mediumvioletred');
-            if (QueryString['workerId'])
-                $('.survyB').attr('href', 'https://docs.google.com/forms/d/1RFKflpeYkfWApm1tYqouKvv75cz_pS2S0ZusBfTCPsI/viewform?entry.683314448=' + userID + '&entry.641831269=' + QueryString['workerId']);
-            else
-                $('.survyB').attr('href', 'https://docs.google.com/forms/d/1RFKflpeYkfWApm1tYqouKvv75cz_pS2S0ZusBfTCPsI/viewform?entry.683314448=' + userID);
+    game.client.showNextGame = function (hasNext, userID, totalpoints, mturkToken) {
+        moregames = hasNext;
+        uID = userID;
+        $('#gamerID').text(mturkToken).css('font-weight', 'bold');
+        $('#playerPoints').text(totalpoints).css('font-weight', 'bold');
+        if (!hasNext) {
             $.connection.hub.stop();
         }
     };
@@ -470,6 +508,7 @@ $(function () {
     }
 
     function updateVoteBars(numOfCandidates, whoVoted, winners, numOfVotes, playerString) {
+        resetVoteBars(numOfCandidates);
         for (var i = 0; i < numOfCandidates; i++) {
             var cVoted = whoVoted[i + 1].split(',');
             if (winners.indexOf(i.toString()) != -1)
@@ -527,11 +566,11 @@ $(function () {
         });
     });
 });
+
+
 $(document).on('mousedown', '.images', function(event) {
     if (imageClick) {
         $(".images").hover().unbind();
-        //$(".images:not(#" + event.target.id + ")").fadeTo("fast", 0.5);
-        //$("#" + event.target.id).fadeTo("fast", 1);
         var originalSrc = $(this).attr("src");
         var srcClick = "images/user" + parseInt(originalSrc.substring(11, 12)) + "_click.png";
         $("#" + event.target.id).attr("src", srcClick);
@@ -546,10 +585,9 @@ $(document).on('mouseup', '.images', function(event) {
 
         clearInterval(barInterval);
         $('#timeremaining').hide();
+        $('#voteStatus').hide();
         $('#turnStatus').text('Please wait for your turn');
         $('#waitImg').show();
-        //$('#test').text('');
-        $('#voteStatus').text('');
         imageClick = false;
         backFromDown = false;
         $(".images").css('cursor', 'auto');
@@ -561,14 +599,13 @@ $(document).on('mouseup', '.images', function(event) {
         game.server.voteDetails($.connection.hub.id, playerIndex, event.target.id, duration);
     }
 });
+
     window.onbeforeunload = function(e) {
         e = e || window.event;
-
         // For IE and Firefox prior to version 4
         if (e) {
             e.returnValue = 'Leaving will lose all your progress?';
         }
-
         // For Safari
         return 'Leaving will lose all your progress?';
     };

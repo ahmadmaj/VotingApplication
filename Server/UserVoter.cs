@@ -29,14 +29,13 @@ namespace Server
             this.connectionID = connectionId;
             this.mTurkID = workerID;
             this.assID = assID;
-            if (workerID != "")
-            {
+
                 Guid g = Guid.NewGuid();
                 string GuidString = Convert.ToBase64String(g.ToByteArray());
                 GuidString = GuidString.Replace("=", "");
                 GuidString = GuidString.Replace("+", "");
                 this.mTurkToken = GuidString;
-            }
+            
             this.CurrScore = 0;
             this.TotalScore = 0;
             this.CurrPriority = new List<int>();
@@ -111,7 +110,7 @@ namespace Server
 
         public Boolean HasPlayed(string configFile)
         {
-            return GamesHistory.Any(playedGame => playedGame.configFile.Equals(configFile));
+            return GamesHistory != null && GamesHistory.Any(playedGame => playedGame.configFile.Equals(configFile));
         }
     }
 
