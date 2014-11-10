@@ -14,106 +14,143 @@
     <link rel="stylesheet" href="Scripts/flipclock.css">
     <script src="Scripts/flipclock.min.js"></script>	
     <script src="http://localhost:8010/signalr/hubs"></script>
-    <body>
-        <div id="Quiz" style="padding-left: 20px;">
-            <h1 style="padding-bottom: 10px; text-align: center;">The Voting Game Quiz</h1>
-            <form name="quiz">
-                <img src="quizImages/Q1.png" alt="Question1" height=250 width=920 border=2><br />
-                1.How many voters are playing the following game?
-                <ul style="margin-top: 1pt">
-                    <li><input type="radio" name="q1" value="2">2</li>
-                    <li><input type="radio" name="q1" value="3">3</li>
-                    <li><input type="radio" name="q1" value="4">4</li>
-                    <li><input type="radio" name="q1" value="5">5</li>
-                </ul>
-                <br />
-                <img src="quizImages/Q1.png" alt="Question1" height=250 width=920 border=2><br />
-                2. Which one of the players are you?
-                <ul style="margin-top: 1pt">
-                    <li><input type="radio" name="q2" value="P1">P1</li>
-                    <li><input type="radio" name="q2" value="P2">P2</li>
-                    <li><input type="radio" name="q2" value="P3">P3</li>
-                    <li><input type="radio" name="q2" value="P4">P4</li>
-                </ul>
+<body>
+    <div id="Quiz" style="padding-left: 20px;display:none;">
+        <h1 style="padding-bottom: 10px; text-align: center;">The Voting Game Quiz</h1>
+        <form name="quiz">
+            <img src="quizImages/Q1.png" alt="Question1" height=250 width=920 border=2><br />
+            1.How many voters are playing the following game?
+            <ul style="margin-top: 1pt">
+                <li><input type="radio" name="q1" value="2">2</li>
+                <li><input type="radio" name="q1" value="3">3</li>
+                <li><input type="radio" name="q1" value="4">4</li>
+                <li><input type="radio" name="q1" value="5">5</li>
+            </ul>
+            <br />
+            <img src="quizImages/Q1.png" alt="Question1" height=250 width=920 border=2><br />
+            2. Which one of the players are you?
+            <ul style="margin-top: 1pt">
+                <li><input type="radio" name="q2" value="P1">P1</li>
+                <li><input type="radio" name="q2" value="P2">P2</li>
+                <li><input type="radio" name="q2" value="P3">P3</li>
+                <li><input type="radio" name="q2" value="P4">P4</li>
+            </ul>
 
-                <br /><br />
-                <img src="quizImages/Q1.png" alt="Question1" height=250 width=920 border=2><br />
-                3. Those are your priorities. Who is your most favourite candidate?
-                <ul style="margin-top: 1pt">
-                    <li><input type="radio" name="q3" value="Purple"><font color="Purple"><b>Purple</b></font></li>
-                    <li><input type="radio" name="q3" value="A (Grey)">A (<font color="Grey"><b>Grey</b></font>)</li>
-                    <li><input type="radio" name="q3" value="B (Blue)">B (<font color="Blue"><b>Blue</b></font>)</li>
-                    <li><input type="radio" name="q3" value="C (Red)">C (<font color="Red"><b>Red</b></font>)</li>
-                </ul>
-
-
-                <br /><br />
-                <img src="quizImages/Q5.png" alt="Question5" height=250 width=920 border=2><br />
-                4. This game has just ended. Who is the winner?
-                <ul style="margin-top: 1pt">
-                    <li><input type="radio" name="q4" value="C (Red)">C (<font color="Red"><b>Red</b></font>)</li>
-                    <li><input type="radio" name="q4" value="C (Red) and B (Blue)">C (<font color="Red"><b>Red</b></font>) and B (<font color="Blue"><b>Blue</b></font>)</li>
-                    <li><input type="radio" name="q4" value="A (Grey)">A (<font color="Grey"><b>Grey</b></font>)</li>
-                    <li><input type="radio" name="q4" value="C (Red) or B (Blue)">C (<font color="Red"><b>Red</b></font>) or B (<font color="Blue"><b>Blue</b></font>)</li>
-                </ul>
+            <br /><br />
+            <img src="quizImages/Q1.png" alt="Question1" height=250 width=920 border=2><br />
+            3. Those are your priorities. Who is your most favourite candidate?
+            <ul style="margin-top: 1pt">
+                <li><input type="radio" name="q3" value="Purple"><font color="Purple"><b>Purple</b></font></li>
+                <li><input type="radio" name="q3" value="A (Grey)">A (<font color="Grey"><b>Grey</b></font>)</li>
+                <li><input type="radio" name="q3" value="B (Blue)">B (<font color="Blue"><b>Blue</b></font>)</li>
+                <li><input type="radio" name="q3" value="C (Red)">C (<font color="Red"><b>Red</b></font>)</li>
+            </ul>
 
 
-                <br /><br />
-                <img src="quizImages/Q4.png" alt="Question3" height=250 width=920 border=2><br />
-                5. who will win if you change your vote to <b>"B"</b> (<font color="Blue"><b>Blue</b></font>) candidate
-                <ul style="margin-top: 1pt">
-                    <li><input type="radio" name="q5" value="B (Blue) and A (Grey)">B (<font color="Blue"><b>Blue</b></font>) and A (<b><font color="Grey">Grey</font></b>)</li>
-                    <li><input type="radio" name="q5" value="A (Grey)">A (<font color="Grey"><b>Grey</b></font>)</li>
-                    <li><input type="radio" name="q5" value="B (Blue)">B (<font color="Blue"><b>Blue</b></font>)</li>
-                    <li><input type="radio" name="q5" value="C (Red)">C (<font color="Red"><b>Red</b></font>)</li>
-                </ul>
+            <br /><br />
+            <img src="quizImages/Q5.png" alt="Question5" height=250 width=920 border=2><br />
+            4. This game has just ended. Who is the winner?
+            <ul style="margin-top: 1pt">
+                <li><input type="radio" name="q4" value="C (Red)">C (<font color="Red"><b>Red</b></font>)</li>
+                <li><input type="radio" name="q4" value="C (Red) and B (Blue)">C (<font color="Red"><b>Red</b></font>) and B (<font color="Blue"><b>Blue</b></font>)</li>
+                <li><input type="radio" name="q4" value="A (Grey)">A (<font color="Grey"><b>Grey</b></font>)</li>
+                <li><input type="radio" name="q4" value="C (Red) or B (Blue)">C (<font color="Red"><b>Red</b></font>) or B (<font color="Blue"><b>Blue</b></font>)</li>
+            </ul>
 
 
-                <br /><br />
-                <img src="quizImages/Q5.png" alt="Question5" height=250 width=920 border=2><br />
-                6. This game has just ended. and these are your priorities. What is your score?
-                <ul style="margin-top: 1pt">
-                    <li><input type="radio" name="q6" value="100">100</li>
-                    <li><input type="radio" name="q6" value="70">70</li>
-                    <li><input type="radio" name="q6" value="25">25</li>
-                    <li><input type="radio" name="q6" value="10">10</li>
-                </ul>
+            <br /><br />
+            <img src="quizImages/Q4.png" alt="Question3" height=250 width=920 border=2><br />
+            5. who will win if you change your vote to <b>"B"</b> (<font color="Blue"><b>Blue</b></font>) candidate
+            <ul style="margin-top: 1pt">
+                <li><input type="radio" name="q5" value="B (Blue) and A (Grey)">B (<font color="Blue"><b>Blue</b></font>) and A (<b><font color="Grey">Grey</font></b>)</li>
+                <li><input type="radio" name="q5" value="A (Grey)">A (<font color="Grey"><b>Grey</b></font>)</li>
+                <li><input type="radio" name="q5" value="B (Blue)">B (<font color="Blue"><b>Blue</b></font>)</li>
+                <li><input type="radio" name="q5" value="C (Red)">C (<font color="Red"><b>Red</b></font>)</li>
+            </ul>
 
-                <input type="button" value="Check answers" onclick=" getScore(this.form) " style="padding: 5px;">
-                <input type="reset" value="Clear answers" style="padding: 5px;">
-                <br /><br /><br /><br /><br /><br /><br /><br />
-            </form>
-        </div>
-        <div id="MainPage" style="display: none;">
-            <div class="ribbon">
-                <h3>Welcome to the Voting Game</h3>
-                <p>
-                    <br />
-                    <!--p> You will play a game of <b style="color: chartreuse;">5</b> Players with <b style="color: darkturquoise;">3</b> Candidates</p-->
-                    <button id="StartGame" class="button">Press To Start The Game</button><br/><br />
-                </p>
-            </div>
-            <div id="StatusInfo" style="display: none;">
+
+            <br /><br />
+            <img src="quizImages/Q5.png" alt="Question5" height=250 width=920 border=2><br />
+            6. This game has just ended. and these are your priorities. What is your score?
+            <ul style="margin-top: 1pt">
+                <li><input type="radio" name="q6" value="100">100</li>
+                <li><input type="radio" name="q6" value="70">70</li>
+                <li><input type="radio" name="q6" value="25">25</li>
+                <li><input type="radio" name="q6" value="10">10</li>
+            </ul>
+
+            <input type="button" value="Check answers" onclick=" getScore(this.form,6,4,0) " style="padding: 5px;">
+            <input type="reset" value="Clear answers" style="padding: 5px;">
+            <br /><br /><br /><br /><br /><br /><br /><br />
+        </form>
+    </div>
+
+    <div id="Quiz2" style="padding-left: 20px;">
+        <h1 style="padding-bottom: 10px; text-align: center;">The Voting Game Quiz</h1>
+    <form name="quiz">
+        <img src="quizImages/Q6.png" alt="Question1" height="5%" width="60%" border=2><br />
+        1.Who is the leading Candidate in the Poll?
+        <ul style="margin-top: 1pt">
+            <li><input type="radio" name="q1" value="Purple"><font color="Purple"><b>Purple</b></font></li>
+            <li><input type="radio" name="q1" value="Grey"><font color="Grey"><b>Grey</b></font></li>
+            <li><input type="radio" name="q1" value="Blue"><font color="Blue"><b>Blue</b></font></li>
+            <li><input type="radio" name="q1" value="Red"><font color="Red"><b>Red</b></font></li>
+        </ul>
+        <br />
+        <img src="quizImages/Q6.png" alt="Question2" height="5%" width="60%" border=2><br />
+        2. Who is your most prefered candidate?
+        <ul style="margin-top: 1pt">
+            <li><input type="radio" name="q2" value="Purple"><font color="Purple"><b>Purple</b></font></li>
+            <li><input type="radio" name="q2" value="Grey"><font color="Grey"><b>Grey</b></font></li>
+            <li><input type="radio" name="q2" value="Blue"><font color="Blue"><b>Blue</b></font></li>
+            <li><input type="radio" name="q2" value="Red"><font color="Red"><b>Red</b></font></li>
+        </ul>
+        <img src="quizImages/Q7.png" alt="Question3" height="5%" width="60%" border=2><br />
+        3. Suppose you voted for <font color="Red">Red</font> Candidate, and the picture above is the result of the election (<font color="Grey"><b>Grey</b></font> candidate won), how many coins will you get?
+        <ul style="margin-top: 1pt">
+            <li><input type="radio" name="q3" value="20">20</li>
+            <li><input type="radio" name="q3" value="15">15</li>
+            <li><input type="radio" name="q3" value="10">10</li>
+            <li><input type="radio" name="q3" value="0">0</li>
+        </ul>
+        <input type="button" value="Check answers" onclick=" getScore(this.form,2,4,6) " style="padding: 5px;">
+        <input type="reset" value="Clear answers" style="padding: 5px;">
+        <br /><br /><br /><br /><br /><br /><br /><br />
+    </form>
+    </div>
+
+
+
+            <div id="MainPage" style="display: none;">
                 <div class="ribbon">
-                    <p align="left" style="margin-bottom: 5px;"><span align="left" style="border-bottom: 1px solid deepskyblue; color: white; margin-bottom: 0px;"><b>Server Status:</b></span></p>
-                    <p align="left" id="waitStatus" style="margin-bottom: 0px; margin-top: 0px;"></p>
-                    <hr />
-                    <p align="left" style="font-family: monospace">
-                        Current players online: <span id="playersOnline" style="color: chartreuse"></span><br />
-                        Average waiting time: <span id="avgWaitTime" style="color: darkorange"></span><br />
-                    </p>
-                </div>
-            </div>
-            <div id="TimePassed" style="display: none;">
-                <div class="ribbon">
+                    <h3>Welcome to the Voting Game</h3>
                     <p>
-                        <div class="clock" style="margin-left: 4em;"></div>
+                        <br />
+                        <!--p> You will play a game of <b style="color: chartreuse;">5</b> Players with <b style="color: darkturquoise;">3</b> Candidates</p-->
+                        <button id="StartGame" class="button">Press To Start The Game</button><br /><br />
                     </p>
                 </div>
+                <div id="StatusInfo" style="display: none;">
+                    <div class="ribbon">
+                        <p align="left" style="margin-bottom: 5px;"><span align="left" style="border-bottom: 1px solid deepskyblue; color: white; margin-bottom: 0px;"><b>Server Status:</b></span></p>
+                        <p align="left" id="waitStatus" style="margin-bottom: 0px; margin-top: 0px;"></p>
+                        <hr />
+                        <p align="left" style="font-family: monospace">
+                            Current players online: <span id="playersOnline" style="color: chartreuse"></span><br />
+                            Average waiting time: <span id="avgWaitTime" style="color: darkorange"></span><br />
+                        </p>
+                    </div>
+                </div>
+                <div id="TimePassed" style="display: none;">
+                    <div class="ribbon">
+                        <p>
+                            <div class="clock" style="margin-left: 4em;"></div>
+                        </p>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div id="tableContainer" style="display: none;"></div>
+            <div id="tableContainer" style="display: none;"></div>
 
-    </body>
+</body>
 <script src="ClientJS/client.js"></script>
 </html>

@@ -1,8 +1,4 @@
 ﻿var Tries = 3;
-// Insert number of questions
-var numQues = 6;
-// Insert number of choices in each question
-var numChoi = 4;
 // Insert number of questions displayed in answer area
 var answers = new Array(6);
 
@@ -13,9 +9,11 @@ answers[2] = "C (Red)";
 answers[3] = "C (Red) and B (Blue)";
 answers[4] = "B (Blue) and A (Grey)";
 answers[5] = "70";
-
+answers[6] = "Grey";
+answers[7] = "Red";
+answers[8] = "10";
 // Do not change anything below here ...
-function getScore(form) {
+function getScore(form, numQues, numChoi,offset) {
     var score = 0;
     var currElt;
     var currSelection;
@@ -24,7 +22,7 @@ function getScore(form) {
         for (j = 0; j < numChoi; j++) {
             currSelection = form.elements[currElt + j];
             if (currSelection.checked) {
-                if (currSelection.value == answers[i]) {
+                if (currSelection.value == answers[offset+i]) {
                     score++;
                     break;
                 }
@@ -34,11 +32,12 @@ function getScore(form) {
     score = Math.round(score / numQues * 100);
     var correctAnswers = "";
     for (i = 1; i <= numQues; i++) {
-        correctAnswers += i + ". " + answers[i - 1] + "\r\n";
+        correctAnswers += i + ". " + answers[offset+ (i - 1)] + "\r\n";
     }
     if (score == 100) {
         alert("\tSuccess!!\t\n\tYou have completed the quiz\t");
         $('#Quiz').hide();
+        $('#Quiz2').hide();
         $('#MainPage').show();
     } else {
         Tries--;
@@ -383,9 +382,9 @@ $(function () {
         });
         $('#survy').click(function() {
             if (QueryString['workerId'])
-                window.open('https://docs.google.com/forms/d/1RFKflpeYkfWApm1tYqouKvv75cz_pS2S0ZusBfTCPsI/viewform?entry.683314448=' + uID + '&entry.641831269=' + QueryString['workerId']);
+                window.open('https://docs.google.com/forms/d/1JPqyhlU-kuRE9XGGKD4_lBCk5FCv9iSbTbKMiHNzHLs/viewform?entry.683314448=' + uID + '&entry.641831269=' + QueryString['workerId']);
             else
-                window.open('https://docs.google.com/forms/d/1RFKflpeYkfWApm1tYqouKvv75cz_pS2S0ZusBfTCPsI/viewform?entry.683314448=' + uID);
+                window.open('https://docs.google.com/forms/d/1JPqyhlU-kuRE9XGGKD4_lBCk5FCv9iSbTbKMiHNzHLs/viewform?entry.683314448=' + uID);
         });
         $('#cont').click(function() {
             document.getElementById('mypopupGameOver').className = 'popup-ui';
