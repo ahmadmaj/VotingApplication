@@ -12,6 +12,7 @@ answers[5] = "70";
 answers[6] = "Grey";
 answers[7] = "Red";
 answers[8] = "10";
+answers[9] = "0";
 // Do not change anything below here ...
 function getScore(form, numQues, numChoi,offset) {
     var score = 0;
