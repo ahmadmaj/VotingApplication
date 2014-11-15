@@ -28,13 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Config = new System.Windows.Forms.Button();
             this.txtConsole = new System.Windows.Forms.RichTextBox();
             this.StartServ = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.SinglePMode = new System.Windows.Forms.CheckBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.textBox1 = new System.Windows.Forms.TextBox();
@@ -47,11 +48,11 @@
             this.button1 = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.button4 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
-            this.button4 = new System.Windows.Forms.Button();
-            this.SinglePMode = new System.Windows.Forms.CheckBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -115,6 +116,7 @@
             // tabPage1
             // 
             this.tabPage1.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.tabPage1.Controls.Add(this.checkBox2);
             this.tabPage1.Controls.Add(this.SinglePMode);
             this.tabPage1.Controls.Add(this.checkBox1);
             this.tabPage1.Controls.Add(this.Config);
@@ -126,10 +128,21 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Initialization";
             // 
+            // SinglePMode
+            // 
+            this.SinglePMode.AutoSize = true;
+            this.SinglePMode.Location = new System.Drawing.Point(38, 84);
+            this.SinglePMode.Name = "SinglePMode";
+            this.SinglePMode.Size = new System.Drawing.Size(152, 21);
+            this.SinglePMode.TabIndex = 5;
+            this.SinglePMode.Text = "Single Player Mode";
+            this.SinglePMode.UseVisualStyleBackColor = true;
+            this.SinglePMode.CheckedChanged += new System.EventHandler(this.SinglePMode_CheckedChanged);
+            // 
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(20, 140);
+            this.checkBox1.Location = new System.Drawing.Point(20, 57);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(109, 21);
             this.checkBox1.TabIndex = 4;
@@ -243,9 +256,9 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.NullValue = "0";
-            this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.NullValue = "0";
+            this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.ShowEditingIcon = false;
             this.dataGridView1.ShowRowErrors = false;
@@ -265,6 +278,16 @@
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Current Games";
             this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(213, 214);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(105, 27);
+            this.button4.TabIndex = 4;
+            this.button4.Text = "KillGame";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button3
             // 
@@ -301,35 +324,25 @@
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.RowHeadersVisible = false;
             this.dataGridView2.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle4.NullValue = "0";
-            this.dataGridView2.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle6.NullValue = "0";
+            this.dataGridView2.RowsDefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridView2.RowTemplate.Height = 24;
             this.dataGridView2.ShowEditingIcon = false;
             this.dataGridView2.ShowRowErrors = false;
             this.dataGridView2.Size = new System.Drawing.Size(447, 204);
             this.dataGridView2.TabIndex = 1;
             // 
-            // button4
+            // checkBox2
             // 
-            this.button4.Location = new System.Drawing.Point(213, 214);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(105, 27);
-            this.button4.TabIndex = 4;
-            this.button4.Text = "KillGame";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
-            // 
-            // SinglePMode
-            // 
-            this.SinglePMode.AutoSize = true;
-            this.SinglePMode.Location = new System.Drawing.Point(38, 162);
-            this.SinglePMode.Name = "SinglePMode";
-            this.SinglePMode.Size = new System.Drawing.Size(152, 21);
-            this.SinglePMode.TabIndex = 5;
-            this.SinglePMode.Text = "Single Player Mode";
-            this.SinglePMode.UseVisualStyleBackColor = true;
-            this.SinglePMode.CheckedChanged += new System.EventHandler(this.SinglePMode_CheckedChanged);
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(38, 111);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(139, 21);
+            this.checkBox2.TabIndex = 6;
+            this.checkBox2.Text = "Don\'t Log Agents";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
             // ServerManager
             // 
@@ -380,5 +393,6 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.CheckBox SinglePMode;
+        private System.Windows.Forms.CheckBox checkBox2;
     }
 }

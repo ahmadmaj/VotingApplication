@@ -187,6 +187,11 @@ namespace Server
             }
         }
 
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            Program.LogAgents = !Program.LogAgents;
+        }
+
 
     }
 }

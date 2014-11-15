@@ -8,7 +8,7 @@ namespace Server.Agents
 {
     class FirstModel : Agent
     {
-        public FirstModel(Game newgame, List<string> priolist) : base(newgame, priolist)
+        public FirstModel(Game newgame, List<string> priolist,int aID) : base(newgame, priolist, aID)
         {
         }
         public FirstModel(Game newgame, List<int> priolist, int playerID)

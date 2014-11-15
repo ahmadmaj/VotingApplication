@@ -10,13 +10,9 @@ namespace Server.Agents
     class NoiseModel : Agent
     {
         private List<int> initialState; 
-        public NoiseModel(Game newgame, List<string> priolist) : base(newgame, priolist)
+        public NoiseModel(Game newgame, List<string> priolist,int ID,List<int> initState) : base(newgame, priolist, ID)
         {
-            initialState = new List<int>(newgame.numOfCandidates);
-            for (int i = 0; i < newgame.numOfCandidates; i++)
-                initialState.Add(0);
-            foreach (int candIndex in newgame.priorities.Select(pref => newgame.candidatesNames.IndexOf(pref[0])))
-                initialState[candIndex]++;
+            initialState = initState;
         }
 
         public NoiseModel(Game newgame, List<int> priolist, int playerID)

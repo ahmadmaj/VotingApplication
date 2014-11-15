@@ -63,12 +63,16 @@ namespace Server
             this.points = new List<int>(gamedets.points);
             this.priorities = new List<List<string>>(gamedets.priorities);
             this.prioritiesJSON = "";
-            foreach (List<string> prio in this.priorities)
-                prioritiesJSON += string.Join(",", prio) + "#";
-            this.prioritiesJSON=this.prioritiesJSON.Remove(this.prioritiesJSON.Length - 1);
+            this.whoVoted = gamedets.whoVoted;
+            if (whoVoted == 2)
+            {
+                foreach (List<string> prio in this.priorities)
+                    prioritiesJSON += string.Join(",", prio) + "#";
+                prioritiesJSON = prioritiesJSON.Remove(prioritiesJSON.Length - 1);
+            }
             this.votesPerPlayer = new List<int>(gamedets.getVotesList());
             this.rounds = gamedets.numOfRounds;
-            this.whoVoted = gamedets.whoVoted;
+            
             this.votedBy = new List<List<int>>();
             for (int i = 0; i < numOfCandidates; i++)
             {
@@ -99,23 +103,28 @@ namespace Server
             this.logUpdated = false;
             this.agents = new List<Agent>();
             int idx = -1;
+            int aidx = -1;
+            List<int> initState = BuildInitialStateList();
+            //agents.Add(new NoiseModel(this, priorities[0], initState));
+            
             foreach (string poa in playersTypeOrder)
             {
                 idx++;
                 if (poa == "human") continue;
+                aidx++;
                 switch (poa)
                 {
                     case "Random":
-                        agents.Add(new RandomModel(this, priorities[idx]));
+                        agents.Add(new RandomModel(this, priorities[idx],aidx));
                         break;
                     case "First":
-                        agents.Add(new FirstModel(this, priorities[idx]));
+                        agents.Add(new FirstModel(this, priorities[idx], aidx));
                         break;
                     case "Last":
-                        agents.Add(new LastModel(this, priorities[idx]));
+                        agents.Add(new LastModel(this, priorities[idx], aidx));
                         break;
                     case "Noise":
-                        agents.Add(new NoiseModel(this, priorities[idx]));
+                        agents.Add(new NoiseModel(this, priorities[idx], aidx, initState));
                         break;
                 }
             }
@@ -134,10 +143,21 @@ namespace Server
                 startSecondrnd = false;
         }
 
+        private List<int> BuildInitialStateList()
+        {
+            List<int> initialState = new List<int>(numOfCandidates);
+            for (int i = 0; i < numOfCandidates; i++)
+                initialState.Add(0);
+            foreach (int candIndex in priorities.Select(pref => candidatesNames.IndexOf(pref[0])))
+                initialState[candIndex]++;
+            return initialState;
+        }
+
+
         public int vote(int candidatePriority, int player, int duration, string connID = "")
         {
             if (votesPerPlayer[player] <= 0) throw new InvalidOperationException("player voted with 0 votes..");
-            
+
             int candIndex = this.candidatesNames.IndexOf(priorities[player][candidatePriority]);
             updateVotedBy(candIndex, player);
 
@@ -147,26 +167,30 @@ namespace Server
             votesPerPlayer[player]--;
 
             //update log
-            string time = DateTime.Now.ToString();
-            updateCurWinner(); //update current winner and scores
-            string winnersString = string.Join(" ", curWinners.Select(x => (x + 1).ToString()).ToArray());
-            string candidatesString = string.Join(",", votedBy.Select(x => x.Count.ToString()).ToArray());
-            string pointsString = string.Join(",", currentPoints.Select(x => x.ToString()).ToArray());
-
-            String playerID = "";
-            if (playersTypeOrder[player] == "replaced")
-                playerID = "replace_" + replacingAgents[replaceTurn].replacedplayerID + "_" +
-                           replacingAgents[replaceTurn].agentType();
-            else if (playersTypeOrder[player] != "human")
+            if (playersTypeOrder[player] == "human" || Program.LogAgents)
             {
-                playerID = "comp_" + computerTurn + "_" + agents[computerTurn].agentType();
+                updateCurWinner(true);   //update current winner and scores
+                string time = DateTime.Now.ToString();
+                string winnersString = string.Join(" ", curWinners.Select(x => (x + 1).ToString()).ToArray());
+                string candidatesString = string.Join(",", votedBy.Select(x => x.Count.ToString()).ToArray());
+                string pointsString = string.Join(",", currentPoints.Select(x => x.ToString()).ToArray());
+
+                String playerID = "";
+                if (playersTypeOrder[player] == "replaced")
+                    playerID = "replace_" + replacingAgents[replaceTurn].replacedplayerID + "_" +
+                               replacingAgents[replaceTurn].agentType();
+                else if (playersTypeOrder[player] != "human")
+                {
+                    playerID = "comp_" + computerTurn + "_" + agents[computerTurn].agentType();
+                }
+                else
+                    playerID = Program.ConnIDtoUser[connID].userID.ToString();
+
+                writeToFile.Add(time + "," + playerID + "," + (candIndex + 1) + "," + duration + "," +
+                                winnersString + "," + candidatesString + "," + pointsString);
             }
             else
-                playerID = Program.ConnIDtoUser[connID].userID.ToString();
-
-            writeToFile.Add(time + "," + playerID + "," + (candIndex + 1) + "," + duration + "," +
-                                 winnersString + "," + candidatesString + "," + pointsString);
-
+                updateCurWinner(false); //update current winner
             gameOver = checkGameConverged();
 
             //Boolean gameOver = false;
@@ -178,23 +202,32 @@ namespace Server
 
             GameOver();
             return -1;
-            /*
-            if (rounds >= roundNumber) return -2;
-            playersDump();
-            writeToCSVFile();
-            return -1; //game over
-            */
         }
 
         public void GameOver()
         {
             if (gameOver)
                 writeToFile[3] = "game ended after:,the players voted for the same candidate for 2 turns";
+            else if (!endNextVote) writeToFile[3] = "game ended after:,the turns are over";
             else
-                if (!endNextVote) writeToFile[3] = "game ended after:,the turns are over";
-                else writeToFile[3] = "game ended after:,player disconnected";
+            {
+                writeToFile[3] = "game ended after:,player disconnected";
+                return;
+            }
+            updateCurWinner(true);
             playersDump();
+            writeFinalState();
             writeToCSVFile();
+        }
+
+        private void writeFinalState()
+        {
+            string time = DateTime.Now.ToString();
+            string winnersString = string.Join(" ", curWinners.Select(x => (x + 1).ToString()).ToArray());
+            string candidatesString = string.Join(",", votedBy.Select(x => x.Count.ToString()).ToArray());
+            string pointsString = string.Join(",", currentPoints.Select(x => x.ToString()).ToArray());
+            writeToFile.Add("");
+            writeToFile.Add(time + ",Final State, , ," + winnersString + "," + candidatesString + "," + pointsString);
         }
 
         void playersDump()
@@ -214,7 +247,6 @@ namespace Server
         }
 
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public int getTurn(string playerID)
         {
             if (playersTypeOrder[turn] == "human")
@@ -231,7 +263,6 @@ namespace Server
             return playersID[humanTurn] == playerID ? 1 : 0;
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public int getNextTurn()
         {
             //if (!this.firstTurn)
@@ -339,7 +370,7 @@ namespace Server
             return ans;
         }
 
-        public void updateCurWinner()
+        public void updateCurWinner(bool withpoints)
         {            
             //find current winning candidates
             List<int> winningCandidates = new List<int>();
@@ -357,7 +388,7 @@ namespace Server
                 }
             }
             curWinners = winningCandidates;
-            updatePlayersPoints(); //update players scores
+            if (withpoints) updatePlayersPoints(); //update players scores
         }
 
         public void updatePlayersPoints()
@@ -422,69 +453,59 @@ namespace Server
             return ans;
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void updateLog()
         {
             if (logUpdated == false)
             {
-                //priorities
                 int j = 5;
-                for (int i = 0; i < getNumOfPlayers(); i++)
-                {
-                    string priorityString;
-                    if(this.playersTypeOrder[i] != "human")
-                        priorityString = "comp_" + getAgentNumber(i);
-                    else
-                        priorityString = Program.ConnIDtoUser[playersID[gethumanNumber(i)]].userID.ToString();
-                    for (int k = 0; k < this.priorities[i].Count; k++)
-                        priorityString = priorityString + "," + (candidatesNames.IndexOf(priorities[i][k]) +1);
-                    this.writeToFile.Insert(j, priorityString);
-                }
-
+                //priorities
+                string priorityString = "";
                 //titles
                 string titles = "time,player,vote,duration,current winner,";
+                int agentidx = -1;
                 for (int i = 0; i < this.numOfCandidates; i++)
-                {
-                    titles = titles + "votes for candidate " + (i+1) + ",";
-                }
+                    titles += "votes for candidate " + (i + 1) + ",";
 
                 for (int i = 0; i < getNumOfPlayers(); i++)
                 {
-                    if (i == getNumOfPlayers() - 1)
+                    if (playersTypeOrder[i] != "human") agentidx++;
+                    if (playersTypeOrder[i] == "human" || Program.LogAgents)
                     {
-                        if(this.playersTypeOrder[i] == "human")
-                            titles = titles + "points player" + Program.ConnIDtoUser[this.playersID[gethumanNumber(i)]].userID.ToString();
-                        else
-                            titles = titles + "points player comp_" + getAgentNumber(i);
+                        if (playersTypeOrder[i] != "human")
+                            priorityString = "comp_" + agents[agentidx].agentsIDinGame;
 
-                    }
-                    else
-                    {
-                        if (this.playersTypeOrder[i] == "human")
-                            titles = titles + "points player" + Program.ConnIDtoUser[this.playersID[gethumanNumber(i)]].userID.ToString() + ",";
                         else
-                            titles = titles + "points player comp_" + getAgentNumber(i).ToString() + ",";
-                    }
+                            priorityString = Program.ConnIDtoUser[playersID[gethumanNumber(i)]].userID.ToString();
 
+                        for (int k = 0; k < priorities[i].Count; k++)
+                            priorityString = priorityString + "," + (candidatesNames.IndexOf(priorities[i][k]) + 1);
+                    }
+                        if (playersTypeOrder[i] == "human")
+                            titles += "points player" +
+                                      Program.ConnIDtoUser[playersID[gethumanNumber(i)]].userID + ",";
+                        else
+                            titles += "points comp_" + agents[agentidx].agentsIDinGame + ",";
+                    
                 }
+                titles = titles.Remove(titles.Length - 1);
 
+                writeToFile.Insert(j, priorityString);
                 writeToFile.Add(titles);
                 logUpdated = true;
                 timeStarted = DateTime.Now;
             }
-
-
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public void writeToCSVFile()
         {
             this.fileCreated = true;
             //add disconnected players tp log
             int firstRows = 5 + getNumOfPlayers();
-            var toFile = this.writeToFile;
+            var toFile = writeToFile;
             if (toFile != null)
             {
+                if (!Program.LogAgents)
+                    firstRows = 5 + numOfHumanPlayers;
                 toFile.Insert(firstRows, "disconnected player id, round");
                 int j = firstRows+1;
                 for (int i = 0; i < this.playersDisconnected.Count; i++)
@@ -534,7 +555,7 @@ namespace Server
                     votedBy[candIndex].Add(i);
                     //this.playersVotes[i][0] = candIndex;
                 }
-                updateCurWinner();
+                updateCurWinner(true);
             }
             else if (firstRound == "random")
             {
@@ -545,7 +566,7 @@ namespace Server
                     this.votedBy[randomCand].Add(i);
                     //this.playersVotes[i][0] = randomCand;
                 }
-                updateCurWinner();
+                updateCurWinner(true);
             }
         }
 
@@ -573,7 +594,7 @@ namespace Server
         {
             int ans = 0;
             for (int i = 0; i < index; i++)
-                if (this.playersTypeOrder[i] != "human")
+                if (playersTypeOrder[i] != "human")
                     ans++;
             return ans;
         }

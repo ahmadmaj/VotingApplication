@@ -125,6 +125,7 @@ namespace Server
                 randomNumber -= i;
                 x++;
             }
+            //TODO: Fix BUG HERE!!!
             Game newGame = new Game(selecteDetails);
             if (batchofplayers.Count() == newGame.numOfHumanPlayers)
             {

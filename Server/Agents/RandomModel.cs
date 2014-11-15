@@ -8,7 +8,7 @@ namespace Server.Agents
 {
     class RandomModel : Agent
     {
-        public RandomModel(Game newgame, List<string> priolist) : base(newgame, priolist)
+        public RandomModel(Game newgame, List<string> priolist, int aID) : base(newgame, priolist, aID)
         {
         }
 

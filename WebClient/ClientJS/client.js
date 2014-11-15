@@ -553,8 +553,8 @@ $(function () {
                 $('#progNum' + i).text(numOfVotes[i + 1]);
                 $('#progNum' + i).css('margin-right', '10px');
             } else {
-                $("#pRowTop" + i).css('height', numOfPlayers - numOfVotes[i + 1] + "%");
-                $("#pRowBottom" + i ).css('height', numOfVotes[i + 1] + "%");
+                $("#pRowTop" + i).css('height', ((numOfPlayers - numOfVotes[i + 1])/numOfPlayers)*100 + "%");
+                $("#pRowBottom" + i ).css('height', (numOfVotes[i + 1]/numOfPlayers)*100 + "%");
                 if (numOfVotes[i + 1] > 0) {
                     $('#Bpcell' + i + 2).find('div').html(numOfVotes[i + 1] + " Votes").css('color', 'whitesmoke').css('height','100%');
                 }

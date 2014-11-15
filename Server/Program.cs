@@ -18,6 +18,8 @@ namespace Server
         public static String logFolder = "";
         public static Boolean mTurkMode = false;
         public static Boolean SinglePMode = false;
+        public static bool LogAgents = true;
+
         public static UserVoter getplayerUser(string id)
         {
             UserVoter player = null;
