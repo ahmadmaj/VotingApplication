@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
-using Microsoft.Owin.Security.Provider;
 
-namespace Server
+namespace Server.Connection
 {
     static class WaitingRoom
     {

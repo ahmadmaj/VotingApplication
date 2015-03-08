@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 
-namespace Server
+namespace Server.Connection
 {
     [HubName("serverHub")]
     public class ServerHub : Hub

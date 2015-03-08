@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using Server.GUI;
 
 
 namespace Server
@@ -40,22 +41,6 @@ namespace Server
 
             Application.Run(new ServerManager());
         }
-
-        //// **** file format ****
-        //  number_of_players: <number>
-        //  number_of_candidates: <number>
-        //  players_order: <human/computer>
-        //  number_of_rounds: <number>
-        //  show_who_voted: <yes/no>
-        //  agents: <number of agent files>
-        //  <agent type> <path>
-        //  ...
-        //  <agent type> <path>
-        //  candidates_names: <candidate1 name> <candidate2 name> ....
-        //  points: <1st priority points> <2st priority points> ..
-        //  priorities: 
-        //  <path>
-        ////
 
         public static GameDetails readConfigFile(string file)
         {

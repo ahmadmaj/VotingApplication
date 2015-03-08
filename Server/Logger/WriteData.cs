@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
 
-
-namespace Server
+namespace Server.Logger
 {
     public class WriteData
     {

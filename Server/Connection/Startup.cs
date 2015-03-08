@@ -1,7 +1,7 @@
-﻿using Owin;
-using Microsoft.Owin.Cors;
+﻿using Microsoft.Owin.Cors;
+using Owin;
 
-namespace Server
+namespace Server.Connection
 {
     public class Startup
     {

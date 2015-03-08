@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Server.Agents;
+﻿using System.Collections.Generic;
 
-namespace Server
+namespace Server.Agents
 {
     public abstract class Agent
     {

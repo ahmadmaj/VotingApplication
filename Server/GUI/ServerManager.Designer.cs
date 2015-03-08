@@ -1,4 +1,4 @@
-﻿namespace Server
+﻿namespace Server.GUI
 {
     partial class ServerManager
     {

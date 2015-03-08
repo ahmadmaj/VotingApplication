@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using ConsoleRedirection;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Hosting;
+using Server.Connection;
 
-namespace Server
+namespace Server.GUI
 {
     public partial class ServerManager : Form
     {
@@ -22,7 +22,7 @@ namespace Server
 
         private void ServerManager_Load(object sender, EventArgs e)
         {
-            this.OpenFileDialog1 = new OpenFileDialog();
+            OpenFileDialog1 = new OpenFileDialog();
             InitializeOpenFileDialog();
             // Instantiate the writer
             _writer = new TextBoxStreamWriter(this);
@@ -33,14 +33,15 @@ namespace Server
         private void InitializeOpenFileDialog()
         {
             // Set the file dialog to filter for graphics files. 
-            this.OpenFileDialog1.Filter =
+            OpenFileDialog1.Filter =
                 "Config Files (*.xml)|*.xml|" +
                 "All files (*.*)|*.*";
 
             // Allow the user to select multiple images. 
-            this.OpenFileDialog1.Multiselect = true;
-            this.OpenFileDialog1.Title = "My Configuration Browser";
-            this.OpenFileDialog1.InitialDirectory = Directory.GetCurrentDirectory();
+            OpenFileDialog1.Multiselect = true;
+            OpenFileDialog1.RestoreDirectory = true;
+            OpenFileDialog1.Title = "Select configuration files";
+            OpenFileDialog1.InitialDirectory = Directory.GetCurrentDirectory();
         }
 
         private void button1_Click(object sender, EventArgs e)

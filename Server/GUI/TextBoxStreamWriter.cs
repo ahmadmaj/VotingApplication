@@ -1,8 +1,7 @@
-﻿using System.Text;
-using System.IO;
-using Server;
+﻿using System.IO;
+using System.Text;
 
-namespace ConsoleRedirection
+namespace Server.GUI
 {
     public class TextBoxStreamWriter : TextWriter
     {
