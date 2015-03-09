@@ -293,11 +293,15 @@ namespace Server.GUI
 
         private void button7_Click(object sender, EventArgs e)
         {
-            KeyValuePair<string, double> obj = (KeyValuePair<string, double>)treeView1.SelectedNode.Tag;
-            Dictionary<string, double> parent = Program.LotteryFeatureDictionary[treeView1.SelectedNode.Parent.Name];
-            parent.Remove(obj.Key);
-            parent.Add(textBox4.Text, Convert.ToDouble(textBox5.Text));
-            UpdateTree();
+            if (treeView1.SelectedNode != null)
+            {
+                KeyValuePair<string, double> obj = (KeyValuePair<string, double>)treeView1.SelectedNode.Tag;
+
+                Dictionary<string, double> parent = Program.LotteryFeatureDictionary[treeView1.SelectedNode.Parent.Name];
+                parent.Remove(obj.Key);
+                parent.Add(textBox4.Text, Convert.ToDouble(textBox5.Text));
+                UpdateTree();
+            }
         }
     }
 }
