@@ -1,6 +1,0 @@
-turns
-1 first
-2 priority 2
-3 random
-4 last
-5 first
