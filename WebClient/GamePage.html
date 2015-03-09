@@ -1,15 +1,9 @@
 ﻿<!DOCTYPE html>
    
 <html>
-<head>
-    <title>Voting Game</title>
-</head>
-<body>
-    <div id="MainPage">
-          <input id="StartGame" type="button" value="Press To Start The Game" /><br>
-         <label id="status"></label>
-    </div>
-    <div id="tableContainer" hidden></div>
+    <head>
+        <title>Voting Game</title>
+    </head>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
     <!--Reference the jQuery library. -->
     <link href="StyleGame.css" rel="stylesheet" />
@@ -17,455 +11,151 @@
     <script src="Scripts/jquery-ui-1.10.4.min.js"></script>
     <!--Reference the SignalR library. -->
     <script src="Scripts/jquery.signalR-2.0.3.min.js"></script>
+    <link rel="stylesheet" href="Scripts/flipclock.css">
+    <script src="Scripts/flipclock.min.js"></script>	
     <script src="http://localhost:8010/signalr/hubs"></script>
-    <script>
-        function progressBarFunc() {
-            $('#secbar').progressbar({ value: '101.667' });
-            $('#secbar').show();
-            var sec = 61;
-            var val = 101.667;
-            barInterval = setInterval(function () {
-                val = val - 1.667;
-                sec--;
-                $('#secbar').progressbar({
-                    value: val,
-                    change: function () {
-                        $('#secs').text(sec);
-                    },
-                    complete: function () { }
-                });
-                if (sec == 0) {
-                    backFromDown = true;
-                    $('#' + defaultVote).trigger('mouseup');
-                }
+<body>
+    <div id="Quiz" style="padding-left: 20px;display:none;">
+        <h1 style="padding-bottom: 10px; text-align: center;">The Voting Game Quiz</h1>
+        <form name="quiz">
+            <img src="quizImages/Q1.png" alt="Question1" height=250 width=920 border=2><br />
+            1.How many voters are playing the following game?
+            <ul style="margin-top: 1pt">
+                <li><input type="radio" name="q1" value="2">2</li>
+                <li><input type="radio" name="q1" value="3">3</li>
+                <li><input type="radio" name="q1" value="4">4</li>
+                <li><input type="radio" name="q1" value="5">5</li>
+            </ul>
+            <br />
+            <img src="quizImages/Q1.png" alt="Question1" height=250 width=920 border=2><br />
+            2. Which one of the players are you?
+            <ul style="margin-top: 1pt">
+                <li><input type="radio" name="q2" value="P1">P1</li>
+                <li><input type="radio" name="q2" value="P2">P2</li>
+                <li><input type="radio" name="q2" value="P3">P3</li>
+                <li><input type="radio" name="q2" value="P4">P4</li>
+            </ul>
 
-            }, 1000);
-        };
-    </script>
-    <script>
-        $.connection.hub.url = "http://localhost:8010/signalr";
-        var barInterval;
-        var numOfImages;
-        var numOfPlayers = 0;
-        var playerIndex;
-        var defaultVote;
-        var imageClick;
-        var backFromDown;
-        var game;
-        var votesProgressInterval = 0;
-        var showWhoVoted = false;
-        $(function () {
-            //Set the hubs URL for the connection
-            
-
-            // Declare a proxy to reference the hub.
-            game = $.connection.serverHub;
-
-            game.client.startGameMsg = function (msg) {
-
-                if (msg == "wait") {
-                    $('#status').text("Please wait for the other players, the game will start shortly...");
-                    $('#nextGamestatus').text("Please wait for the other players, the game will start shortly...");
-                    $('#StartGame').prop('disabled', true);
-                    $('#nextGameB').prop('disabled', true);
-                }
-                else if (msg == "start") {
-                    $('#status').text('');
-                    $('#nextGamestatus').text('');
-                    $("#MainPage").hide();
-                    $('#tableContainer').show();
-                    game.server.gameDetailsMsg($.connection.hub.id);
-                    //window.open("/GamePage.html", "_self", false);
-                    $('#turnStatus').text('Please wait for your turn');
-                }
-            };
-            
-            game.client.gameDetails = function (msg, playerI, numOfCandidates, numPlayers, numVotes, numTurns, priority, candNames, candIndex, defaultCand, point, votes, isVoted, voted, playerString, turn, voting, winner, turnsWait) {
-                //$('playerTurn').val(turn);
-                $("#tableContainer").empty();
-                votesProgressInterval = 190 / numPlayers;
-                numOfPlayers = numPlayers;
-                numOfImages = numOfCandidates;
-                playerIndex = playerI;
-                showWhoVoted = isVoted;
-                imageClick = false;
-                backFromDown = false;
-
-                defaultVote = 0;
-                //create table
-                $(function () {
-                    //first table
-                    var table1 = $('<table id=topTable></table>');
-                    row11 = $('<tr border="0" width="100%"></tr>');
-                    cell11 = $('<td width="25%" align="left" valign="top"></td>').html('<td id=infopanel>' +
-                        '<label style="font-family:Arial"> There are <label id=numP>' + numPlayers + '</label> players' +
-                        '<label id=showPlayers>, you are <label id=currplayer>' + playerString + '</label></label></label> <br/>' +
-                        ' <label id="turnsLeft" style="font-family:Arial"> Game ends in: <label id=turnsLeftnum>' + numTurns + '</label> turns' +
-                        '</label></td>');
-
-                    cell12 = $('<td width="50%" align="center" style="vertical-align:middle;"></td>').html(
-                        '<p><label id="turnStatus"></label></p>' +
-                        '<p><label id="voteStatus"></label></p>' +
-                        '<p id="waitImg"><img src="images/wait.gif" style="height:inherit;"></p>' +
-                        '<p><label id="turnsToWait">Your turn is in <label id="numToWait"></label> steps</label></p>' +
-                        '<p><label id="playerVoted"></label></p>' +
-                        '<p><label id="gameOverTxt" hidden></label></p>' +
-                        '<p id="nextGameP" hidden><input id="nextGameB" type="button" value="Ready for another game" /><br>' +
-                        '<label id="nextGamestatus"></label></p>' +
-                        '<div id="secbar">' +
-                        '<span id="secs">' +
-                        '</span>' +
-                        '</div>');
-                    cell13 = $('<td width="25%" align="left" valign="top"></td>').html('<label></label>');
-                    table1.append(row11);
-                    row11.append(cell11);
-                    row11.append(cell12);
-                    row11.append(cell13);
-                    $('#tableContainer').append(table1);
-                    
-                    //second table
-                    var table2 = $('<table id=bottomTable></table>');
-                    row21 = $('<tr width="100%" style="height:10%"></tr>'); //priority
-                    row22 = $('<tr width="100%" style="height:10%"></tr>'); //points
-                    row23 = $('<tr width="100%" style="height:60%"></tr>'); //pic
-                    row24 = $('<tr width="100%" style="height:10%"></tr>'); //name
-                    row25 = $('<tr width="100%" style="height:10%"></tr>'); //voted by
-                    var cellWidth = 100 / numOfCandidates;
-                    var points = point.split('#');
-                    var priorities = priority.split('#');
-                    var numOfVotes = votes.split('#');
-                    var names = candNames.split('#');
-                    var candIndexes = candIndex.split('#');
-                    var whoVoted = voted.split("#");
-  
-                    for (var j = 0; j < 5; j++) { //for each row
-                        if (j == 0) {
-                            for (var i = 0; i < numOfCandidates; i++) {
-                                cell21 = $('<td width=cellWidth + "%" align="center" style="height:10%"></td>').html('<label style="font-family:Arial">' + priorities[i] + '</label>');
-                                row21.append(cell21);
-                            }
-                        }
-                        else if (j == 1) {
-                            for (var i = 0; i < numOfCandidates; i++) {
-                                cell22 = $('<td width=cellWidth + "%" align="center" style="height:10%"></td>').html('<label style="font-family:Arial">' + points[i + 1] + ' coins</label> <br><br>');
-                                row22.append(cell22);
-                            }
-                        }
-                        else if (j == 2) {
-                            var pcellWidth = cellWidth * 0.5;
-                            var icellWidth = cellWidth * 0.5;
-                            for (var i = 0; i < numOfCandidates; i++) {
-                                //if (i == 0)
-                                //    var url = "images/user" + (candIndexes[i + 1]) + "_default.png";
-                                //else
-                                var url = "images/user" + (candIndexes[i + 1]) + ".png";
-                                var size = 80 - (8 * i);
-                                //cell23 = $('<td class="imgCells" width=cellWidth + "%" align="center" style="height:60%"></td>').
-                                //    html('<div class="progress"><label class="progNum" id="num' + i + '">' + numOfVotes[i + 1] + '</label><br /><div class="outer"> <div class="inner" id="inner'+i+'"></div></div></div> <img class="images" id="' + i + '" src="' + url + '" style="height:' + size + '%">');
-                                
-                                cell23 = $('<td class="imgCells" align="center" style="height:60%; width:cellWidth + %"></td>');
-                                imgTable = $('<table width="100%" align="center" style="height:100%;"></table>');
-                                imgrow = $('<tr width=100% style="height:100%"></tr>');
-                                imgCell1 = $('<td width="25%" style="height:100%" align="right"></td>');
-                                imgCell2 = $('<td width="75%" style="height:100%;" align="left" valign="middle"></td>').html('<img class="images" id="' + i + '" src="' + url + '" style=" margin-top:20px; height:' + size + '%">');
-                                pTable = $('<table class="progBars" id="progBars'+i+'" width="30%" style="height:93%"></table><label class="numVoteslabel" id="progNum' + i + '"></label>');
-                                var pheight = 100 / numPlayers;
-                                for (var k = 0; k < numPlayers; k++) {
-                                    prow = $('<tr width="100%" style="height:' + pheight + '%"></tr>');
-                                    pcell = ('<td id="pcell' + i + k + '" width="100%" align="center" style="border: none;"><label class="progLabel" id="plabel' + i + k + '" style="margin-right:0px"></label></td>');
-                                    prow.append(pcell);
-                                    pTable.append(prow);
-                                }
-                                imgCell1.append(pTable);
-                                imgrow.append(imgCell1);
-                                imgrow.append(imgCell2);
-                                imgTable.append(imgrow);
-
-                                cell23.append(imgTable);
-                                row23.append(cell23);
-                            }
-                        }
-                        else if (j == 3) {
-                            for (var i = 0; i < numOfCandidates; i++) {
-                                cell24 = $('<td width=cellWidth + "%" align="center" style="height:10%"></td>').html('<label style="font-family:Arial; font-style:italic; font-weight: bold">' + names[i + 1] + '</label>');
-                                row24.append(cell24);
-                            }
-                        }
-                        else if (showWhoVoted == true && j == 4) {
-                            //for (var i = 0; i < numOfCandidates; i++) {
-                            //    cell25 = $('<td width=cellWidth + "%" align="center" style="height:10%"></td>').html('<label id=voted' + i + ' style="font-family:Arial">Who voted: ' + whoVoted[i + 1] + '</label>');
-                            //    row25.append(cell25);
-                            //}
-
-                        }
-                    }
-                    table2.append(row21);
-                    table2.append(row22);
-                    table2.append(row23);
-                    table2.append(row24);
-                    table2.append(row25);
-
-                    $('#tableContainer').append(table2);
-
-                    var winners = winner.split("#");
-                    updateVoteBars(numOfCandidates, whoVoted, winners, numOfVotes, playerString);
-                    
-                    if (turn == 1) {
-                        imageClick = true;
-                        $('#waitImg').hide();
-                        //$('#playerVoted').text('');
-                        $('#turnsToWait').hide();
-                        $('#turnStatus').text("It's your turn");
-                        $('#voteStatus').text('VOTE NOW!');
-                        $(".images").css('cursor', 'pointer');
-                        $('.images').hover(
-                            function (event) {
-                                var originalSrc = $(this).attr("src");
-                                var srcon = "images/user" + parseInt(originalSrc.substring(11,12)) + "_hover.png";
-                                $("#" + event.target.id).attr("src", srcon);
-                            },
-                            function (event) {
-                                var originalSrc = $(this).attr("src");
-                                var imgsrc = "images/user" + parseInt(originalSrc.substring(11,12)) + ".png";
-                                $("#" + event.target.id).attr("src", imgsrc);
-                            }
-                        );
-                        progressBarFunc();
-                    }
-                    else {
-                        imageClick = false;
-                        $('#turnsToWait').show();
-                        $('#turnStatus').text('Please wait for player ' + (voting + 1) + ' to vote');
-                        $('#numToWait').text(turnsWait);
-                        $('#voteStatus').text('');
-                        $('#waitImg').show();
-                        $(".images").css('cursor', 'auto');
-                    }
-                });
-                if (showWhoVoted == false) {
-                    $('#showPlayers').hide();
-                }
-                $('#nextGameB').click(function () {
-                    game.server.nextGame($.connection.hub.id);
-                });
-            }; //details function
-
-            game.client.yourTurn = function () {
-                imageClick = true;
-                $('#waitImg').hide();
-                $(".images").each(function () {
-                    var originalSrc = $(this).attr("src");
-                    var imgsrc = "images/user" + parseInt(originalSrc.substring(11,12)) + ".png";
-                    $(this).attr("src", imgsrc);
-                });
-                //$('#playerVoted').text('');
-                $('#turnsToWait').hide();
-                $('#turnStatus').text("It's your turn");
-                $('#voteStatus').text('VOTE NOW!');
-                //$(".images").fadeTo("fast", 1);
-                $(".images").css('cursor', 'pointer');
-                $('.images').hover(
-                    function (event) {
-                        var originalSrc = $(this).attr("src");
-                        var srcon = "images/user" + parseInt(originalSrc.substring(11,12)) + "_hover.png";
-                        $("#" + event.target.id).attr("src", srcon);
-                    },
-                    function (event) {
-                        var originalSrc = $(this).attr("src");
-                        var imgsrc = "images/user" + parseInt(originalSrc.substring(11,12)) + ".png";
-                        $("#" + event.target.id).attr("src", imgsrc);
-                    }
-                );
-                progressBarFunc();
-            };
-
-            game.client.votedUpdate = function (numOfCandidates, votes, votesL, turnsL, candIndex, defaultCand, playerV, voting, winner, whoVoted, playerString, turnsWait) {
-                defaultVote = defaultCand;
-                $('#turnsToWait').show();
-                $('#numToWait').text(turnsWait);
-                //$('#playerVoted').text('player ' + (playerV + 1) + ' voted');
-                $('#turnStatus').text('Please wait for player ' + (voting+1) + ' to vote');
-                //$('#votesLeft').text('Remaining votes: ' + votesL);
-                $('#turnsLeftnum').text(turnsL);
-                var numOfVotes = votes.split("#");
-                var winners = winner.split("#");
-                var whoVotedString = whoVoted.split("#");
-                //if (showWhoVoted == true) {
-                    
-                //    for (var i = 0; i < numOfCandidates; i++) {
-                //        $('#voted' + i).text('Who voted: ' + whoVotedString[i + 1]);
-                //    }
-                //}
-                resetVoteBars(numOfCandidates);
-                updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
-
-                var candIndexes = candIndex.split('#');
-                //for (var i = 0; i < numOfCandidates; i++) {
-                //    if (i == defaultCand) {
-                //        var url = "images/user" + (candIndexes[i + 1]) + "_default.png";
-                //        $('#' + i).attr('src', url);
-                //    } else {
-                //        var url = "images/user" + (candIndexes[i + 1]) + ".png";
-                //        $('#' + i).attr('src', url);
-                //    }
-                //}
-            };
-
-            game.client.otherVotedUpdate = function (numOfCandidates, votes, votesL, turnsL, playerV, voting, winner, whoVoted, playerString, turnswait) {
-                $('#turnStatus').text('Please wait for player ' + (voting+1) + ' to vote');
-                //$('#votesLeft').text('Remaining votes: ' + votesL);
-                $('#turnsLeftnum').text(turnsL);
-                var numOfVotes = votes.split("#");
-                var winners = winner.split("#");
-                var whoVotedString = whoVoted.split("#");
+            <br /><br />
+            <img src="quizImages/Q1.png" alt="Question1" height=250 width=920 border=2><br />
+            3. Those are your priorities. Who is your most favourite candidate?
+            <ul style="margin-top: 1pt">
+                <li><input type="radio" name="q3" value="Purple"><font color="Purple"><b>Purple</b></font></li>
+                <li><input type="radio" name="q3" value="A (Grey)">A (<font color="Grey"><b>Grey</b></font>)</li>
+                <li><input type="radio" name="q3" value="B (Blue)">B (<font color="Blue"><b>Blue</b></font>)</li>
+                <li><input type="radio" name="q3" value="C (Red)">C (<font color="Red"><b>Red</b></font>)</li>
+            </ul>
 
 
-                //if (showWhoVoted == true) {
-                    
-                //    for (var i = 0; i < numOfCandidates; i++) {
-                //        $('#voted' + i).text('Who voted: ' + whoVotedString[i + 1]);
-                //    }
-                //}
+            <br /><br />
+            <img src="quizImages/Q5.png" alt="Question5" height=250 width=920 border=2><br />
+            4. This game has just ended. Who is the winner?
+            <ul style="margin-top: 1pt">
+                <li><input type="radio" name="q4" value="C (Red)">C (<font color="Red"><b>Red</b></font>)</li>
+                <li><input type="radio" name="q4" value="C (Red) and B (Blue)">C (<font color="Red"><b>Red</b></font>) and B (<font color="Blue"><b>Blue</b></font>)</li>
+                <li><input type="radio" name="q4" value="A (Grey)">A (<font color="Grey"><b>Grey</b></font>)</li>
+                <li><input type="radio" name="q4" value="C (Red) or B (Blue)">C (<font color="Red"><b>Red</b></font>) or B (<font color="Blue"><b>Blue</b></font>)</li>
+            </ul>
 
-                resetVoteBars(numOfCandidates);
 
-                updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
+            <br /><br />
+            <img src="quizImages/Q4.png" alt="Question3" height=250 width=920 border=2><br />
+            5. who will win if you change your vote to <b>"B"</b> (<font color="Blue"><b>Blue</b></font>) candidate
+            <ul style="margin-top: 1pt">
+                <li><input type="radio" name="q5" value="B (Blue) and A (Grey)">B (<font color="Blue"><b>Blue</b></font>) and A (<b><font color="Grey">Grey</font></b>)</li>
+                <li><input type="radio" name="q5" value="A (Grey)">A (<font color="Grey"><b>Grey</b></font>)</li>
+                <li><input type="radio" name="q5" value="B (Blue)">B (<font color="Blue"><b>Blue</b></font>)</li>
+                <li><input type="radio" name="q5" value="C (Red)">C (<font color="Red"><b>Red</b></font>)</li>
+            </ul>
 
-                $('#turnsToWait').show();
-                $('#numToWait').text(turnswait);
-                //$('#playerVoted').text('player ' + (playerV+1) + ' voted');
 
-            };
+            <br /><br />
+            <img src="quizImages/Q5.png" alt="Question5" height=250 width=920 border=2><br />
+            6. This game has just ended. and these are your priorities. What is your score?
+            <ul style="margin-top: 1pt">
+                <li><input type="radio" name="q6" value="100">100</li>
+                <li><input type="radio" name="q6" value="70">70</li>
+                <li><input type="radio" name="q6" value="25">25</li>
+                <li><input type="radio" name="q6" value="10">10</li>
+            </ul>
 
-            game.client.gameOver = function (numOfCandidates, votes, votesL, turnsL, points, winner, currentWinner, whoVoted, playerString) {
-                imageClick = false;
-                $(".images").css('cursor', 'auto');
-                $(".images").hover().unbind();
-                //$('#votesLeft').text('Remaining votes: ' + votesL);
-                $('#turnsLeftnum').text(turnsL);
-                var numOfVotes = votes.split("#");
-                var winners = currentWinner.split("#");
-                var whoVotedString = whoVoted.split("#");
-                //if (showWhoVoted == true) {
-                   
-                //    for (var i = 0; i < numOfCandidates; i++) {
-                //        $('#voted' + i).text('Who voted: ' + whoVotedString[i + 1]);
-                //    }
-                //}
+            <input type="button" value="Check answers" onclick=" getScore(this.form,6,4,0) " style="padding: 5px;">
+            <input type="reset" value="Clear answers" style="padding: 5px;">
+            <br /><br /><br /><br /><br /><br /><br /><br />
+        </form>
+    </div>
 
-                resetVoteBars(numOfCandidates);
+    <div id="Quiz2" style="padding-left: 20px;">
+        <h1 style="padding-bottom: 10px; text-align: center;">The Voting Game Quiz</h1>
+    <form name="quiz">
+        <img src="quizImages/Q6.png" alt="Question1" height="5%" width="60%" border=2><br />
+        1.Who is the leading Candidate in the Poll?
+        <ul style="margin-top: 1pt">
+            <li><input type="radio" name="q1" value="Purple"><font color="Purple"><b>Purple</b></font></li>
+            <li><input type="radio" name="q1" value="Grey"><font color="Grey"><b>Grey</b></font></li>
+            <li><input type="radio" name="q1" value="Blue"><font color="Blue"><b>Blue</b></font></li>
+            <li><input type="radio" name="q1" value="Red"><font color="Red"><b>Red</b></font></li>
+        </ul>
+        <br />
+        <img src="quizImages/Q6.png" alt="Question2" height="5%" width="60%" border=2><br />
+        2. Who is your most prefered candidate?
+        <ul style="margin-top: 1pt">
+            <li><input type="radio" name="q2" value="Purple"><font color="Purple"><b>Purple</b></font></li>
+            <li><input type="radio" name="q2" value="Grey"><font color="Grey"><b>Grey</b></font></li>
+            <li><input type="radio" name="q2" value="Blue"><font color="Blue"><b>Blue</b></font></li>
+            <li><input type="radio" name="q2" value="Red"><font color="Red"><b>Red</b></font></li>
+        </ul>
+        <img src="quizImages/Q7.png" alt="Question3" height="5%" width="60%" border=2><br />
+        3. Suppose you voted for <font color="Red">Red</font> Candidate, and the picture above is the result of the election (<font color="Grey"><b>Grey</b></font> candidate won), how many coins will you get?
+        <ul style="margin-top: 1pt">
+            <li><input type="radio" name="q3" value="20">20</li>
+            <li><input type="radio" name="q3" value="15">15</li>
+            <li><input type="radio" name="q3" value="10">10</li>
+            <li><input type="radio" name="q3" value="0">0</li>
+        </ul>
+        <img src="quizImages/Q8.png" alt="Question4" height="5%" width="60%" border=2><br />
+        4. Suppose you voted for <font color="Grey"><b>Grey</b> </font> Candidate, and the picture above is the result of the election (<font color="Grey"><b>Grey</b></font> candidate won), how many coins will you get?
+        <ul style="margin-top: 1pt">
+            <li><input type="radio" name="q4" value="20">20</li>
+            <li><input type="radio" name="q4" value="15">15</li>
+            <li><input type="radio" name="q4" value="10">10</li>
+            <li><input type="radio" name="q4" value="0">0</li>
+        </ul>
+        <input type="button" value="Check answers" onclick=" getScore(this.form,4,4,6) " style="padding: 5px;">
+        <input type="reset" value="Clear answers" style="padding: 5px;">
+        <br /><br /><br /><br /><br /><br /><br /><br />
+    </form>
+    </div>
+            <div id="MainPage" style="display: none;">
+                <div class="ribbon">
+                    <h3>Welcome to the Voting Game</h3>
+                    <p>
+                        <br />
+                        <!--p> You will play a game of <b style="color: chartreuse;">5</b> Players with <b style="color: darkturquoise;">3</b> Candidates</p-->
+                        <button id="StartGame" class="button">Press To Start The Game</button><br /><br />
+                    </p>
+                </div>
+                <div id="StatusInfo" style="display: none;">
+                    <div class="ribbon">
+                        <p align="left" style="margin-bottom: 5px;"><span align="left" style="border-bottom: 1px solid deepskyblue; color: white; margin-bottom: 0px;"><b>Server Status:</b></span></p>
+                        <p align="left" id="waitStatus" style="margin-bottom: 0px; margin-top: 0px;"></p>
+                        <hr />
+                        <p align="left" style="font-family: monospace">
+                            Current players online: <span id="playersOnline" style="color: chartreuse"></span><br />
+                            Average waiting time: <span id="avgWaitTime" style="color: darkorange"></span><br />
+                        </p>
+                    </div>
+                </div>
+                <div id="TimePassed" style="display: none;">
+                    <div class="ribbon">
+                        <p>
+                            <div class="clock" style="margin-left: 4em;"></div>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div id="tableContainer" style="display: none;"></div>
 
-                updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
-
-                var pPoints = points.split('#');
-                $('#waitImg').hide();
-                $('#turnsToWait').hide();
-                //$('#playerVoted').text('');
-                $('#turnStatus').text('GAME OVER!!!');
-                if (winner.indexOf(',')>=0)
-                    $('#gameOverTxt').html('The winning candidates are: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
-                else
-                    $('#gameOverTxt').html('The winning candidate is: <i><b>' + winner + '</b></i><br/> Your score is: ' + pPoints[playerIndex + 1]);
-                //main.server.connectMsg('connect', $.connection.hub.id);
-                $('#nextGameP').show();
-                $('#gameOverTxt').show();
-            };
-            function resetVoteBars(numOfCandidates) {
-                for (var i = 0; i < numOfCandidates; i++) {
-                    for (var j = 0; j < numOfPlayers; j++) {
-                        $('#pcell' + i + j).css('background-image', 'none');
-                        $('#plabel' + i + j).text("");
-                    }
-                }
-            }
-            function updateVoteBars(numOfCandidates, whoVoted, winners, numOfVotes, playerString) {
-                for (var i = 0; i < numOfCandidates; i++) {
-                    var cVoted = whoVoted[i + 1].split(',');
-                    var glow = 0;
-                    for (var j = 1; j < winners.length; j++) {
-                        if (winners[j] == i)
-                            glow = 1;
-                    }
-
-                    for (var j = numOfPlayers - 1, k = 0; j >= (numOfPlayers - numOfVotes[i + 1]), k < cVoted.length; j--, k++) {
-                        if (cVoted[k] != "") {
-                            if (glow == 1) {
-                                $('#progBars' + i).css('border-color', '#FFCC00');
-                                $('#progBars' + i).css('border-width', '2px');
-                                $('#progBars' + i).css('box-shadow', '0 0 15px #FFCC00');
-                            } else {
-                                $('#progBars' + i).css('border-color', '#C0C0C0');
-                                $('#progBars' + i).css('border-width', '2px');
-                                $('#progBars' + i).css('box-shadow', 'none');
-                            }
-                            if (playerString == cVoted[k]) {
-                                $('#pcell' + i + j).css('background-image', "url('images/progressBar2green2.png')");
-                                $('#plabel' + i + j).css('font-weight', 'bold').css('font-size', 'large');
-                            } else {
-                                $('#pcell' + i + j).css('background-image', "url('images/progressBar2p2.png')");
-                                $('#plabel' + i + j).css('font-weight', 'normal').css('font-size', 'smaller');
-                            }
-
-                            if (showWhoVoted == true)
-                                $('#plabel' + i + j).text(cVoted[k]);
-                        }
-                        else {
-                            $('#progBars' + i).css('border-color', '#C0C0C0');
-                            $('#progBars' + i).css('border-width', '2px');
-                            $('#progBars' + i).css('box-shadow', 'none');
-                        }
-                    }
-
-                    if (numOfVotes[i + 1] < 10) {
-                        $('#progNum' + i).text(numOfVotes[i + 1]);
-                        $('#progNum' + i).css('margin-right', '10px');
-                    }
-
-                    else if (numOfVotes[i + 1] < 100) {
-                        $('#progNum' + i).text(numOfVotes[i + 1]);
-                        $('#progNum' + i).css('margin-right', '8px');
-                    }
-
-                }
-            }
-
-            $.connection.hub.start().done(function () {
-                $('#StartGame').click(function () {
-                    // Call the Send method on the hub.
-                    game.server.connectMsg('connect', $.connection.hub.id);
-                });
-            });
-        }); 
-        $(document).on('mousedown', '.images', function (event) {
-            if (imageClick) {
-                $(".images").hover().unbind();
-                //$(".images:not(#" + event.target.id + ")").fadeTo("fast", 0.5);
-                //$("#" + event.target.id).fadeTo("fast", 1);
-                var originalSrc = $(this).attr("src");
-                var srcClick = "images/user" + parseInt(originalSrc.substring(11,12)) + "_click.png";
-                $("#" + event.target.id).attr("src",srcClick);               
-                backFromDown = true;
-            }
-        });
-        $(document).on('mouseup', '.images', function(event) {
-            if (imageClick && backFromDown) {
-                var originalSrc = $(this).attr("src");
-                var srcClick = "images/user" + parseInt(originalSrc.substring(11, 12)) + "_hover.png";
-                $("#" + event.target.id).attr("src", srcClick);
-
-                clearInterval(barInterval);
-                $('#secbar').hide();
-                $('#turnStatus').text('Please wait for your turn');
-                $('#waitImg').show();
-                //$('#test').text('');
-                $('#voteStatus').text('');
-                imageClick = false;
-                backFromDown = false;
-                $(".images").css('cursor', 'auto');
-
-                game.server.voteDetails($.connection.hub.id, playerIndex, event.target.id);
-            }
-        });
-    </script>
 </body>
+<script src="ClientJS/client.js"></script>
 </html>
