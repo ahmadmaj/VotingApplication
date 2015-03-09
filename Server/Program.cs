@@ -13,6 +13,7 @@ namespace Server
     public static class Program
     {
         public static List<GameDetails> gameDetailsList = new List<GameDetails>();
+        public static Dictionary<string, Dictionary<string, double>> LotteryFeatureDictionary = new Dictionary<string, Dictionary<string, double>>();
         public static GameDetails gameDetails;
         public static Dictionary<string, UserVoter> ConnIDtoUser = new Dictionary<string, UserVoter>(); //for each playID the User class he is
         public static List<Game> PlayingGames = new List<Game>();
@@ -127,49 +128,6 @@ namespace Server
                     return null;
                 }
 
-
-
-
-
-
-                /*agents
-                List<Agent> agents = new List<Agent>();
-                Boolean isRounds = false;
-                if (numOfHumanPlayers < numOfPlayers)
-                {
-                    nextLine = sr.ReadLine();
-                    line = nextLine.Split(' ');
-                    if (line[0] == "agents:")
-                    {
-                        int numOfAgents = Convert.ToInt32(line[1]);
-                        Agent a;
-                        for (int i = 0; i < numOfAgents; i++)
-                        {
-                            nextLine = sr.ReadLine();
-                            a = readAgent(nextLine, numOfRounds, numberOfCandidates);
-                            if (a != null)
-                            {
-                                agents.Add(a);
-                                isRounds = a.isRounds();
-                            }
-                            else
-                            {
-                                Console.WriteLine("error while reading agent file");
-                                return null;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("error while reading agent file");
-                        return null;
-                    }
-                }
-                else // no agents
-                {
-                    nextLine = sr.ReadLine(); // skip ont the "agents:" line
-                }*/
-
                 return new GameDetails(numOfHumanPlayers, numOfPlayers, numberOfCandidates, numOfRounds, candnames,
                     playersOrder, points, priorities, whoVoted, startSecondRnd, Path.GetFileName(file));
             }
@@ -178,6 +136,35 @@ namespace Server
                 Debug.WriteLine("the file could not be read:");
                 Debug.WriteLine(e.Message);
                 return null;
+            }
+        }
+
+        public static void readDistribConfigFile(string fileName)
+        {
+            int x = 0;
+            LotteryFeatureDictionary.Clear();
+            try
+            {
+                XDocument xDoc = XDocument.Load(fileName);
+                var res = xDoc.Element("Lottery");
+                var features = res.Elements("Feature");
+                foreach (XElement dist in features)
+                {
+
+                    Dictionary<string, double> propvalues =
+                        dist.Elements()
+                            .Where(prob => prob.HasAttributes)
+                            .ToDictionary(prob => prob.Value, prob => Convert.ToDouble(prob.Attribute("num").Value));
+                    if (dist.HasAttributes)
+                        LotteryFeatureDictionary.Add(dist.Attribute("name").Value, propvalues);
+                    else
+                        LotteryFeatureDictionary.Add("Feature" + x++, propvalues);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("the file could not be read:");
+                Debug.WriteLine(e.Message);
             }
         }
     }

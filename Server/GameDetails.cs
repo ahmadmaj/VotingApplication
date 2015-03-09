@@ -19,7 +19,7 @@ namespace Server
         public readonly Boolean isRounds;// { get; private set; }
         public readonly int whoVoted;// { get; private set; }
         public readonly string startSecondRound;// { get; private set; }
-        public readonly string configFile;// { get; private set; }
+        public string configFile { get; private set; }
 
         public GameDetails(int humanPlayers, int players, int candidates, int rounds, List<string> candNames, List<string> player, List<int> points, List<List<string>> priority, int voted, string start, string config)
         {

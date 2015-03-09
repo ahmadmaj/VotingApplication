@@ -101,6 +101,10 @@
     <Compile Include="Connection\WaitingRoom.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameDetails.cs" />
+    <Compile Include="GameSelector\GenericDistribution.cs" />
+    <Compile Include="GameSelector\LotteryGame.cs" />
+    <Compile Include="GameSelector\MostlikelyRandom.cs" />
+    <Compile Include="GameSelector\PropotionSelector.cs" />
     <Compile Include="GUI\ServerManager.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -116,6 +120,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\Program.datasource" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">

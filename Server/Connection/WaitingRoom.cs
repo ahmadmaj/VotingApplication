@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using Server.GameSelector;
 
 namespace Server.Connection
 {
     static class WaitingRoom
     {
+        private static LotteryGame chooseGame = new MostlikelyRandom();
         public static List<UserVoter> waitingPlayers = new List<UserVoter>(); //for each playID the User class he is
         private static List<List<UserVoter>> sortedPlayers = new List<List<UserVoter>>();
 
@@ -70,71 +72,24 @@ namespace Server.Connection
             //Create number of games needed
             for (int x=0; x < waitingPlayers.Count/Program.gameDetails.numOfHumanPlayers; x++)
                 sortedPlayers.Add(new List<UserVoter>());
-                //Program.PlayingGames.Add(new Game(Program.gameDetails.Value));
 
-            //look for players under starvation
-            //TODO: fix this not a good idea...
-            /*
-            int minGames = int.MaxValue;
-            List<UserVoter> minPlayersList =  new List<UserVoter>(); 
-            foreach (UserVoter wP in waitingPlayers)
-            {
-                if (wP.NumGamesPlayed() == minGames)
-                    minPlayersList.Add(wP);
-                if (wP.NumGamesPlayed() < minGames)
-                {
-                    minGames = wP.NumGamesPlayed();
-                    minPlayersList.Clear();
-                    minPlayersList.Add(wP);
-                }
-            }
-            //shuffle the list of players under starvation and assign them to games
-            splitPlayersToGames(minPlayersList);*/
-            //shuffle the remaining players and assign them to games
             if (sortedPlayers.Any())
             {
                 List<UserVoter> garanteedToPlay = waitingPlayers.GetRange(0,
                     sortedPlayers.Count*Program.gameDetails.numOfHumanPlayers);
+
                 splitPlayersToGames(garanteedToPlay);
+
                 foreach (List<UserVoter> batchofplayers in sortedPlayers)
                 {
-                    DecideOnGame(batchofplayers);
+
+                    chooseGame.DecideOnGame(batchofplayers);
                     batchofplayers.Clear();
                 }
                 sortedPlayers.Clear();
             }
         }
 
-        private static void DecideOnGame(List<UserVoter> batchofplayers)
-        {
-            List<int> tmpWeight = Program.gameDetailsList.Select(possibGameDetails => batchofplayers.Sum(player => Convert.ToInt32(!player.HasPlayed(possibGameDetails.configFile)))).ToList();
-            int totalWeight = tmpWeight.Sum();
-            Random _rnd = new Random();
-            int randomNumber = _rnd.Next(1, totalWeight+1);
-            int x = 0;
-            GameDetails selecteDetails = Program.gameDetails;
-            foreach (int i in tmpWeight)
-            {
-                if (randomNumber <= i)
-                {
-                    selecteDetails = Program.gameDetailsList[x];
-                    break;
-                }
-                randomNumber -= i;
-                x++;
-            }
-            //TODO: Fix BUG HERE!!!
-            Game newGame = new Game(selecteDetails);
-            if (batchofplayers.Count() == newGame.numOfHumanPlayers)
-            {
-                foreach (UserVoter player in batchofplayers)
-                    newGame.addPlayerID(player);
-                Program.PlayingGames.Add(newGame);
-            }
-            else
-                foreach (UserVoter voter in batchofplayers)
-                    joinWaitingRnStart(voter);
-        }
 
         private static void splitPlayersToGames(List<UserVoter> playersList)
         {
