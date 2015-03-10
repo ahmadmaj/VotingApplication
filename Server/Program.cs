@@ -19,6 +19,7 @@ namespace Server
         public static List<Game> PlayingGames = new List<Game>();
         public static String logFolder = "";
         public static Boolean mTurkMode = false;
+        public static int numOfGames = 20;
         public static Boolean SinglePMode = false;
         public static bool LogAgents = true;
 

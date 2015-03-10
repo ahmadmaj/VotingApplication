@@ -160,7 +160,7 @@ namespace Server.Connection
             UserVoter tmpvoter;
             if (Program.ConnIDtoUser.TryGetValue(id, out tmpvoter))
             {
-                Boolean chk = tmpvoter.GamesHistory.Count != Program.gameDetailsList.Count;
+                Boolean chk = tmpvoter.GamesHistory.Count != Program.numOfGames;
                 Clients.Client(id).showNextGame(chk, tmpvoter.userID, tmpvoter.TotalScore,tmpvoter.mTurkToken);
                 if (!chk) Program.ConnIDtoUser.Remove(id);
             }

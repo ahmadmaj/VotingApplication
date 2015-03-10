@@ -303,5 +303,10 @@ namespace Server.GUI
                 UpdateTree();
             }
         }
+
+        private void textBox6_TextChanged(object sender, EventArgs e)
+        {
+            Program.numOfGames = Convert.ToInt32(textBox6.Text);
+        }
     }
 }
