@@ -30,7 +30,7 @@ namespace Server.GameSelector
             foreach (ProportionValue<string>[] pValues in Featureslist.Values)
             {
                 string selected = pValues.ChooseByRandom();
-                ListOfGames = (List<GameDetails>) ListOfGames.Where(gameDetailse => gameDetailse.configFile.Contains(selected));
+                ListOfGames = ListOfGames.Where(gameDetailse => gameDetailse.configFile.Contains(selected)).ToList();
             }
             if (ListOfGames.Count != 1)
               throw new InvalidOperationException(
@@ -39,7 +39,7 @@ namespace Server.GameSelector
             AssignToGame(ListOfGames[0], batchofplayers);
         }
 
-        public void TestDecideOnGame()
+        public GameDetails TestDecideOnGame()
         {
             List<GameDetails> ListOfGames = Program.gameDetailsList;
             string selectedFeatures = "";
@@ -54,6 +54,7 @@ namespace Server.GameSelector
                   "Not enough selective features");
 
             Console.WriteLine("Features: " + selectedFeatures + "\nSelected Game is: " + ListOfGames[0].configFile);
+            return ListOfGames[0];
         }
     }
 }

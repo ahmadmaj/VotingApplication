@@ -44,7 +44,7 @@ namespace Server.GUI
             // Allow the user to select multiple images. 
             _openFileDialog2.Multiselect = false;
             _openFileDialog2.RestoreDirectory = true;
-            _openFileDialog2.Title = "Select configuration files";
+            _openFileDialog2.Title = "Select distribution files";
             _openFileDialog2.InitialDirectory = Directory.GetCurrentDirectory();
         }
 
@@ -240,6 +240,9 @@ namespace Server.GUI
                 // Read the files 
                 Program.readDistribConfigFile(_openFileDialog2.FileName);
 
+                GenericDistribution chooseGame;
+                chooseGame = new GenericDistribution(Program.LotteryFeatureDictionary);
+                Program.gameDetails = chooseGame.TestDecideOnGame();
                 //loaded Config enable components
                 UpdateTree();
             }
