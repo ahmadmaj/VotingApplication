@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+    <head>
+        <title>Voting Game</title>
+    </head>
+    <body>
+        <script src="Scripts/jquery-2.1.1.min.js"></script>
+        <center>
+            <div id="Iterative">
+                <h1>The Voting Game - Iterative Treatment</h1>
+                <iframe src="https://docs.google.com/presentation/d/1s1B6yL4PSAGbPpLl0JtC7SBNa2Th51sDtr80JKnDD5M/embed?start=false&loop=false&delayms=3000" frameborder="0" width="960" height="749" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+            </div>
+            <div id="OneShot">
+                <h1>The Voting Game - OneShot Treatment</h1>
+                <iframe src="https://docs.google.com/presentation/d/1__Lgab1KHiLiQauI5tWq8zEWBRnSWjGZIWppF7Oo-uA/embed?start=false&loop=false&delayms=60000" frameborder="0" width="960" height="749" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+            </div>
+        </center>
+        <script>
+            var QueryString = function () {
+                // This function is anonymous, is executed immediately and 
+                // the return value is assigned to QueryString!
+                var query_string = {};
+                var query = window.location.search.substring(1);
+                var vars = query.split("&");
+                for (var i = 0; i < vars.length; i++) {
+                    var pair = vars[i].split("=");
+                    // If first entry with this name
+                    if (typeof query_string[pair[0]] === "undefined") {
+                        query_string[pair[0]] = pair[1];
+                        // If second entry with this name
+                    } else if (typeof query_string[pair[0]] === "string") {
+                        var arr = [query_string[pair[0]], pair[1]];
+                        query_string[pair[0]] = arr;
+                        // If third or later entry with this name
+                    } else {
+                        query_string[pair[0]].push(pair[1]);
+                    }
+                }
+                return query_string;
+            }();
+
+            $(function () {
+                $('#Iterative').hide();
+                $('#OneShot').hide();
+                if (QueryString['tut'] == "1")
+                    $('#Iterative').show();
+                else
+                    $('#OneShot').show();
+            });
+        </script>
+    </body>
+</html>

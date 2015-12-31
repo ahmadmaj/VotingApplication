@@ -25,7 +25,7 @@ namespace Server
 
         public static UserVoter getplayerUser(string id)
         {
-            UserVoter player = null;
+            UserVoter player;
             ConnIDtoUser.TryGetValue(id, out player);
             return player;
         }

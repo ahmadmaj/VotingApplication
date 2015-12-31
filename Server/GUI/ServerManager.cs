@@ -72,19 +72,18 @@ namespace Server.GUI
                     Program.gameDetailsList.Add(Program.readConfigFile(confile));
 
                 //loaded Config enable components
+                Program.gameDetails = Program.gameDetailsList.First();
                 StartServ.Enabled = true;
                 tabPage2.Enabled = true;
             }
         }
 
         private void StartServ_Click(object sender, EventArgs e)
-        {
+        {  
             string url = "http://localhost:8010";
             WebApp.Start<Startup>("http://+:8010");
             Console.WriteLine("Server running on {0}", url);
             Program.logFolder = DateTime.Now.ToString("ddMMyy_HHmm");
-
-
         }
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
@@ -161,7 +160,7 @@ namespace Server.GUI
             // If these threads are different, it returns true. 
             if (txtConsole.InvokeRequired)
             {
-                SetTextCallback d = new SetTextCallback(SetText);
+                SetTextCallback d = SetText;
                 Invoke(d, new object[] {text});
             }
             else
@@ -242,9 +241,17 @@ namespace Server.GUI
 
                 GenericDistribution chooseGame;
                 chooseGame = new GenericDistribution(Program.LotteryFeatureDictionary);
-                Program.gameDetails = chooseGame.TestDecideOnGame();
-                //loaded Config enable components
-                UpdateTree();
+                try
+                {
+                    Program.gameDetails = chooseGame.TestDecideOnGame();
+                    //loaded Config enable components
+                    UpdateTree();
+                }
+                    
+                catch (InvalidOperationException exp){
+                    MessageBox.Show("You did not load any configurations");    
+                }
+                
             }
         }
 
@@ -310,6 +317,35 @@ namespace Server.GUI
         private void textBox6_TextChanged(object sender, EventArgs e)
         {
             Program.numOfGames = Convert.ToInt32(textBox6.Text);
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            Application.Restart();
+        }
+
+        private void txtConsole_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                //click event
+                //MessageBox.Show("you got it!");
+                ContextMenu contextMenu = new ContextMenu();
+                MenuItem menuItem = new MenuItem("&Export to Clipboard");
+                menuItem.Click += CopyToClip;
+                contextMenu.MenuItems.Add(menuItem);
+                txtConsole.ContextMenu = contextMenu;
+            }
+        }
+        void CopyToClip(object sender, EventArgs e)
+        {
+            txtConsole.SelectAll();
+            if (txtConsole.SelectedText != "")
+                Clipboard.SetText(txtConsole.SelectedText);
+            txtConsole.DeselectAll();
+            txtConsole.SelectionStart = txtConsole.Text.Length;
+            txtConsole.ScrollToCaret();
+            
         }
     }
 }

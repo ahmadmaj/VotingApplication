@@ -9,7 +9,7 @@ namespace Server.Connection
 {
     static class WaitingRoom
     {
-        private static LotteryGame chooseGame = new GenericDistribution(Program.LotteryFeatureDictionary);  //new MostlikelyRandom();
+        private static LotteryGame chooseGame = new MostlikelyRandom();//GenericDistribution(Program.LotteryFeatureDictionary);  //new 
         public static List<UserVoter> waitingPlayers = new List<UserVoter>(); //for each playID the User class he is
         private static List<List<UserVoter>> sortedPlayers = new List<List<UserVoter>>();
 

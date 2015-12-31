@@ -105,6 +105,8 @@
     <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.tooltip.min.css" />
+    <Content Include="Scripts\jquery.signalR.min.js" />
+    <Content Include="tutorial.html" />
     <Content Include="GamePage.html" />
     <Content Include="images\animated-overlay.gif" />
     <Content Include="images\progressBar.png" />
@@ -128,7 +130,6 @@
     <None Include="Scripts\jquery-2.1.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.1.min.js" />
     <Content Include="Scripts\jquery-ui-1.10.4.min.js" />
-    <Content Include="Scripts\jquery.signalR-2.0.3.min.js" />
     <Content Include="StyleGame.css" />
     <Content Include="Web.config" />
   </ItemGroup>

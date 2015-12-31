@@ -100,7 +100,7 @@ namespace Server
             this.writeToFile.Add("number of players:," + gamedets.players.Count);
             this.writeToFile.Add("number of candidates:," + this.numOfCandidates);
             this.writeToFile.Add("game ended after:,");
-            this.writeToFile.Add("player,priorities");
+            this.writeToFile.Add("player,priorities,connID/MturkID");
             this.logUpdated = false;
             this.agents = new List<Agent>();
             int idx = -1;
@@ -458,7 +458,6 @@ namespace Server
         {
             if (logUpdated == false)
             {
-                int j = 5;
                 //priorities
                 string priorityString = "";
                 //titles
@@ -472,14 +471,22 @@ namespace Server
                     if (playersTypeOrder[i] != "human") agentidx++;
                     if (playersTypeOrder[i] == "human" || Program.LogAgents)
                     {
+                        UserVoter tmp = null;
                         if (playersTypeOrder[i] != "human")
                             priorityString = "comp_" + agents[agentidx].agentsIDinGame;
 
-                        else
-                            priorityString = Program.ConnIDtoUser[playersID[gethumanNumber(i)]].userID.ToString();
+                        else{
+                            tmp = Program.ConnIDtoUser[playersID[gethumanNumber(i)]];
+                            priorityString = tmp.userID.ToString();
+                        }
 
                         for (int k = 0; k < priorities[i].Count; k++)
                             priorityString = priorityString + "," + (candidatesNames.IndexOf(priorities[i][k]) + 1);
+
+                        if (tmp != null) 
+                            priorityString = tmp.mTurkID.Length > 0 ? priorityString + "," + tmp.mTurkID : priorityString + "," +  tmp.connectionID;
+                        writeToFile.Add(priorityString);
+
                     }
                         if (playersTypeOrder[i] == "human")
                             titles += "points player" +
@@ -490,7 +497,6 @@ namespace Server
                 }
                 titles = titles.Remove(titles.Length - 1);
 
-                writeToFile.Insert(j, priorityString);
                 writeToFile.Add(titles);
                 logUpdated = true;
                 timeStarted = DateTime.Now;

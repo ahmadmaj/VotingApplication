@@ -29,13 +29,16 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Config = new System.Windows.Forms.Button();
             this.txtConsole = new System.Windows.Forms.RichTextBox();
             this.StartServ = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.button8 = new System.Windows.Forms.Button();
+            this.textBox6 = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.SinglePMode = new System.Windows.Forms.CheckBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
@@ -68,8 +71,6 @@
             this.button2 = new System.Windows.Forms.Button();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.programBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.label7 = new System.Windows.Forms.Label();
-            this.textBox6 = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage5.SuspendLayout();
@@ -109,14 +110,15 @@
             this.txtConsole.Size = new System.Drawing.Size(375, 140);
             this.txtConsole.TabIndex = 2;
             this.txtConsole.Text = "";
+            this.txtConsole.MouseUp += new System.Windows.Forms.MouseEventHandler(this.txtConsole_MouseUp);
             // 
             // StartServ
             // 
             this.StartServ.Enabled = false;
-            this.StartServ.Location = new System.Drawing.Point(178, 110);
+            this.StartServ.Location = new System.Drawing.Point(266, 152);
             this.StartServ.Margin = new System.Windows.Forms.Padding(2);
             this.StartServ.Name = "StartServ";
-            this.StartServ.Size = new System.Drawing.Size(91, 19);
+            this.StartServ.Size = new System.Drawing.Size(91, 40);
             this.StartServ.TabIndex = 3;
             this.StartServ.Text = "Start Server";
             this.StartServ.UseVisualStyleBackColor = true;
@@ -141,7 +143,7 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.tabPage1.Controls.Add(this.button8);
             this.tabPage1.Controls.Add(this.textBox6);
             this.tabPage1.Controls.Add(this.label7);
             this.tabPage1.Controls.Add(this.checkBox2);
@@ -157,10 +159,40 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Initialization";
             // 
+            // button8
+            // 
+            this.button8.Image = global::Server.Properties.Resources.Restart;
+            this.button8.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button8.Location = new System.Drawing.Point(266, 6);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(91, 38);
+            this.button8.TabIndex = 9;
+            this.button8.Text = "Restart";
+            this.button8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
+            // 
+            // textBox6
+            // 
+            this.textBox6.Location = new System.Drawing.Point(135, 61);
+            this.textBox6.Name = "textBox6";
+            this.textBox6.Size = new System.Drawing.Size(52, 20);
+            this.textBox6.TabIndex = 8;
+            this.textBox6.Text = "20";
+            this.textBox6.TextChanged += new System.EventHandler(this.textBox6_TextChanged);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(5, 63);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(127, 13);
+            this.label7.TabIndex = 7;
+            this.label7.Text = "Number of games to play:";
+            // 
             // checkBox2
             // 
             this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(30, 89);
+            this.checkBox2.Location = new System.Drawing.Point(30, 130);
             this.checkBox2.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(108, 17);
@@ -172,7 +204,7 @@
             // SinglePMode
             // 
             this.SinglePMode.AutoSize = true;
-            this.SinglePMode.Location = new System.Drawing.Point(30, 67);
+            this.SinglePMode.Location = new System.Drawing.Point(30, 108);
             this.SinglePMode.Margin = new System.Windows.Forms.Padding(2);
             this.SinglePMode.Name = "SinglePMode";
             this.SinglePMode.Size = new System.Drawing.Size(117, 17);
@@ -184,7 +216,7 @@
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(16, 46);
+            this.checkBox1.Location = new System.Drawing.Point(16, 87);
             this.checkBox1.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(87, 17);
@@ -443,9 +475,9 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.NullValue = "0";
-            this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.NullValue = "0";
+            this.dataGridView1.RowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.ShowEditingIcon = false;
             this.dataGridView1.ShowRowErrors = false;
@@ -516,36 +548,14 @@
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.RowHeadersVisible = false;
             this.dataGridView2.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle4.NullValue = "0";
-            this.dataGridView2.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.NullValue = "0";
+            this.dataGridView2.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView2.RowTemplate.Height = 24;
             this.dataGridView2.ShowEditingIcon = false;
             this.dataGridView2.ShowRowErrors = false;
             this.dataGridView2.Size = new System.Drawing.Size(358, 163);
             this.dataGridView2.TabIndex = 1;
-            // 
-            // programBindingSource
-            // 
-            this.programBindingSource.DataSource = typeof(Server.Program);
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(175, 46);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(127, 13);
-            this.label7.TabIndex = 7;
-            this.label7.Text = "Number of games to play:";
-            // 
-            // textBox6
-            // 
-            this.textBox6.Location = new System.Drawing.Point(305, 44);
-            this.textBox6.Name = "textBox6";
-            this.textBox6.Size = new System.Drawing.Size(52, 20);
-            this.textBox6.TabIndex = 8;
-            this.textBox6.Text = Program.numOfGames.ToString();
-            this.textBox6.TextChanged += new System.EventHandler(this.textBox6_TextChanged);
             // 
             // ServerManager
             // 
@@ -619,5 +629,6 @@
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.TextBox textBox6;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button button8;
     }
 }

@@ -229,7 +229,7 @@ body {
     margin: 10px auto;
     padding: 0 10px 0;
     position: relative;
-    width: 394px;
+    width: 405px;
 }
 
 .ribbon h3 {
@@ -249,7 +249,7 @@ body {
     position: relative;
     text-shadow: 0 1px 1px #111;
     top: 8px;
-    width: 404px;
+    width: 415px;
 }
 
 .ribbon h3::before,

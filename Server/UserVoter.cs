@@ -25,22 +25,22 @@ namespace Server
 
         public UserVoter(string connectionId, string workerID = "", string assID= "")
         {
-            this.userID = Interlocked.Increment(ref nextId);  
-            this.connectionID = connectionId;
-            this.mTurkID = workerID;
+            userID = Interlocked.Increment(ref nextId);  
+            connectionID = connectionId;
+            mTurkID = workerID;
             this.assID = assID;
 
                 Guid g = Guid.NewGuid();
                 string GuidString = Convert.ToBase64String(g.ToByteArray());
                 GuidString = GuidString.Replace("=", "");
                 GuidString = GuidString.Replace("+", "");
-                this.mTurkToken = GuidString;
+                mTurkToken = GuidString;
             
-            this.CurrScore = 0;
-            this.TotalScore = 0;
-            this.CurrPriority = new List<int>();
-            this.GamesHistory = new List<Game>();
-            this.ConnectTime = DateTime.Now;
+            CurrScore = 0;
+            TotalScore = 0;
+            CurrPriority = new List<int>();
+            GamesHistory = new List<Game>();
+            ConnectTime = DateTime.Now;
             Console.WriteLine("[{0}] Connected: Player {1} ({2})", DateTime.Now.ToString("HH:mm:ss"),userID, mTurkID != "" ? mTurkID : connectionId);
         }
 

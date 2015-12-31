@@ -65,19 +65,20 @@ var uID;
 var game;
 var names;
 var moregames = true;
-
-
+var dontshow;
+var startime;
 $.connection.hub.url = "http://localhost:8010/signalr";
 
 
 function progressBarFunc(x) {
     var x = x || function () { };
     $("#prog_status").html(MaxSec);
-    sec = MaxSec;
     $(".progress_bar").animate({ width: "99%" }, 0, function () {
+        sec = MaxSec;
         $('#timeremaining').show();
         x();
         animate2();
+        window.clearInterval(barInterval);
         barInterval = window.setInterval(animate2, 1000);
     });
 }
@@ -89,6 +90,7 @@ function animate2() {
     $(".progress_bar").animate({ width: val + "%" }, 1000, "linear");
     if (sec < 0) {
         window.clearInterval(barInterval);
+        sec = MaxSec;
         backFromDown = true;
         $('#' + defaultVote).trigger('mouseup');
     } 
@@ -116,18 +118,49 @@ var QueryString = function() {
     }
     return query_string;
 }();
+
 var getGetOrdinal = function(n) {
     var s = ["th", "st", "nd", "rd"],
         v = n % 100;
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
 };
 
+function updateQueryStringParameter(uri, key, value) {
+    var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+    var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+    if (uri.match(re)) {
+        return uri.replace(re, '$1' + key + "=" + value + '$2');
+    }
+    else {
+        return uri + separator + key + "=" + value;
+    }
+}
+
 
 $(function () {
+
     //Set the hubs URL for the connection
     var numOfPlayers = 0;
     var showWhoVoted = 0;
     var clock; //The Clock Object
+    switch (QueryString['quiz']) {
+        case "6969":
+            $('#Quiz').hide();
+            $('#Quiz2').hide();
+            $('#MainPage').show();
+            break;
+        case "1":
+            $('#Quiz').show();
+            $('#Quiz2').hide();
+            break;
+        case "2":
+            $('#Quiz').hide();
+            $('#Quiz2').show();
+            break;
+        default:
+            break;
+    }
+
 
 
     // Declare a proxy to reference the hub.
@@ -136,6 +169,14 @@ $(function () {
         $('body').replaceWith("<div><h1 style=\"text-align: center;\">We are sorry!<br/> There seems to be a problem with the server.</h1></div>");
         return;
     }
+    if (QueryString['workerId'] == null) {
+        var person = prompt("Please enter station ID", "ISE-12");
+        if (person != null) {
+            dontshow = 0;
+            window.location.href = updateQueryStringParameter(window.location.href, "workerId", person);
+        }
+    }
+
     game.client.startGameMsg = function(msg) {
 
         if (msg == "wait") {
@@ -300,7 +341,7 @@ $(function () {
                 pTable = $('<table class="progBars" id="progBars' + i + '"height="100%" width="30%"></table><label class="numVoteslabel" id="progNum' + i + '"></label>');
 
                 var pheight = 100 / numPlayers;
-                if (pheight > 1) {
+                if (false) {//(pheight > 1) {
                     for (var k = 0; k < numPlayers; k++) {
                         prow = $('<tr width="100%" style="height:' + pheight + '%"></tr>');
                         pcell = ('<td id="pcell' + i + k + '" width="100%" align="center" style="border: none;"><label class="progLabel" id="plabel' + i + k + '" style="margin-right:0px"></label></td>');
@@ -357,6 +398,7 @@ $(function () {
                         $("#" + event.target.id).attr("src", imgsrc);
                     }
                 );
+                startime = new Date().getTime();
                 progressBarFunc();
             } else {
                 imageClick = false;
@@ -399,7 +441,7 @@ $(function () {
     }; //details function
 
     game.client.yourTurn = function() {
-        progressBarFunc(function () {
+       // progressBarFunc(function () {
             $('#waitImg').hide();
             $('#turnsToWait').hide();
             $(".images").each(function () {
@@ -423,8 +465,19 @@ $(function () {
                     $("#" + event.target.id).attr("src", imgsrc);
                 }
             );
-        });
-        
+            $("#prog_status").html(MaxSec);
+            startime = new Date().getTime();
+            $(".progress_bar").animate({ width: "99%" }, 0, function () {
+                sec = MaxSec;
+                $('#timeremaining').show();
+               // x();
+                animate2();
+                window.clearInterval(barInterval);
+                barInterval = window.setInterval(animate2, 1000);
+            });
+           
+
+        //});    
     };
 
     game.client.votedUpdate = function(numOfCandidates, votes, votesL, turnsL, defaultCand, voting, winner, whoVoted, playerString, turnsWait) {
@@ -438,11 +491,11 @@ $(function () {
         var winners = winner.split("#");
         var whoVotedString = whoVoted.split("#");
         updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
-
-
     };
 
     game.client.otherVotedUpdate = function(numOfCandidates, votes, votesL, turnsL, voting, winner, whoVoted, playerString, turnswait) {
+        $('#turnsToWait').show();
+        $('#numToWait').text(turnswait);
         //$('#turnStatus').text('Please wait for player ' + (voting + 1) + ' to vote');
         //$('#votesLeft').text('Remaining votes: ' + votesL);
         $('#turnsLeftnum').text(turnsL);
@@ -450,10 +503,6 @@ $(function () {
         var winners = winner.split("#");
         var whoVotedString = whoVoted.split("#");
         updateVoteBars(numOfCandidates, whoVotedString, winners, numOfVotes, playerString);
-
-        $('#turnsToWait').show();
-        $('#numToWait').text(turnswait);
-
     };
 
     game.client.gameOver = function(numOfCandidates, votes, votesL, turnsL, points, winner, currentWinner, whoVoted, playerString) {
@@ -532,7 +581,7 @@ $(function () {
                     "box-shadow": "inset 2px 2px 2px 2px #888"
                 });
             }
-            if (numOfPlayers <= 30) {
+            if (false) {//(numOfPlayers <= 30) {
                 for (var j = numOfPlayers - 1, k = 0; j >= (numOfPlayers - numOfVotes[i + 1]), k < cVoted.length; j--, k++) {
                     if (cVoted[k] != "") {
                         $('#pcell' + i + j).addClass('Vote');
@@ -600,17 +649,20 @@ $(document).on('mouseup', '.images', function(event) {
         if (duration < 0)
             duration = 0;
         $("#ToWhoYou").show();
-        $("#towhoyouVoted").text(names[parseInt(event.target.id)+1] );
-        game.server.voteDetails($.connection.hub.id, playerIndex, event.target.id, duration);
+        $("#towhoyouVoted").text(names[parseInt(event.target.id) + 1]);
+        var end = new Date().getTime();
+        var time = end - startime;
+        game.server.voteDetails($.connection.hub.id, playerIndex, event.target.id, time);
     }
 });
 
-    window.onbeforeunload = function(e) {
-        e = e || window.event;
-        // For IE and Firefox prior to version 4
-        if (e) {
-            e.returnValue = 'Leaving will lose all your progress?';
-        }
-        // For Safari
-        return 'Leaving will lose all your progress?';
-    };
+window.onbeforeunload = function(e) {
+    if (dontshow == 0) return;
+    e = e || window.event;
+    // For IE and Firefox prior to version 4
+    if (e) {
+        e.returnValue = 'Leaving will lose all your progress?';
+    }
+    // For Safari
+    return 'Leaving will lose all your progress?';
+};

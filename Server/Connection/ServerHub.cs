@@ -13,7 +13,7 @@ namespace Server.Connection
     [HubName("serverHub")]
     public class ServerHub : Hub
     {
-        public override Task OnDisconnected()
+        public override Task OnDisconnected(bool stopCalled)
         {
             Game theGame = Program.getplayersGame(Context.ConnectionId);
             UserVoter removedVoter = null;
@@ -59,12 +59,12 @@ namespace Server.Connection
                                     {
                                         theGame.humanTurn = 0;
                                         updateOtherPlayers(theGame, Context.ConnectionId, playerIndex, next);
-                                        updatePlayer(theGame, Context.ConnectionId, playerIndex, next);
+                                        UpdatePlayer(theGame, Context.ConnectionId, playerIndex, next);
                                     }
                                     else
                                     {
                                         updateOtherPlayers(theGame, Context.ConnectionId, playerIndex, next);
-                                        updatePlayer(theGame, Context.ConnectionId, playerIndex, next);
+                                        UpdatePlayer(theGame, Context.ConnectionId, playerIndex, next);
                                     }
                                 }
                             }
@@ -90,7 +90,10 @@ namespace Server.Connection
             UserVoter newplayer;
             if (!Program.ConnIDtoUser.TryGetValue(id, out newplayer))
             {
-                newplayer = data.Count != 0 ? new UserVoter(id, data["workerId"].ToString(), data["assignmentId"].ToString()) : new UserVoter(id);
+                newplayer = new UserVoter(id, 
+                    data["workerId"] != null ? data["workerId"].ToString() : "",
+                    data["assignmentId"] != null ? data["assignmentId"].ToString() : "");
+      
                 Program.ConnIDtoUser.Add(id, newplayer);
             }
 
@@ -180,6 +183,7 @@ namespace Server.Connection
             }
         }
         //sent when the client voted
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void VoteDetails(string id, int playerIndex, int candidate, int time)
         {
             Game thegame = Program.getplayersGame(id);
@@ -211,11 +215,10 @@ namespace Server.Connection
                                         ("p" + (playerIDX + 1)), thegame.turnsToWait(playerIDX));
                             }
                         }
-                        if (next != -1){
-                            updateOtherPlayers(thegame, id, playerIndex, next);
-                            updatePlayer(thegame, id, playerIndex, next);
-                        }
-                        
+                        if (next != -1)
+                            //updateOtherPlayers(thegame, id, playerIndex, next);
+                            //UpdatePlayer(thegame, id, playerIndex, next);
+                            Clients.Client(thegame.getPlayerID(thegame.humanTurn)).YourTurn();
                         else
                             sendGameOver(thegame);
                     }
@@ -246,14 +249,16 @@ namespace Server.Connection
             }
         }
 
-        private void updatePlayer(Game game, string id, int playerIndex, int next)
+        private void UpdatePlayer(Game game, string id, int playerIndex, int next)
         {
             UserVoter playerUser;
             if (Program.ConnIDtoUser.TryGetValue(id, out playerUser))
-            {
                 //numOfCandidates, votes, votesL, turnsL, defaultCand, voting, winner, whoVoted, playerString, turnsWait
-                Clients.Client(id).VotedUpdate(game.numOfCandidates, game.createNumOfVotesString(playerUser), game.votesPerPlayer[playerIndex], game.getTurnsLeft(), game.getDefault(playerIndex), next, game.getCurrentWinner(playerIndex), game.createWhoVotedString(playerIndex), ("p" + (playerIndex + 1)), game.turnsToWait(playerIndex));
-            }
+                Clients.Client(id)
+                    .VotedUpdate(game.numOfCandidates, game.createNumOfVotesString(playerUser),
+                        game.votesPerPlayer[playerIndex], game.getTurnsLeft(), game.getDefault(playerIndex), next,
+                        game.getCurrentWinner(playerIndex), game.createWhoVotedString(playerIndex),
+                        ("p" + (playerIndex + 1)), game.turnsToWait(playerIndex));
 
             Clients.Client(game.getPlayerID(game.humanTurn)).YourTurn();
         }
